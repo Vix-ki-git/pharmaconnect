@@ -1,0 +1,14 @@
+# IntelliJ settings
+.idea/
+*.iml
+out/
+gen/
+
+# Build folders
+backend/target/
+frontend/node_modules/
+frontend/build/
+
+# OS junk
+.DS_Store
+Thumbs.db
