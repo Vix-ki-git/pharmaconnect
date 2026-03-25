@@ -1,4 +1,4 @@
-package com.pharmaconnect.backend;
+package com.cts.mfrp.pc;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

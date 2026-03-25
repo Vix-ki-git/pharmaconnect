@@ -1,15 +1,13 @@
-# IntelliJ settings
-.idea/
-*.iml
-out/
-gen/
-
 # Build folders
-backend/target/
+target/
+pc/target/
 frontend/node_modules/
 frontend/build/
 
-backend/src/main/resources/application.properties
-# OS junk
-.DS_Store
-Thumbs.db
+# IDE settings
+.idea/
+*.iml
+out/
+
+# Secrets
+**/application.properties

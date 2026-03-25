@@ -1,4 +1,4 @@
-package com.pharmaconnect.backend;
+package com.cts.mfrp.pc;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
