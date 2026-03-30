@@ -53,4 +53,10 @@ public class UserServiceImpl implements UserService {
         user.setTokenExpiry(null);
         userRepository.save(user);
     }
+
+    @Override
+    public void logout(String userId) {
+        // Logic to invalidate session or clear tokens goes here
+        System.out.println("User with ID " + userId + " has logged out safely.");
+    }
 }

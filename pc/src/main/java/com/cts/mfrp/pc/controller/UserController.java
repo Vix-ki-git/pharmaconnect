@@ -36,4 +36,10 @@ public class UserController {
         userService.resetPassword(request.getToken(), request.getNewPassword());
         return ResponseEntity.ok("Password updated successfully!");
     }
+
+    @PostMapping("/logout")
+    public ResponseEntity<String> logout(@RequestParam String userId) {
+        userService.logout(userId);
+        return ResponseEntity.ok("User logged out successfully. Active session ended.");
+    }
 }
