@@ -1,8 +1,13 @@
 # Build folders
+pc-frontend/node_modules/
+pc-frontend/dist/
+pc-frontend/.angular/
+
+# --- Backend (Spring Boot / pc) ---
 target/
 pc/target/
-frontend/node_modules/
-frontend/build/
+*.jar
+*.war
 
 # IDE settings
 .idea/
@@ -11,3 +16,4 @@ out/
 
 # Secrets
 **/application.properties
+.env
