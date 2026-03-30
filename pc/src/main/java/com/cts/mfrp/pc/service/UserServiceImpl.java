@@ -28,4 +28,29 @@ public class UserServiceImpl implements UserService {
         // id is UUID generated, createdAt is handled by @CreationTimestamp
         return userRepository.save(user);
     }
+
+    @Override
+    public String initiatePasswordReset(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String token = java.util.UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setTokenExpiry(java.time.LocalDateTime.now().plusMinutes(15));
+
+        userRepository.save(user);
+        return token;
+    }
+
+    @Override
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByResetToken(token)
+                .filter(u -> u.getTokenExpiry().isAfter(java.time.LocalDateTime.now()))
+                .orElseThrow(() -> new RuntimeException("Invalid or expired token"));
+
+        user.setPasswordHash(newPassword);
+        user.setResetToken(null);
+        user.setTokenExpiry(null);
+        userRepository.save(user);
+    }
 }

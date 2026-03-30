@@ -19,6 +19,13 @@ public class User {
     @Column(updatable = false, nullable = false, columnDefinition = "VARCHAR(36)")
     private String id;
 
+    // Add these to your User class
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "token_expiry")
+    private java.time.LocalDateTime tokenExpiry;
+
     private String name;
 
     @Column(unique = true)
