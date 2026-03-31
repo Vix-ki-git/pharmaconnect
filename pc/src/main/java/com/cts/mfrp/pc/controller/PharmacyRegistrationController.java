@@ -8,7 +8,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/seller-onboarding") // Makes the domain context obvious
-@CrossOrigin(origins = "*")
 public class PharmacyRegistrationController {
 
     private final PharmacyRegistrationService pharmacyRegistrationService;
