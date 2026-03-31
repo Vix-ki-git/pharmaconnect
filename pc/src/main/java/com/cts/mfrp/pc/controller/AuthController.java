@@ -13,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-// 🚨 Notice: I removed @CrossOrigin("*") because your SecurityConfig handles it now!
 public class AuthController {
 
     private final AuthService authService;
@@ -22,7 +21,6 @@ public class AuthController {
         this.authService = authService;
     }
 
-    // 🛠️ NEW: This helper method builds a secure, HttpOnly cookie
     private ResponseCookie createSessionCookie(String token) {
         return ResponseCookie.from("AUTH_SESSION", token)
                 .httpOnly(true)       // Prevents XSS attacks (Angular can't read it, only the browser can)
@@ -80,3 +78,5 @@ public class AuthController {
         }
     }
 }
+
+

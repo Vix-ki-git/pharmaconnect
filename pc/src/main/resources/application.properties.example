@@ -27,4 +27,8 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+<<<<<<< HEAD
 >>>>>>> 052cb3b243d688dee714e4f51f0d064cf00ce334
+=======
+
+>>>>>>> 89fd685e3acb215642db22c74aca9e5a06a12bd2
