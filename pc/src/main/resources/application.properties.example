@@ -11,7 +11,7 @@ spring.datasource.url=jdbc:mysql://localhost:3306/pharmaconnect?useSSL=false&ser
 spring.datasource.username=root
 # TODO: Enter your local MySQL password below. 
 # Do NOT commit your real password to GitHub!
-spring.datasource.password=
+spring.datasource.password=2004
 
 # ===============================
 # JPA / HIBERNATE CONFIGURATION
@@ -24,3 +24,4 @@ spring.jpa.show-sql=true
 spring.jpa.properties.hibernate.format_sql=true
 
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+
