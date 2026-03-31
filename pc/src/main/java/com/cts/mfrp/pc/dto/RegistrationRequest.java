@@ -21,7 +21,5 @@ public class RegistrationRequest {
     @Pattern(regexp = "^[0-9]{10}$", message = "Phone number must be 10 digits")
     private String phone;
 
-    @NotBlank(message = "Role is required")
-    @Pattern(regexp = "BUYER|SELLER", message = "Role must be either BUYER or SELLER")
-    private String role;
+
 }

@@ -18,6 +18,10 @@ import java.util.Collections;
 @EnableWebSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
+    @Bean
+    public org.springframework.security.crypto.password.PasswordEncoder passwordEncoder() {
+        return new org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder();
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -30,7 +34,7 @@ public class SecurityConfig {
 
                 // 3. Define Authorization Rules
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/auth/**").permitAll() // Open your registration endpoint
+                        .requestMatchers("/api/**").permitAll() // Open your registration endpoint
                         .anyRequest().authenticated()
                 )
 
