@@ -50,4 +50,37 @@ public class AuthService {
             throw new RuntimeException("Invalid ID token.");
         }
     }
+
+    public String initiatePasswordReset(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // If the user is an OAuth user, they shouldn't reset via our app
+        if ("OAUTH_USER".equals(user.getPasswordHash())) {
+            throw new RuntimeException("Please reset your password through your Google Account settings.");
+        }
+
+        String token = java.util.UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setTokenExpiry(java.time.LocalDateTime.now().plusMinutes(15));
+        userRepository.save(user);
+        return token;
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByResetToken(token)
+                .filter(u -> u.getTokenExpiry().isAfter(java.time.LocalDateTime.now()))
+                .orElseThrow(() -> new RuntimeException("Invalid or expired token"));
+
+        user.setPasswordHash(newPassword); // In a real app, encrypt this!
+        user.setResetToken(null);
+        user.setTokenExpiry(null);
+        userRepository.save(user);
+    }
+
+    public void logout(String email) {
+        // For now, we log the activity.
+        // In the future, you could add a "last_logout" timestamp to the User table.
+        System.out.println("User " + email + " has logged out from Smart Pharma Connect.");
+    }
 }

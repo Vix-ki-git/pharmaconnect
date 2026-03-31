@@ -26,4 +26,16 @@ public class AuthController {
             return ResponseEntity.status(401).body("Authentication failed: " + e.getMessage());
         }
     }
+
+    @PostMapping("/forgot-password")
+    public ResponseEntity<?> forgotPassword(@RequestBody java.util.Map<String, String> request) {
+        String token = authService.initiatePasswordReset(request.get("email"));
+        return ResponseEntity.ok("Reset token generated: " + token);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@RequestParam String email) {
+        authService.logout(email);
+        return ResponseEntity.ok("Successfully logged out.");
+    }
 }

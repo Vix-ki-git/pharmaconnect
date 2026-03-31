@@ -8,6 +8,6 @@ public class UserDTO {
     private String email;
     private String password;
     private String phoneNumber;
-    private Float latitude;  // Changed to Float to match User.java
-    private Float longitude; // Changed to Float to match User.java
+    private Float latitude;
+    private Float longitude;
 }
