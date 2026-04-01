@@ -22,15 +22,12 @@ public class PharmacyRegistrationService {
     @Transactional
     public Pharmacy registerNewPharmacyForSeller(SellerPharmacyRegistrationRequestDto registrationRequestDto) {
 
-        // 1. Locate the existing user who is trying to become a seller
         User prospectiveSeller = userRepository.findByEmail(registrationRequestDto.getSellerEmailAddress())
                 .orElseThrow(() -> new RuntimeException("User account not found for email: " + registrationRequestDto.getSellerEmailAddress()));
 
-        // 2. Upgrade the user's role from BUYER to SELLER
         prospectiveSeller.setRole("SELLER");
         userRepository.save(prospectiveSeller);
 
-        // 3. Map the incoming DTO to the Database Entity
         Pharmacy newPharmacyEntity = new Pharmacy();
         newPharmacyEntity.setName(registrationRequestDto.getPharmacyName());
         newPharmacyEntity.setAddress(registrationRequestDto.getPharmacyAddress());
@@ -38,13 +35,11 @@ public class PharmacyRegistrationService {
         newPharmacyEntity.setLng(registrationRequestDto.getLocationLongitude());
         newPharmacyEntity.setPhone(registrationRequestDto.getContactPhoneNumber());
 
-        // Handle potential nulls from the frontend gracefully
         newPharmacyEntity.setIs247(registrationRequestDto.getIsOperated247() != null ? registrationRequestDto.getIsOperated247() : false);
 
-        // 4. Apply strict Business Rules for new registrations
-        newPharmacyEntity.setIsVerified(false); // Requires manual Admin approval later
-        newPharmacyEntity.setIsActive(true);    // The record is active in the system
-        newPharmacyEntity.setOwner(prospectiveSeller); // Link the Pharmacy to the User
+        newPharmacyEntity.setIsVerified(false);
+        newPharmacyEntity.setIsActive(true);
+        newPharmacyEntity.setOwner(prospectiveSeller);
 
         return pharmacyRepository.save(newPharmacyEntity);
     }
