@@ -22,7 +22,7 @@ public class AuthService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    @Value("${google.client.id}")
+    //@Value("${google.client.id}")
     private String googleClientId;
 
     public User authenticateUser(String email, String rawPassword) {
