@@ -17,3 +17,9 @@ out/
 # Secrets
 **/application.properties
 .env
+
+# --- Uploaded Documents (CRITICAL for Privacy) ---
+# Ignore the upload-dir inside your Spring project
+pc/upload-dir/
+# Ignore the general uploads folder at the root
+uploads/
