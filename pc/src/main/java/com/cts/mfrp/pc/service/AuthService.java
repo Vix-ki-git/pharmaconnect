@@ -13,14 +13,17 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
-@RequiredArgsConstructor
+@RequiredArgsConstructor // This only injects fields marked as 'final'
 public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService; // FIXED: Added 'final' for proper injection
 
     @Value("${google.client.id}")
     private String googleClientId;
@@ -36,21 +39,15 @@ public class AuthService {
     }
 
     public User registerNewUser(RegistrationRequest regRequest) {
-        // 1. Validation
         if (userRepository.findByEmail(regRequest.getEmail()).isPresent()) {
             throw new RuntimeException("An account with this email already exists.");
         }
 
-        // 2. Mapping & Security Fix
         User user = new User();
         user.setName(regRequest.getName());
         user.setEmail(regRequest.getEmail());
         user.setPhone(regRequest.getPhone());
-
-        // CRITICAL FIX: Hardcode the lowest privilege level
         user.setRole("BUYER");
-
-        // 3. Password Encoding
         user.setPasswordHash(passwordEncoder.encode(regRequest.getPassword()));
 
         return userRepository.save(user);
@@ -73,12 +70,39 @@ public class AuthService {
             User newUser = new User();
             newUser.setEmail(email);
             newUser.setName((String) payload.get("name"));
-
-            // SECURITY FIX: Google sign-ups also default to BUYER
             newUser.setRole("BUYER");
             newUser.setPasswordHash("OAUTH_USER_PROTECTED");
-
             return userRepository.save(newUser);
         });
+    }
+
+    public void processForgotPassword(String email) {
+        // We look for the user. If not found, the Controller handles the generic message.
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        // Generate a unique 36-character token
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(15));
+
+        userRepository.save(user);
+
+        // Send the email via Brevo
+        emailService.sendResetPasswordEmail(user.getEmail(), token);
+    }
+
+    public void resetPassword(String token, String newPassword) {
+        User user = userRepository.findByResetToken(token)
+                .orElseThrow(() -> new RuntimeException("Invalid or expired token."));
+
+        if (user.getResetTokenExpiry().isBefore(java.time.LocalDateTime.now())) {
+            throw new RuntimeException("Token has expired.");
+        }
+
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
+        user.setResetToken(null); // Clear token after use
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
     }
 }
