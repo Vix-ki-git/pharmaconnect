@@ -12,8 +12,11 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
@@ -21,6 +24,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService; // 🛠️ Added this
 
     @Value("${google.client.id}")
     private String googleClientId;
@@ -36,23 +40,15 @@ public class AuthService {
     }
 
     public User registerNewUser(RegistrationRequest regRequest) {
-        // 1. Validation
         if (userRepository.findByEmail(regRequest.getEmail()).isPresent()) {
             throw new RuntimeException("An account with this email already exists.");
         }
-
-        // 2. Mapping & Security Fix
         User user = new User();
         user.setName(regRequest.getName());
         user.setEmail(regRequest.getEmail());
         user.setPhone(regRequest.getPhone());
-
-        // CRITICAL FIX: Hardcode the lowest privilege level
         user.setRole("BUYER");
-
-        // 3. Password Encoding
         user.setPasswordHash(passwordEncoder.encode(regRequest.getPassword()));
-
         return userRepository.save(user);
     }
 
@@ -62,9 +58,7 @@ public class AuthService {
                 .build();
 
         GoogleIdToken idToken = verifier.verify(idTokenString);
-        if (idToken == null) {
-            throw new RuntimeException("Google verification failed: Invalid ID token.");
-        }
+        if (idToken == null) throw new RuntimeException("Google verification failed.");
 
         Payload payload = idToken.getPayload();
         String email = payload.getEmail();
@@ -73,45 +67,54 @@ public class AuthService {
             User newUser = new User();
             newUser.setEmail(email);
             newUser.setName((String) payload.get("name"));
-
-            // SECURITY FIX: Google sign-ups also default to BUYER
             newUser.setRole("BUYER");
             newUser.setPasswordHash("OAUTH_USER_PROTECTED");
-
             return userRepository.save(newUser);
         });
     }
 
-    public String initiatePasswordReset(String email) {
+    @Transactional
+    public String processForgotPassword(String email) {
+        // 1. Find User
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found"));
+                .orElseThrow(() -> new RuntimeException("Error: This email address is not registered in our system."));
 
-        // If the user is an OAuth user, they shouldn't reset via our app
-        if ("OAUTH_USER".equals(user.getPasswordHash())) {
-            throw new RuntimeException("Please reset your password through your Google Account settings.");
+        // 2. Check if OAuth user (cannot reset password here)
+        if ("OAUTH_USER_PROTECTED".equals(user.getPasswordHash())) {
+            throw new RuntimeException("Please use Google Login to access your account.");
         }
 
-        String token = java.util.UUID.randomUUID().toString();
+        // 3. Generate Token
+        String token = UUID.randomUUID().toString();
         user.setResetToken(token);
-        user.setTokenExpiry(java.time.LocalDateTime.now().plusMinutes(15));
+        user.setTokenExpiry(LocalDateTime.now().plusMinutes(15));
+
+        // 4. Save to DB
         userRepository.save(user);
-        return token;
+
+        // 5. Trigger Email
+        emailService.sendResetPasswordEmail(user.getEmail(), token);
+
+        return "A password reset link has been sent to your email.";
     }
 
+    @Transactional
     public void resetPassword(String token, String newPassword) {
         User user = userRepository.findByResetToken(token)
-                .filter(u -> u.getTokenExpiry().isAfter(java.time.LocalDateTime.now()))
-                .orElseThrow(() -> new RuntimeException("Invalid or expired token"));
+                .orElseThrow(() -> new RuntimeException("Invalid reset token."));
 
-        user.setPasswordHash(newPassword); // In a real app, encrypt this!
+        if (user.getTokenExpiry() == null || user.getTokenExpiry().isBefore(LocalDateTime.now())) {
+            throw new RuntimeException("The reset link has expired.");
+        }
+
+        // 🛠️ Encrypt the new password!
+        user.setPasswordHash(passwordEncoder.encode(newPassword));
         user.setResetToken(null);
         user.setTokenExpiry(null);
         userRepository.save(user);
     }
 
     public void logout(String email) {
-        // For now, we log the activity.
-        // In the future, you could add a "last_logout" timestamp to the User table.
-        System.out.println("User " + email + " has logged out from Smart Pharma Connect.");
+        System.out.println("User " + email + " has logged out.");
     }
 }

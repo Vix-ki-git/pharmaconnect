@@ -26,19 +26,16 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http
-                // 1. Disable CSRF (Mandatory for Postman/REST APIs)
-                .csrf(AbstractHttpConfigurer::disable)
-
-                // 2. Enable CORS with the source defined below
+                .csrf(AbstractHttpConfigurer::disable) // Disable CSRF
                 .cors(cors -> cors.configurationSource(corsConfigurationSource()))
-
-                // 3. Define Authorization Rules
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/**").permitAll() // Open your registration endpoint
+                        // Use wildcard (**) to make sure all sub-paths are allowed
+                        .requestMatchers("/api/auth/**").permitAll()
                         .anyRequest().authenticated()
                 )
-
-                // 4. Disable default Login forms for API testing
+                .sessionManagement(session -> session
+                        .sessionCreationPolicy(org.springframework.security.config.http.SessionCreationPolicy.STATELESS)
+                )
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable);
 
