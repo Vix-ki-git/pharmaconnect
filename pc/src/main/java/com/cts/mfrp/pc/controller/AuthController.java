@@ -71,7 +71,6 @@ public class AuthController {
         try {
             authService.processForgotPassword(email);
         } catch (Exception e) {
-            // Log the error but don't tell the user the email doesn't exist for security
             System.out.println("Forgot password attempt for non-existent or failed email: " + email);
         }
         return ResponseEntity.ok(Map.of("message", "If an account exists with this email, a reset link has been sent."));
