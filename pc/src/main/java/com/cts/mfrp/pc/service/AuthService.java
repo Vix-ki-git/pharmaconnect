@@ -32,7 +32,16 @@ public class AuthService {
         User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Authentication failed: User not found."));
 
-        if (!passwordEncoder.matches(rawPassword, user.getPasswordHash())) {
+        // --- CRITICAL DEBUG LOGS ---
+        System.out.println("DEBUG: Login attempt for " + email);
+        System.out.println("DEBUG: Raw Password Length: " + rawPassword.length());
+        System.out.println("DEBUG: DB Hash: " + user.getPasswordHash());
+
+        boolean matches = passwordEncoder.matches(rawPassword, user.getPasswordHash());
+        System.out.println("DEBUG: Does BCrypt match? " + matches);
+        // ---------------------------
+
+        if (!matches) {
             throw new RuntimeException("Invalid credentials. Please try again.");
         }
         return user;
@@ -96,12 +105,18 @@ public class AuthService {
         User user = userRepository.findByResetToken(token)
                 .orElseThrow(() -> new RuntimeException("Invalid or expired token."));
 
-        if (user.getResetTokenExpiry().isBefore(java.time.LocalDateTime.now())) {
+        if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
             throw new RuntimeException("Token has expired.");
         }
 
-        user.setPasswordHash(passwordEncoder.encode(newPassword));
-        user.setResetToken(null); // Clear token after use
+        // Hash it and log it immediately
+        String encodedPassword = passwordEncoder.encode(newPassword);
+        System.out.println("DEBUG: Resetting password for " + user.getEmail());
+        System.out.println("DEBUG: New Raw Password: " + newPassword);
+        System.out.println("DEBUG: New Encoded Hash: " + encodedPassword);
+
+        user.setPasswordHash(encodedPassword);
+        user.setResetToken(null);
         user.setResetTokenExpiry(null);
         userRepository.save(user);
     }
