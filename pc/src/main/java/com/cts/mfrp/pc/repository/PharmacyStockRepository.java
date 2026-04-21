@@ -18,4 +18,12 @@ public interface PharmacyStockRepository extends JpaRepository<PharmacyStock, St
 
     @Query("SELECT ps FROM PharmacyStock ps WHERE ps.medicine.id = :medicineId AND ps.quantity > 0")
     List<PharmacyStock> findAvailableStockByMedicine(@Param("medicineId") String medicineId);
+
+    @Query("SELECT ps FROM PharmacyStock ps " +
+            "JOIN FETCH ps.pharmacy p " +
+            "WHERE ps.medicine.id = :medicineId " +
+            "AND ps.quantity > 0 " +
+            "AND p.isVerified = true " +
+            "ORDER BY ps.price ASC")
+    List<PharmacyStock> findPharmaciesOrderByPriceAsc(@Param("medicineId") String medicineId);
 }
