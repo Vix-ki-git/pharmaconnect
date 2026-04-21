@@ -7,7 +7,6 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/seller-portal")
-@CrossOrigin(origins = "*")
 public class SellerPortalController {
 
     private final SellerPortalAccessService sellerPortalAccessService;
