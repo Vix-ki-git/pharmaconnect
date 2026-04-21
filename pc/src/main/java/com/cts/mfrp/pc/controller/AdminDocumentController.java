@@ -11,7 +11,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/documents")
+@RequestMapping("/api/auth/admin/documents")
 @CrossOrigin(origins = "http://localhost:4200")
 public class AdminDocumentController {
 
