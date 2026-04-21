@@ -25,7 +25,7 @@ public class AuthService {
     private final PasswordEncoder passwordEncoder;
     private final EmailService emailService; // FIXED: Added 'final' for proper injection
 
-    @Value("${google.client.id}")
+    //@Value("${google.client.id}")
     private String googleClientId;
 
     public User authenticateUser(String email, String rawPassword) {
