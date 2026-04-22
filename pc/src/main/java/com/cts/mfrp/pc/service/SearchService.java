@@ -59,4 +59,12 @@ public class SearchService {
         // Return empty list if the medicine doesn't exist or has no generic equivalent
         return Collections.emptyList();
     }
+
+
+    public List<MedicineSearchResult> filterMedicines(String keyword, Float lat, Float lng, Double radius) {
+        // Default to a 10km search area if the frontend doesn't provide a radius
+        Double searchRadius = (radius != null && radius > 0) ? radius : 10.0;
+
+        return stockRepository.filterNearbyMedicines(keyword, lat, lng, searchRadius);
+    }
 }

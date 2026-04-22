@@ -61,4 +61,15 @@ public class SearchController {
 
         return ResponseEntity.ok(searchService.findAlternatives(brandName));
     }
+
+    @GetMapping("/filter")
+    public ResponseEntity<List<MedicineSearchResult>> filterNearbyMedicines(
+            @RequestParam String keyword,
+            @RequestParam Float lat,
+            @RequestParam Float lng,
+            @RequestParam(required = false) Double radius) {
+
+        List<MedicineSearchResult> results = searchService.filterMedicines(keyword, lat, lng, radius);
+        return ResponseEntity.ok(results);
+    }
 }
