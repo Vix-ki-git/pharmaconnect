@@ -29,6 +29,12 @@ public class User {
     @Column(name = "password_hash")
     private String passwordHash;
 
+    @Column(name = "reset_token")
+    private String resetToken;
+
+    @Column(name = "reset_token_expiry")
+    private LocalDateTime resetTokenExpiry;
+
     private String role;
     private Float lat;
     private Float lng;
