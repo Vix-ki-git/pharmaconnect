@@ -67,4 +67,26 @@ public interface PharmacyStockRepository extends JpaRepository<PharmacyStock, St
             @Param("keyword") String keyword,
             @Param("userLat") Float userLat,
             @Param("userLng") Float userLng);
+
+    @Query(value =
+            "SELECT ps.id as stockId, p.name as pharmacyName, p.address as pharmacyAddress, " +
+                    "p.lat as lat, p.lng as lng, m.name as medicineName, m.generic_name as genericName, " +
+                    "ps.quantity as quantity, ps.price as price, " +
+                    "( 6371 * acos( cos( radians(:userLat) ) * cos( radians( p.lat ) ) * " +
+                    "cos( radians( p.lng ) - radians(:userLng) ) + sin( radians(:userLat) ) * " +
+                    "sin( radians( p.lat ) ) ) ) AS distance " +
+                    "FROM pharmacy_stock ps " +
+                    "JOIN pharmacy p ON ps.pharmacy_id = p.id " +
+                    "JOIN medicine m ON ps.medicine_id = m.id " +
+                    "WHERE (LOWER(m.name) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+                    "OR LOWER(m.generic_name) LIKE LOWER(CONCAT('%', :keyword, '%'))) " +
+                    "AND ps.quantity > 0 AND p.is_active = true AND p.is_verified = true " +
+                    "HAVING distance <= :radius " +
+                    "ORDER BY distance ASC",
+            nativeQuery = true)
+    List<MedicineSearchResult> filterNearbyMedicines(
+            @Param("keyword") String keyword,
+            @Param("userLat") Float userLat,
+            @Param("userLng") Float userLng,
+            @Param("radius") Double radius);
 }
