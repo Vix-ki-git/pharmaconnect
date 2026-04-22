@@ -36,7 +36,7 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(AbstractHttpConfigurer::disable)
-                .httpBasic(AbstqractHttpConfigurer::disable);
+                .httpBasic(AbstractHttpConfigurer::disable);
 
         return http.build();
     }

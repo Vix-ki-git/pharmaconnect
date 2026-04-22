@@ -9,4 +9,8 @@ import java.util.Optional;
 @Repository
 public interface MedicineRepository extends JpaRepository<Medicine, String> {
     Optional<Medicine> findFirstByNameIgnoreCase(String name);
+
+    // Add this for BulkUploadService Class
+    Optional<Medicine> findByNameIgnoreCase(String name);
+
 }
