@@ -1,16 +1,15 @@
 <div class="auth-wrapper">
   <div class="auth-card">
 
-    <!-- Logo / Title -->
-    <h1 class="auth-title">PharmaConnect</h1>
+    <a class="back-link" href="/">&#8592; Back to Home</a>
+
+    <div class="auth-logo">Pharma<span>Connect</span></div>
     <p class="auth-subtitle">Sign in to your account</p>
 
-    <!-- Error message -->
     @if (errorMessage) {
-      <p class="error-msg">{{ errorMessage }}</p>
+      <div class="alert alert-error">{{ errorMessage }}</div>
     }
 
-    <!-- Login Form -->
     <form (ngSubmit)="onSubmit()">
 
       <div class="form-group">
@@ -37,13 +36,14 @@
         />
       </div>
 
-      <button type="submit" class="btn-primary">Login</button>
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? 'Signing in...' : 'Login' }}
+      </button>
 
     </form>
 
-    <!-- Link to Register -->
     <p class="switch-link">
-      Don't have an account? <a routerLink="/register">Register</a>
+      Don't have an account? <a routerLink="/register">Register here</a>
     </p>
 
   </div>

@@ -1,17 +1,58 @@
 import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private base = 'http://localhost:8081/api/auth';
 
-  // Simple login check (replace with real API call later)
-  login(email: string, password: string): boolean {
-    console.log('Logging in:', email);
-    return email !== '' && password !== '';
+  constructor(private http: HttpClient) {}
+
+  login(email: string, password: string): Observable<any> {
+    return this.http.post<any>(`${this.base}/login`, { email, password }).pipe(
+      tap(user => {
+        localStorage.setItem('userId', user.id);
+        localStorage.setItem('userEmail', user.email);
+        localStorage.setItem('userName', user.name);
+        localStorage.setItem('userRole', user.role);
+      })
+    );
   }
 
-  // Simple register (replace with real API call later)
-  register(name: string, email: string, password: string): boolean {
-    console.log('Registering:', name, email);
-    return name !== '' && email !== '' && password !== '';
+  register(name: string, email: string, password: string, phone: string): Observable<any> {
+    return this.http.post<any>(`${this.base}/register`, { name, email, password, phone });
+  }
+
+  registerPharmacy(dto: {
+    pharmacyName: string;
+    pharmacyAddress: string;
+    contactPhoneNumber: string;
+    locationLatitude: number | null;
+    locationLongitude: number | null;
+    isOperated247: boolean;
+    sellerEmailAddress: string;
+  }): Observable<any> {
+    return this.http.post<any>('http://localhost:8081/api/seller-onboarding/register-pharmacy', dto);
+  }
+
+  logout() {
+    localStorage.clear();
+  }
+
+  getCurrentUser() {
+    return {
+      id: localStorage.getItem('userId'),
+      email: localStorage.getItem('userEmail'),
+      name: localStorage.getItem('userName'),
+      role: localStorage.getItem('userRole')
+    };
+  }
+
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('userId');
+  }
+
+  getRole(): string | null {
+    return localStorage.getItem('userRole');
   }
 }

@@ -4,7 +4,7 @@
   align-items: center;
   justify-content: center;
   background-color: var(--bg-soft);
-  padding: 1.5rem;
+  padding: 2rem 1.5rem;
 }
 
 .auth-card {
@@ -13,8 +13,7 @@
   border-radius: 16px;
   box-shadow: var(--shadow-soft);
   width: 100%;
-  max-width: 420px;
-  position: relative;
+  max-width: 680px;
 }
 
 .back-link {
@@ -69,8 +68,29 @@
   border-left: 3px solid #2e7d32;
 }
 
+.section-heading {
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--primary-green);
+  margin: 1.5rem 0 1rem;
+  padding-bottom: 0.4rem;
+  border-bottom: 2px solid #e8f5e9;
+}
+
+.section-heading:first-of-type {
+  margin-top: 0;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
 .form-group {
-  margin-bottom: 1.1rem;
+  margin-bottom: 1rem;
 }
 
 .form-group label {
@@ -99,6 +119,55 @@
   box-shadow: 0 0 0 3px rgba(230, 184, 0, 0.15);
 }
 
+.location-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr auto;
+  gap: 1rem;
+  align-items: end;
+  margin-bottom: 1rem;
+}
+
+.btn-locate {
+  padding: 0.65rem 1rem;
+  background: transparent;
+  border: 1.5px solid var(--primary-green);
+  color: var(--primary-green);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: all 0.2s;
+  height: fit-content;
+}
+
+.btn-locate:hover {
+  background: var(--primary-green);
+  color: white;
+}
+
+.btn-locate:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.checkbox-label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.9rem;
+  color: var(--text-main);
+  margin-bottom: 1.5rem;
+  cursor: pointer;
+}
+
+.checkbox-label input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-green);
+  cursor: pointer;
+}
+
 .btn-primary {
   width: 100%;
   padding: 0.78rem;
@@ -109,7 +178,6 @@
   font-size: 1rem;
   font-weight: 600;
   cursor: pointer;
-  margin-top: 0.5rem;
   transition: background-color 0.2s, opacity 0.2s;
   letter-spacing: 0.01em;
 }

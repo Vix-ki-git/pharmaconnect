@@ -14,15 +14,32 @@ export class Login {
   email = '';
   password = '';
   errorMessage = '';
+  loading = false;
 
   constructor(private authService: AuthService, private router: Router) {}
 
   onSubmit() {
-    const success = this.authService.login(this.email, this.password);
-    if (success) {
-      this.router.navigate(['/']);
-    } else {
+    if (!this.email || !this.password) {
       this.errorMessage = 'Please fill in all fields.';
+      return;
     }
+    this.loading = true;
+    this.errorMessage = '';
+
+    this.authService.login(this.email, this.password).subscribe({
+      next: (user) => {
+        if (user.role === 'ADMIN') {
+          this.router.navigate(['/admin/sellers']);
+        } else if (user.role === 'SELLER') {
+          this.router.navigate(['/seller/dashboard']);
+        } else {
+          this.router.navigate(['/search']);
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        this.errorMessage = err.error || 'Invalid email or password.';
+      }
+    });
   }
 }

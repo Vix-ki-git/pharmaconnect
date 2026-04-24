@@ -1,0 +1,92 @@
+<div class="auth-wrapper">
+  <div class="auth-card">
+
+    <a class="back-link" href="/">&#8592; Back to Home</a>
+
+    <div class="auth-logo">Pharma<span>Connect</span></div>
+    <p class="auth-subtitle">Register your pharmacy</p>
+
+    @if (errorMessage) {
+      <div class="alert alert-error">{{ errorMessage }}</div>
+    }
+    @if (successMessage) {
+      <div class="alert alert-success">{{ successMessage }}</div>
+    }
+
+    <form (ngSubmit)="onSubmit()">
+
+      <!-- Section 1: Account -->
+      <div class="section-heading">Your Account</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Full Name</label>
+          <input type="text" [(ngModel)]="name" name="name" placeholder="Jane Doe" required />
+        </div>
+        <div class="form-group">
+          <label>Email</label>
+          <input type="email" [(ngModel)]="email" name="email" placeholder="you@example.com" required />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Phone (10 digits)</label>
+          <input type="tel" [(ngModel)]="phone" name="phone" placeholder="9876543210" required />
+        </div>
+        <div class="form-group">
+          <label>Password (min 8 chars)</label>
+          <input type="password" [(ngModel)]="password" name="password" placeholder="••••••••" required />
+        </div>
+      </div>
+
+      <!-- Section 2: Pharmacy -->
+      <div class="section-heading">Your Pharmacy</div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Pharmacy Name</label>
+          <input type="text" [(ngModel)]="pharmacyName" name="pharmacyName" placeholder="City Pharma" required />
+        </div>
+        <div class="form-group">
+          <label>Pharmacy Contact Phone</label>
+          <input type="tel" [(ngModel)]="contactPhoneNumber" name="contactPhoneNumber" placeholder="9876543210" required />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Address</label>
+        <input type="text" [(ngModel)]="pharmacyAddress" name="pharmacyAddress" placeholder="123 Main Street, City" required />
+      </div>
+
+      <div class="location-row">
+        <div class="form-group">
+          <label>Latitude</label>
+          <input type="number" [(ngModel)]="locationLatitude" name="locationLatitude" placeholder="e.g. 12.9716" step="any" />
+        </div>
+        <div class="form-group">
+          <label>Longitude</label>
+          <input type="number" [(ngModel)]="locationLongitude" name="locationLongitude" placeholder="e.g. 77.5946" step="any" />
+        </div>
+        <button type="button" class="btn-locate" (click)="useMyLocation()" [disabled]="locating">
+          {{ locating ? 'Locating...' : '&#128205; Use My Location' }}
+        </button>
+      </div>
+
+      <label class="checkbox-label">
+        <input type="checkbox" [(ngModel)]="isOperated247" name="isOperated247" />
+        Open 24/7 (will appear in emergency searches)
+      </label>
+
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? 'Registering...' : 'Register Pharmacy' }}
+      </button>
+
+    </form>
+
+    <p class="switch-link">
+      Already have an account? <a routerLink="/login">Sign in</a>
+    </p>
+
+  </div>
+</div>

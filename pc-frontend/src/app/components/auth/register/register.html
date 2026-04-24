@@ -1,16 +1,18 @@
 <div class="auth-wrapper">
   <div class="auth-card">
 
-    <!-- Logo / Title -->
-    <h1 class="auth-title">PharmaConnect</h1>
-    <p class="auth-subtitle">Create a new account</p>
+    <a class="back-link" href="/">&#8592; Back to Home</a>
 
-    <!-- Error message -->
+    <div class="auth-logo">Pharma<span>Connect</span></div>
+    <p class="auth-subtitle">Create your account</p>
+
     @if (errorMessage) {
-      <p class="error-msg">{{ errorMessage }}</p>
+      <div class="alert alert-error">{{ errorMessage }}</div>
+    }
+    @if (successMessage) {
+      <div class="alert alert-success">{{ successMessage }}</div>
     }
 
-    <!-- Register Form -->
     <form (ngSubmit)="onSubmit()">
 
       <div class="form-group">
@@ -38,24 +40,37 @@
       </div>
 
       <div class="form-group">
+        <label for="phone">Phone Number</label>
+        <input
+          id="phone"
+          type="tel"
+          [(ngModel)]="phone"
+          name="phone"
+          placeholder="10-digit number, e.g. 9876543210"
+          required
+        />
+      </div>
+
+      <div class="form-group">
         <label for="password">Password</label>
         <input
           id="password"
           type="password"
           [(ngModel)]="password"
           name="password"
-          placeholder="••••••••"
+          placeholder="Minimum 8 characters"
           required
         />
       </div>
 
-      <button type="submit" class="btn-primary">Register</button>
+      <button type="submit" class="btn-primary" [disabled]="loading">
+        {{ loading ? 'Creating account...' : 'Register' }}
+      </button>
 
     </form>
 
-    <!-- Link to Login -->
     <p class="switch-link">
-      Already have an account? <a routerLink="/login">Login</a>
+      Already have an account? <a routerLink="/login">Sign in</a>
     </p>
 
   </div>
