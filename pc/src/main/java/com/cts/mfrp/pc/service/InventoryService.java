@@ -73,6 +73,15 @@ public class InventoryService {
         return mapToDTO(stockRepository.save(stock));
     }
 
+    // US-13: Delete a stock item
+    @Transactional
+    public void deleteStockItem(String stockId) {
+        if (!stockRepository.existsById(stockId)) {
+            throw new EntityNotFoundException("Stock record not found with ID: " + stockId);
+        }
+        stockRepository.deleteById(stockId);
+    }
+
     // ===============================
     // PRIVATE HELPER METHODS
     // ===============================

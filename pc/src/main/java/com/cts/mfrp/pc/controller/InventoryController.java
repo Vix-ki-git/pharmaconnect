@@ -56,4 +56,11 @@ public class InventoryController {
         InventoryResponseDTO response = inventoryService.updateStockDelta(stockId, delta);
         return ResponseEntity.ok(response);
     }
+
+    // US-13
+    @DeleteMapping("/{stockId}")
+    public ResponseEntity<Void> deleteStockItem(@PathVariable String stockId) {
+        inventoryService.deleteStockItem(stockId);
+        return ResponseEntity.noContent().build();
+    }
 }
