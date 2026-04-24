@@ -24,9 +24,20 @@ public class SearchController {
     public ResponseEntity<List<MedicineSearchResult>> getClosestPharmacies(
             @RequestParam String keyword,
             @RequestParam Float lat,
-            @RequestParam Float lng) {
+            @RequestParam Float lng,
+            @RequestParam(required = false) String userId) {
 
-        return ResponseEntity.ok(searchService.searchClosestMedicines(keyword, lat, lng));
+        return ResponseEntity.ok(searchService.searchClosestMedicines(keyword, lat, lng, userId));
+    }
+
+    @GetMapping("/emergency")
+    public ResponseEntity<List<MedicineSearchResult>> emergencySearch(
+            @RequestParam String keyword,
+            @RequestParam Float lat,
+            @RequestParam Float lng,
+            @RequestParam(required = false) String userId) {
+
+        return ResponseEntity.ok(searchService.emergencySearch(keyword, lat, lng, userId));
     }
 
     /**
