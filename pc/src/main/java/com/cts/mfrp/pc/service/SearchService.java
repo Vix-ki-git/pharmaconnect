@@ -9,6 +9,7 @@ import com.cts.mfrp.pc.repository.MedicineRepository;
 import com.cts.mfrp.pc.repository.PharmacyStockRepository;
 import com.cts.mfrp.pc.repository.SearchLogRepository;
 import com.cts.mfrp.pc.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +26,7 @@ public class SearchService {
     private final MedicineRepository medicineRepository;
     private final SearchLogRepository searchLogRepository;
     private final UserRepository userRepository;
+    private final DemandAnalyticsService demandAnalyticsService;
 
     // ==========================================
     // DEV 1: SEARCH EPIC METHODS
@@ -33,13 +35,17 @@ public class SearchService {
     // 1. Spatial Search API (Closest Pharmacies using GPS)
     public List<MedicineSearchResult> searchClosestMedicines(String keyword, Float lat, Float lng, String userId) {
         logSearch(keyword, lat, lng, false, userId);
-        return stockRepository.findClosestPharmaciesWithStock(keyword, lat, lng);
+        List<MedicineSearchResult> results = stockRepository.findClosestPharmaciesWithStock(keyword, lat, lng);
+        results.forEach(r -> demandAnalyticsService.recordSearch(r.getPharmacyId(), r.getMedicineId()));
+        return results;
     }
 
     // Emergency Mode: 24/7 pharmacies only, sorted by distance, search flagged in logs
     public List<MedicineSearchResult> emergencySearch(String keyword, Float lat, Float lng, String userId) {
         logSearch(keyword, lat, lng, true, userId);
-        return stockRepository.findEmergencyPharmaciesWithStock(keyword, lat, lng);
+        List<MedicineSearchResult> results = stockRepository.findEmergencyPharmaciesWithStock(keyword, lat, lng);
+        results.forEach(r -> demandAnalyticsService.recordSearch(r.getPharmacyId(), r.getMedicineId()));
+        return results;
     }
 
     private void logSearch(String keyword, Float lat, Float lng, boolean isEmergency, String userId) {
