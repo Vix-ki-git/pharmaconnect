@@ -49,7 +49,8 @@ public interface PharmacyStockRepository extends JpaRepository<PharmacyStock, St
 
     // SPATIAL SEARCH (Native SQL with Haversine Formula for GPS distance)
     @Query(value =
-            "SELECT ps.id as stockId, p.name as pharmacyName, p.address as pharmacyAddress, " +
+            "SELECT ps.id as stockId, p.id as pharmacyId, m.id as medicineId, " +
+                    "p.name as pharmacyName, p.address as pharmacyAddress, " +
                     "p.lat as lat, p.lng as lng, m.name as medicineName, m.generic_name as genericName, " +
                     "ps.quantity as quantity, ps.price as price, " +
                     "( 6371 * acos( cos( radians(:userLat) ) * cos( radians( p.lat ) ) * " +
@@ -69,7 +70,8 @@ public interface PharmacyStockRepository extends JpaRepository<PharmacyStock, St
             @Param("userLng") Float userLng);
 
     @Query(value =
-            "SELECT ps.id as stockId, p.name as pharmacyName, p.address as pharmacyAddress, " +
+            "SELECT ps.id as stockId, p.id as pharmacyId, m.id as medicineId, " +
+                    "p.name as pharmacyName, p.address as pharmacyAddress, " +
                     "p.lat as lat, p.lng as lng, m.name as medicineName, m.generic_name as genericName, " +
                     "ps.quantity as quantity, ps.price as price, " +
                     "( 6371 * acos( cos( radians(:userLat) ) * cos( radians( p.lat ) ) * " +
@@ -92,7 +94,8 @@ public interface PharmacyStockRepository extends JpaRepository<PharmacyStock, St
 
     // EMERGENCY MODE: 24/7 pharmacies only, sorted strictly by distance
     @Query(value =
-            "SELECT ps.id as stockId, p.name as pharmacyName, p.address as pharmacyAddress, " +
+            "SELECT ps.id as stockId, p.id as pharmacyId, m.id as medicineId, " +
+                    "p.name as pharmacyName, p.address as pharmacyAddress, " +
                     "p.lat as lat, p.lng as lng, m.name as medicineName, m.generic_name as genericName, " +
                     "ps.quantity as quantity, ps.price as price, " +
                     "( 6371 * acos( cos( radians(:userLat) ) * cos( radians( p.lat ) ) * " +

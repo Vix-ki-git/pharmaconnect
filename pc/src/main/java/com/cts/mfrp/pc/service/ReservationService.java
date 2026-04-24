@@ -27,6 +27,7 @@ public class ReservationService {
     private final UserRepository userRepository;
     private final PharmacyRepository pharmacyRepository;
     private final MedicineRepository medicineRepository;
+    private final DemandAnalyticsService demandAnalyticsService;
 
     @Transactional
     public ReservationResponseDto createReservation(ReservationRequestDto request) {
@@ -55,6 +56,8 @@ public class ReservationService {
         reservation.setExpiresAt(LocalDateTime.now().plusMinutes(30));
 
         var saved = reservationRepository.save(reservation);
+
+        demandAnalyticsService.recordReservation(stock.getPharmacy().getId(), stock.getMedicine().getId());
 
         return ReservationResponseDto.builder()
                 .id(saved.getId())
