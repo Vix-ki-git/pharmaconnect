@@ -12,4 +12,8 @@ public interface ReservationRepository extends JpaRepository<Reservation, String
     List<Reservation> findByStatusAndCreatedAtBefore(String status, LocalDateTime time);
 
     List<Reservation> findByStatusAndExpiresAtBefore(String pending, LocalDateTime now);
+
+    List<Reservation> findByUserId(String userId);
+
+    List<Reservation> findByPharmacyId(String pharmacyId);
 }
