@@ -1,7 +1,10 @@
 package com.cts.mfrp.pc.service;
 
+import com.cts.mfrp.pc.dto.DocumentSummaryDto;
+import com.cts.mfrp.pc.dto.PendingSellerApplicationDto;
 import com.cts.mfrp.pc.model.Pharmacy;
 import com.cts.mfrp.pc.model.PharmacyDocument;
+import com.cts.mfrp.pc.model.User;
 import com.cts.mfrp.pc.repository.PharmacyDocumentRepository;
 import com.cts.mfrp.pc.repository.PharmacyRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +14,8 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -66,5 +71,77 @@ public class AdminApprovalService {
                     return savedDoc;
                 })
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Document ID not found: " + id));
+    }
+
+    public List<PendingSellerApplicationDto> getPendingSellerApplications() {
+        return pharmacyRepository.findAllByIsVerifiedFalseAndIsActiveTrue().stream()
+                .map(pharmacy -> {
+                    List<PharmacyDocument> docs = documentRepository.findByPharmacyId(pharmacy.getId());
+
+                    List<DocumentSummaryDto> docDtos = docs.stream()
+                            .map(doc -> DocumentSummaryDto.builder()
+                                    .id(doc.getId())
+                                    .documentType(doc.getDocumentType())
+                                    .documentUrl(doc.getDocumentUrl())
+                                    .status(doc.getStatus())
+                                    .uploadedAt(doc.getUploadedAt())
+                                    .build())
+                            .collect(Collectors.toList());
+
+                    String overallStatus;
+                    if (docs.isEmpty()) {
+                        overallStatus = "NO_DOCUMENTS";
+                    } else if (docs.stream().anyMatch(d -> "PENDING".equals(d.getStatus()))) {
+                        overallStatus = "PENDING";
+                    } else {
+                        overallStatus = "PARTIALLY_REVIEWED";
+                    }
+
+                    User owner = pharmacy.getOwner();
+                    return PendingSellerApplicationDto.builder()
+                            .pharmacyId(pharmacy.getId())
+                            .pharmacyName(pharmacy.getName())
+                            .pharmacyAddress(pharmacy.getAddress())
+                            .pharmacyPhone(pharmacy.getPhone())
+                            .is247(pharmacy.isIs247())
+                            .registeredAt(pharmacy.getCreatedAt())
+                            .ownerName(owner.getName())
+                            .ownerEmail(owner.getEmail())
+                            .ownerPhone(owner.getPhone())
+                            .documents(docDtos)
+                            .overallStatus(overallStatus)
+                            .build();
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public Map<String, String> verifyPharmacy(String pharmacyId) {
+        Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pharmacy not found: " + pharmacyId));
+
+        List<PharmacyDocument> docs = documentRepository.findByPharmacyId(pharmacyId);
+        docs.forEach(doc -> doc.setStatus("APPROVED"));
+        documentRepository.saveAll(docs);
+
+        pharmacy.setIsVerified(true);
+        pharmacyRepository.save(pharmacy);
+
+        return Map.of("message", "Pharmacy verified successfully", "pharmacyId", pharmacyId);
+    }
+
+    @Transactional
+    public Map<String, String> rejectPharmacy(String pharmacyId) {
+        Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pharmacy not found: " + pharmacyId));
+
+        List<PharmacyDocument> docs = documentRepository.findByPharmacyId(pharmacyId);
+        docs.forEach(doc -> doc.setStatus("REJECTED"));
+        documentRepository.saveAll(docs);
+
+        pharmacy.setIsVerified(false);
+        pharmacyRepository.save(pharmacy);
+
+        return Map.of("message", "Pharmacy rejected", "pharmacyId", pharmacyId);
     }
 }

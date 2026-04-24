@@ -9,6 +9,8 @@ pc/target/
 *.jar
 *.war
 
+pharma_connect_context.md
+
 # IDE settings
 .idea/
 *.iml
