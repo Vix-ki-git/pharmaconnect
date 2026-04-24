@@ -103,7 +103,7 @@ public class AdminApprovalService {
                             .pharmacyName(pharmacy.getName())
                             .pharmacyAddress(pharmacy.getAddress())
                             .pharmacyPhone(pharmacy.getPhone())
-                            .is247(pharmacy.isIs247())
+                            .is247(Boolean.TRUE.equals(pharmacy.getIs247()))
                             .registeredAt(pharmacy.getCreatedAt())
                             .ownerName(owner.getName())
                             .ownerEmail(owner.getEmail())
@@ -112,7 +112,7 @@ public class AdminApprovalService {
                             .overallStatus(overallStatus)
                             .build();
                 })
-                .collect(Collectors.toList());
+                .toList();
     }
 
     @Transactional
