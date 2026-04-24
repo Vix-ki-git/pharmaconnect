@@ -26,4 +26,19 @@ public class ReservationController {
     public ResponseEntity<List<ReservationResponseDto>> getUserReservations(@PathVariable String userId) {
         return ResponseEntity.ok(reservationService.getUserReservations(userId));
     }
+
+    @PatchMapping("/{reservationId}/cancel")
+    public ResponseEntity<ReservationResponseDto> cancelReservation(@PathVariable String reservationId) {
+        return ResponseEntity.ok(reservationService.cancelReservation(reservationId));
+    }
+
+    @GetMapping("/pharmacy/{pharmacyId}")
+    public ResponseEntity<List<ReservationResponseDto>> getPharmacyReservations(@PathVariable String pharmacyId) {
+        return ResponseEntity.ok(reservationService.getPharmacyReservations(pharmacyId));
+    }
+
+    @PatchMapping("/{reservationId}/claim")
+    public ResponseEntity<ReservationResponseDto> claimReservation(@PathVariable String reservationId) {
+        return ResponseEntity.ok(reservationService.claimReservation(reservationId));
+    }
 }
