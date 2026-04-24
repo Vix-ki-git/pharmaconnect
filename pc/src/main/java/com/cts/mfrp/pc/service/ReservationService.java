@@ -16,6 +16,7 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -67,5 +68,22 @@ public class ReservationService {
                 .medicineId(stock.getMedicine().getId())
                 .userId(user.getId())
                 .build();
+    }
+
+    public List<ReservationResponseDto> getUserReservations(String userId) {
+        return reservationRepository.findByUserId(userId).stream()
+                .map(r -> ReservationResponseDto.builder()
+                        .id(r.getId())
+                        .status(r.getStatus())
+                        .quantity(r.getQuantity())
+                        .holdAt(r.getHoldAt())
+                        .expiresAt(r.getExpiresAt())
+                        .medicineName(r.getMedicine().getName())
+                        .pharmacyName(r.getPharmacy().getName())
+                        .pharmacyId(r.getPharmacy().getId())
+                        .medicineId(r.getMedicine().getId())
+                        .userId(userId)
+                        .build())
+                .collect(Collectors.toList());
     }
 }
