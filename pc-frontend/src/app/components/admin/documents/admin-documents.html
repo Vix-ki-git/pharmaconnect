@@ -1,0 +1,107 @@
+<div class="pc-page">
+  <nav class="pc-nav">
+    <div class="pc-nav-left">
+      <button class="pc-hamburger" (click)="sidebarOpen = true" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <a class="pc-logo" routerLink="/admin/sellers">
+        <div class="pc-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+        <span class="pc-logo-text">PharmaConnect</span>
+      </a>
+    </div>
+    <button class="pc-logout" (click)="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </button>
+  </nav>
+
+  @if (sidebarOpen) {
+    <div class="pc-sidebar-backdrop" (click)="sidebarOpen = false"></div>
+    <aside class="pc-sidebar">
+      <div class="pc-sidebar-head">
+        <div class="pc-logo"><div class="pc-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div><span class="pc-logo-text">PharmaConnect</span></div>
+        <button class="pc-sidebar-close" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <nav class="pc-sidebar-nav">
+        <a routerLink="/admin/sellers" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Manage Pharmacies</a>
+        <a routerLink="/admin/medicines" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Manage Medicines</a>
+        <a routerLink="/admin/documents" class="pc-sidebar-link active" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Documents</a>
+        <a routerLink="/admin/analytics" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Analytics</a>
+      </nav>
+    </aside>
+  }
+
+  @if (toast) {
+    <div class="pc-toast" [class.pc-toast-success]="toast.type==='success'" [class.pc-toast-error]="toast.type==='error'">{{ toast.msg }}</div>
+  }
+
+  <div class="page-header">
+    <div>
+      <h1>Pending Documents</h1>
+      <p>Review uploaded pharmacy license documents and approve or reject them.</p>
+    </div>
+    @if (!loading) {
+      <span class="pending-count">{{ documents.length }} pending</span>
+    }
+  </div>
+
+  <div class="page-content">
+    @if (loading) {
+      <div class="state-center">
+        <div class="spinner"></div>
+        <p>Loading documents...</p>
+      </div>
+    }
+    @if (!loading && error) {
+      <div class="state-center"><p class="err-msg">{{ error }}</p></div>
+    }
+
+    @if (!loading && documents.length === 0 && !error) {
+      <div class="empty-state">
+        <div class="empty-icon">📄</div>
+        <h3>No pending documents</h3>
+        <p>All pharmacy documents have been reviewed.</p>
+      </div>
+    }
+
+    <div class="cards-list">
+      @for (doc of documents; track doc.id) {
+        <div class="doc-card">
+          <div class="doc-header">
+            <div class="doc-title">
+              <h3 class="doc-type">{{ doc.documentType }}</h3>
+              <span class="ph-name">{{ doc.pharmacyName }}</span>
+            </div>
+            <span class="status-chip chip-pending">PENDING</span>
+          </div>
+
+          <div class="doc-meta">
+            <div class="meta-row">
+              <span class="meta-key">Pharmacy ID</span>
+              <span class="meta-val">{{ doc.pharmacyId?.substring(0, 16) }}...</span>
+            </div>
+            <div class="meta-row">
+              <span class="meta-key">Uploaded</span>
+              <span class="meta-val">{{ parseDate(doc.uploadedAt) }}</span>
+            </div>
+            @if (doc.fileUrl) {
+              <div class="meta-row">
+                <span class="meta-key">File</span>
+                <a class="file-link" [href]="doc.fileUrl" target="_blank" rel="noopener">View Document</a>
+              </div>
+            }
+          </div>
+
+          <div class="doc-actions">
+            <button class="btn-approve" (click)="approve(doc)" [disabled]="actionId === doc.id">
+              {{ actionId === doc.id ? 'Processing...' : '✓ Approve' }}
+            </button>
+            <button class="btn-reject" (click)="reject(doc)" [disabled]="actionId === doc.id">
+              ✕ Reject
+            </button>
+          </div>
+        </div>
+      }
+    </div>
+  </div>
+</div>

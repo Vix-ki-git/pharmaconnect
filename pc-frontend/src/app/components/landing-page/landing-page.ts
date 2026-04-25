@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
+import { ThemeService } from '../../services/theme.service';
 
 @Component({
   selector: 'app-landing-page',
@@ -9,17 +10,18 @@ import { Router } from '@angular/router';
   styleUrl: './landing-page.css',
 })
 export class LandingPage {
-  isDarkMode = false;
-
-  constructor(private router: Router) {}
+  constructor(private router: Router, public themeService: ThemeService) {}
 
   toggleTheme() {
-    this.isDarkMode = !this.isDarkMode;
-    document.body.classList.toggle('dark-theme');
+    this.themeService.toggle();
   }
 
   goToLogin() {
     this.router.navigate(['/login']);
+  }
+
+  goToSearch() {
+    this.router.navigate(['/search']);
   }
 
   goToRegister() {

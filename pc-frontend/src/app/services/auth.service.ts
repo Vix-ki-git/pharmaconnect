@@ -4,7 +4,7 @@ import { Observable, tap } from 'rxjs';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private base = 'http://localhost:8081/api/auth';
+  private base = 'http://localhost:8082/api/auth';
 
   constructor(private http: HttpClient) {}
 
@@ -32,7 +32,7 @@ export class AuthService {
     isOperated247: boolean;
     sellerEmailAddress: string;
   }): Observable<any> {
-    return this.http.post<any>('http://localhost:8081/api/seller-onboarding/register-pharmacy', dto);
+    return this.http.post<any>('http://localhost:8082/api/seller-onboarding/register-pharmacy', dto);
   }
 
   logout() {
@@ -54,5 +54,13 @@ export class AuthService {
 
   getRole(): string | null {
     return localStorage.getItem('userRole');
+  }
+
+  forgotPassword(email: string): Observable<any> {
+    return this.http.post<any>(`${this.base}/forgot-password`, { email });
+  }
+
+  resetPassword(token: string, newPassword: string): Observable<any> {
+    return this.http.post<any>(`${this.base}/reset-password`, { token, newPassword });
   }
 }

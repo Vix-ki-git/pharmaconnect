@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, NgZone } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -11,26 +11,40 @@ import { AuthService } from '../../../services/auth.service';
   styleUrl: './register-pharmacy.css'
 })
 export class RegisterPharmacy {
-  // Account fields (maps to RegistrationRequest)
-  name = '';
+  // Pharmacy Information
+  pharmacyName = '';
+  ownerName = '';
+  licenseNumber = '';
+  gstNumber = '';
+
+  // Contact Information
   email = '';
   phone = '';
-  password = '';
+  address = '';
+  city = '';
+  pincode = '';
+  operatingHours = '';
+  isOperated247 = false;
 
-  // Pharmacy fields (maps to SellerPharmacyRegistrationRequestDto)
-  pharmacyName = '';
-  pharmacyAddress = '';
-  contactPhoneNumber = '';
+  // Location
   locationLatitude: number | null = null;
   locationLongitude: number | null = null;
-  isOperated247 = false;
+
+  // Account Security
+  password = '';
+  confirmPassword = '';
+  agreedToTerms = false;
 
   loading = false;
   locating = false;
   errorMessage = '';
   successMessage = '';
 
-  constructor(private authService: AuthService, private router: Router) {}
+  constructor(
+    private authService: AuthService,
+    private router: Router,
+    private ngZone: NgZone
+  ) {}
 
   useMyLocation() {
     if (!navigator.geolocation) {
@@ -40,54 +54,83 @@ export class RegisterPharmacy {
     this.locating = true;
     navigator.geolocation.getCurrentPosition(
       (pos) => {
-        this.locationLatitude = parseFloat(pos.coords.latitude.toFixed(6));
-        this.locationLongitude = parseFloat(pos.coords.longitude.toFixed(6));
-        this.locating = false;
+        this.ngZone.run(() => {
+          this.locationLatitude = parseFloat(pos.coords.latitude.toFixed(6));
+          this.locationLongitude = parseFloat(pos.coords.longitude.toFixed(6));
+          this.locating = false;
+        });
       },
       () => {
-        this.locating = false;
-        this.errorMessage = 'Could not get location. Please enter coordinates manually.';
+        this.ngZone.run(() => {
+          this.locating = false;
+          this.errorMessage = 'Could not get location. Coordinates are optional.';
+        });
       }
     );
   }
 
   onSubmit() {
-    if (!this.name || !this.email || !this.phone || !this.password ||
-        !this.pharmacyName || !this.pharmacyAddress || !this.contactPhoneNumber) {
+    if (!this.pharmacyName || !this.ownerName || !this.email || !this.phone ||
+        !this.address || !this.password || !this.confirmPassword) {
       this.errorMessage = 'Please fill in all required fields.';
       return;
     }
+    if (!/^[0-9]{10}$/.test(this.phone)) {
+      this.errorMessage = 'Phone must be exactly 10 digits (e.g. 9876543210).';
+      return;
+    }
+    if (this.password.length < 8) {
+      this.errorMessage = 'Password must be at least 8 characters.';
+      return;
+    }
+    if (this.password !== this.confirmPassword) {
+      this.errorMessage = 'Passwords do not match.';
+      return;
+    }
+    if (!this.agreedToTerms) {
+      this.errorMessage = 'You must confirm the terms to register.';
+      return;
+    }
+
+    const fullAddress = [this.address, this.city, this.pincode].filter(Boolean).join(', ');
 
     this.loading = true;
     this.errorMessage = '';
 
-    // Step 1: Create user account
-    this.authService.register(this.name, this.email, this.password, this.phone).subscribe({
+    this.authService.register(this.ownerName, this.email, this.password, this.phone).subscribe({
       next: () => {
-        // Step 2: Register the pharmacy under that account
         this.authService.registerPharmacy({
           pharmacyName: this.pharmacyName,
-          pharmacyAddress: this.pharmacyAddress,
-          contactPhoneNumber: this.contactPhoneNumber,
+          pharmacyAddress: fullAddress,
+          contactPhoneNumber: this.phone,
           locationLatitude: this.locationLatitude,
           locationLongitude: this.locationLongitude,
           isOperated247: this.isOperated247,
           sellerEmailAddress: this.email
         }).subscribe({
           next: () => {
-            this.loading = false;
-            this.successMessage = 'Pharmacy registered! Your account is pending admin approval. Redirecting to login...';
-            setTimeout(() => this.router.navigate(['/login']), 2500);
+            this.authService.login(this.email, this.password).subscribe({
+              next: () => {
+                this.loading = false;
+                this.successMessage = 'Pharmacy registered! Taking you to your dashboard...';
+                setTimeout(() => this.router.navigate(['/seller/dashboard']), 1000);
+              },
+              error: () => {
+                this.loading = false;
+                this.successMessage = 'Pharmacy registered! Pending admin approval. Please sign in.';
+                setTimeout(() => this.router.navigate(['/login']), 2000);
+              }
+            });
           },
           error: (err) => {
             this.loading = false;
-            this.errorMessage = err.error || 'Pharmacy registration failed. Try signing in to complete setup.';
+            this.errorMessage = typeof err.error === 'string' ? err.error : 'Pharmacy registration failed. Please try again.';
           }
         });
       },
       error: (err) => {
         this.loading = false;
-        this.errorMessage = err.error || 'Account creation failed. Please try again.';
+        this.errorMessage = typeof err.error === 'string' ? err.error : 'Account creation failed. Please try again.';
       }
     });
   }

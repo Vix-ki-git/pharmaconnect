@@ -1,77 +1,96 @@
-<div class="auth-wrapper">
-  <div class="auth-card">
+<div class="pc-auth-page">
 
-    <a class="back-link" href="/">&#8592; Back to Home</a>
+  <a class="pc-auth-back" href="/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Home
+  </a>
 
-    <div class="auth-logo">Pharma<span>Connect</span></div>
-    <p class="auth-subtitle">Create your account</p>
+  <div class="pc-auth-card pc-auth-card-lg">
+
+    <div class="pc-auth-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/>
+      </svg>
+    </div>
+
+    <h1 class="pc-auth-title">Create User Account</h1>
+    <p class="pc-auth-sub">Join PharmaConnect to find and reserve medicines</p>
 
     @if (errorMessage) {
-      <div class="alert alert-error">{{ errorMessage }}</div>
+      <div class="pc-alert pc-alert-error">{{ errorMessage }}</div>
     }
     @if (successMessage) {
-      <div class="alert alert-success">{{ successMessage }}</div>
+      <div class="pc-alert pc-alert-success">{{ successMessage }}</div>
     }
 
     <form (ngSubmit)="onSubmit()">
+      <div class="pc-auth-form-grid">
 
-      <div class="form-group">
-        <label for="name">Full Name</label>
-        <input
-          id="name"
-          type="text"
-          [(ngModel)]="name"
-          name="name"
-          placeholder="John Doe"
-          required
-        />
+        <div class="pc-form-group">
+          <label class="pc-label">Full Name *</label>
+          <input class="pc-input" type="text" [(ngModel)]="name" name="name" placeholder="John Doe" required />
+          <span class="pc-hint">Your complete name</span>
+        </div>
+
+        <div class="pc-form-group">
+          <label class="pc-label">Email Address *</label>
+          <input class="pc-input" type="email" [(ngModel)]="email" name="email" placeholder="john@example.com" required />
+          <span class="pc-hint">For login and notifications</span>
+        </div>
+
+        <div class="pc-form-group">
+          <label class="pc-label">Phone Number *</label>
+          <input class="pc-input" type="tel" [(ngModel)]="phone" name="phone" placeholder="+91 98765 43210" required />
+          <span class="pc-hint">10-digit mobile number</span>
+        </div>
+
+        <div class="pc-form-group">
+          <label class="pc-label">City *</label>
+          <input class="pc-input" type="text" [(ngModel)]="city" name="city" placeholder="Bangalore" />
+          <span class="pc-hint">Your city</span>
+        </div>
+
+        <div class="pc-form-group pc-auth-form-full">
+          <label class="pc-label">Address *</label>
+          <input class="pc-input" type="text" [(ngModel)]="address" name="address" placeholder="123 Main Street" />
+          <span class="pc-hint">Street address</span>
+        </div>
+
+        <div class="pc-form-group">
+          <label class="pc-label">Pincode *</label>
+          <input class="pc-input" type="text" [(ngModel)]="pincode" name="pincode" placeholder="560001" />
+          <span class="pc-hint">6-digit PIN code</span>
+        </div>
+
+        <div class="pc-form-group"></div>
+
+        <div class="pc-form-group">
+          <label class="pc-label">Password *</label>
+          <input class="pc-input" type="password" [(ngModel)]="password" name="password" placeholder="Create password" required />
+          <span class="pc-hint">Minimum 8 characters</span>
+        </div>
+
+        <div class="pc-form-group">
+          <label class="pc-label">Confirm Password *</label>
+          <input class="pc-input" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required />
+          <span class="pc-hint">Must match password</span>
+        </div>
+
       </div>
 
-      <div class="form-group">
-        <label for="email">Email</label>
-        <input
-          id="email"
-          type="email"
-          [(ngModel)]="email"
-          name="email"
-          placeholder="you@example.com"
-          required
-        />
+      <div class="pc-terms" style="margin-bottom:1.25rem">
+        <input type="checkbox" [(ngModel)]="agreedToTerms" name="agreedToTerms" id="terms" />
+        <label for="terms">I agree to the Terms of Service and Privacy Policy. I understand that my data will be used to provide medicine search and reservation services.</label>
       </div>
 
-      <div class="form-group">
-        <label for="phone">Phone Number</label>
-        <input
-          id="phone"
-          type="tel"
-          [(ngModel)]="phone"
-          name="phone"
-          placeholder="10-digit number, e.g. 9876543210"
-          required
-        />
-      </div>
-
-      <div class="form-group">
-        <label for="password">Password</label>
-        <input
-          id="password"
-          type="password"
-          [(ngModel)]="password"
-          name="password"
-          placeholder="Minimum 8 characters"
-          required
-        />
-      </div>
-
-      <button type="submit" class="btn-primary" [disabled]="loading">
-        {{ loading ? 'Creating account...' : 'Register' }}
+      <button type="submit" class="pc-auth-submit" [disabled]="loading">
+        @if (loading) { Creating account... } @else { Create Account }
       </button>
-
     </form>
 
-    <p class="switch-link">
-      Already have an account? <a routerLink="/login">Sign in</a>
-    </p>
+    <div class="pc-auth-switch" style="margin-top:1.25rem">
+      Already have an account? <a routerLink="/login">Sign In</a>
+    </div>
 
   </div>
 </div>

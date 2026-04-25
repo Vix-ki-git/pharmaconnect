@@ -1,19 +1,53 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
+import { SellerService } from '../../../services/seller.service';
 
 @Component({
   selector: 'app-seller-dashboard',
-  imports: [CommonModule],
-  template: `
-    <div style="padding: 2rem; font-family: sans-serif; text-align: center; color: #2e7d32;">
-      <h2>Seller Dashboard — coming soon</h2>
-      <button (click)="logout()" style="margin-top:1rem; padding: 0.5rem 1.5rem; background:#2e7d32; color:white; border:none; border-radius:8px; cursor:pointer;">Logout</button>
-    </div>
-  `
+  imports: [CommonModule, RouterLink],
+  templateUrl: './seller-dashboard.html',
+  styleUrl: './seller-dashboard.css'
 })
-export class SellerDashboard {
-  constructor(private authService: AuthService, private router: Router) {}
-  logout() { this.authService.logout(); this.router.navigate(['/']); }
+export class SellerDashboard implements OnInit {
+  user: any;
+  dashboard: any = null;
+  analytics: any[] = [];
+  loading = true;
+  error = '';
+  sidebarOpen = false;
+
+  constructor(
+    private authService: AuthService,
+    private sellerService: SellerService,
+    private router: Router
+  ) {
+    this.user = this.authService.getCurrentUser();
+  }
+
+  ngOnInit() {
+    if (!this.user?.id) { this.router.navigate(['/login']); return; }
+    this.sellerService.getDashboard(this.user.email).subscribe({
+      next: (data) => {
+        this.loading = false;
+        this.dashboard = data;
+        if (data.pharmacyId) {
+          this.sellerService.getAnalytics(data.pharmacyId).subscribe({
+            next: (a) => this.analytics = a,
+            error: () => {}
+          });
+        }
+      },
+      error: (err) => {
+        this.loading = false;
+        this.error = typeof err.error === 'string' ? err.error : 'Failed to load dashboard.';
+      }
+    });
+  }
+
+  logout() {
+    this.authService.logout();
+    this.router.navigate(['/']);
+  }
 }
