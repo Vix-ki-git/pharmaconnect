@@ -67,7 +67,7 @@ export class SellerDocuments implements OnInit {
 
     const formData = new FormData();
     formData.append('file', this.selectedFile);
-    formData.append('documentType', this.documentType);
+    formData.append('docType', this.documentType);
 
     this.sellerService.uploadLicense(this.pharmacyId, formData).subscribe({
       next: () => {

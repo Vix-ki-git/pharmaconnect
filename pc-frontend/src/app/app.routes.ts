@@ -15,6 +15,9 @@ import { AdminSellers } from './components/admin/sellers/admin-sellers';
 import { AdminMedicines } from './components/admin/medicines/admin-medicines';
 import { AdminAnalytics } from './components/admin/analytics/admin-analytics';
 import { AdminDocuments } from './components/admin/documents/admin-documents';
+import { AdminProfile } from './components/admin/profile/admin-profile';
+import { SellerProfile } from './components/seller/profile/seller-profile';
+import { Profile } from './components/patient/profile/profile';
 import { authGuard } from './guards/auth.guard';
 import { sellerGuard } from './guards/seller.guard';
 import { adminGuard } from './guards/admin.guard';
@@ -38,5 +41,8 @@ export const routes: Routes = [
   { path: 'admin/medicines', component: AdminMedicines, canActivate: [adminGuard] },
   { path: 'admin/analytics', component: AdminAnalytics, canActivate: [adminGuard] },
   { path: 'admin/documents', component: AdminDocuments, canActivate: [adminGuard] },
+  { path: 'admin/profile', component: AdminProfile, canActivate: [adminGuard] },
+  { path: 'seller/profile', component: SellerProfile, canActivate: [sellerGuard] },
+  { path: 'profile', component: Profile, canActivate: [authGuard] },
   { path: '**', component: NotFound }
 ];

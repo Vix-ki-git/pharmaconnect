@@ -43,6 +43,6 @@ export class AdminService {
   }
 
   updateDocumentStatus(documentId: string, status: 'APPROVED' | 'REJECTED'): Observable<any> {
-    return this.http.patch<any>(`http://localhost:8082/api/auth/admin/documents/${documentId}/status`, { status });
+    return this.http.patch<any>(`http://localhost:8082/api/auth/admin/documents/${documentId}/status?status=${status}`, {});
   }
 }

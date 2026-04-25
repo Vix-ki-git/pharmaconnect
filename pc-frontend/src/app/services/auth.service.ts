@@ -63,4 +63,15 @@ export class AuthService {
   resetPassword(token: string, newPassword: string): Observable<any> {
     return this.http.post<any>(`${this.base}/reset-password`, { token, newPassword });
   }
+
+  googleLogin(idToken: string): Observable<any> {
+    return this.http.post<any>(`${this.base}/google`, { idToken }).pipe(
+      tap(user => {
+        localStorage.setItem('userId', user.id);
+        localStorage.setItem('userEmail', user.email);
+        localStorage.setItem('userName', user.name);
+        localStorage.setItem('userRole', user.role);
+      })
+    );
+  }
 }
