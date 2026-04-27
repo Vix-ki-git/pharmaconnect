@@ -1,0 +1,158 @@
+<div class="pc-page">
+  <nav class="pc-nav">
+    <div class="pc-nav-left">
+      <button class="pc-hamburger" (click)="sidebarOpen = true" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <a class="pc-logo" routerLink="/admin/sellers">
+        <div class="pc-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+        <span class="pc-logo-text">PharmaConnect</span>
+      </a>
+    </div>
+    <button class="pc-logout" (click)="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </button>
+  </nav>
+
+  @if (sidebarOpen) {
+    <div class="pc-sidebar-backdrop" (click)="sidebarOpen = false"></div>
+    <aside class="pc-sidebar">
+      <div class="pc-sidebar-head">
+        <div class="pc-logo"><div class="pc-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div><span class="pc-logo-text">PharmaConnect</span></div>
+        <button class="pc-sidebar-close" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <nav class="pc-sidebar-nav">
+        <a routerLink="/admin/sellers" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>Manage Pharmacies</a>
+        <a routerLink="/admin/medicines" class="pc-sidebar-link active" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>Manage Medicines</a>
+        <a routerLink="/admin/documents" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Documents</a>
+        <a routerLink="/admin/analytics" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>Analytics</a>
+        <a routerLink="/admin/profile" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+      </nav>
+    </aside>
+  }
+
+  @if (toast) {
+    <div class="pc-toast" [class.pc-toast-success]="toast.type==='success'" [class.pc-toast-error]="toast.type==='error'">{{ toast.msg }}</div>
+  }
+
+  <div class="page-header">
+    <div>
+      <h1>Medicine Catalog</h1>
+      <p>{{ medicines.length }} medicine{{ medicines.length !== 1 ? 's' : '' }} in the system</p>
+    </div>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="showLinkForm = !showLinkForm">
+        {{ showLinkForm ? '✕ Cancel' : '🔗 Link Alternatives' }}
+      </button>
+      <button class="btn-primary" (click)="showAddForm = !showAddForm">
+        {{ showAddForm ? '✕ Cancel' : '+ Add Medicine' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Add Medicine Form -->
+  @if (showAddForm) {
+    <div class="panel">
+      <h3>Add New Medicine</h3>
+      @if (addError) { <div class="inline-error">{{ addError }}</div> }
+      <div class="form-grid">
+        <div class="form-group"><label>Name *</label><input [(ngModel)]="newMed.name" placeholder="e.g. Paracetamol" /></div>
+        <div class="form-group"><label>Generic Name</label><input [(ngModel)]="newMed.genericName" placeholder="e.g. Acetaminophen" /></div>
+        <div class="form-group"><label>Category</label><input [(ngModel)]="newMed.category" placeholder="e.g. Analgesic" /></div>
+        <div class="form-group"><label>Manufacturer</label><input [(ngModel)]="newMed.manufacturer" placeholder="e.g. Sun Pharma" /></div>
+        <div class="form-group"><label>Dosage Form</label><input [(ngModel)]="newMed.dosageForm" placeholder="e.g. Tablet" /></div>
+        <div class="form-group"><label>Strength</label><input [(ngModel)]="newMed.strength" placeholder="e.g. 500mg" /></div>
+      </div>
+      <button class="btn-primary" (click)="submitAdd()" [disabled]="addLoading">
+        {{ addLoading ? 'Adding...' : 'Add Medicine' }}
+      </button>
+    </div>
+  }
+
+  <!-- Link Alternatives Form -->
+  @if (showLinkForm) {
+    <div class="panel">
+      <h3>Link Generic Alternatives</h3>
+      <p class="panel-hint">Link two medicines as alternatives so patients can be shown cheaper generics.</p>
+      @if (linkError) { <div class="inline-error">{{ linkError }}</div> }
+      @if (linkSuccess) { <div class="inline-success">{{ linkSuccess }}</div> }
+      <div class="form-grid link-grid">
+        <div class="form-group">
+          <label>Brand Medicine</label>
+          <select [(ngModel)]="linkMedicineId">
+            <option value="">-- Select Medicine --</option>
+            @for (m of medicines; track m.id) {
+              <option [value]="m.id">{{ m.name }} @if (m.genericName) {({{ m.genericName }})} </option>
+            }
+          </select>
+        </div>
+        <div class="link-arrow">↔</div>
+        <div class="form-group">
+          <label>Generic Alternative</label>
+          <select [(ngModel)]="linkAlternativeId">
+            <option value="">-- Select Alternative --</option>
+            @for (m of medicines; track m.id) {
+              <option [value]="m.id">{{ m.name }} @if (m.genericName) {({{ m.genericName }})} </option>
+            }
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Equivalence Note</label>
+          <input [(ngModel)]="linkNote" placeholder="e.g. Same active ingredient, lower cost" />
+        </div>
+      </div>
+      <button class="btn-primary" (click)="submitLink()" [disabled]="linkLoading">
+        {{ linkLoading ? 'Linking...' : 'Link Alternatives' }}
+      </button>
+    </div>
+  }
+
+  <div class="page-content">
+    <!-- Search -->
+    <div class="search-row">
+      <input class="search-input" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Search by name, generic, or category..." />
+      <span class="count-label">{{ filtered.length }} result{{ filtered.length !== 1 ? 's' : '' }}</span>
+    </div>
+
+    @if (loading) { <div class="state-center"><div class="spinner"></div><p>Loading medicines...</p></div> }
+    @if (!loading && error) { <div class="state-center"><p class="err-msg">{{ error }}</p></div> }
+
+    @if (!loading && filtered.length === 0 && !error) {
+      <div class="empty-state">
+        <div class="empty-icon">💊</div>
+        <h3>No medicines found</h3>
+        <p>{{ searchTerm ? 'Try a different search.' : 'Add medicines using the button above.' }}</p>
+      </div>
+    }
+
+    @if (!loading && filtered.length > 0) {
+      <div class="table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Generic Name</th>
+              <th>Category</th>
+              <th>Manufacturer</th>
+              <th>Form</th>
+              <th>Strength</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (m of filtered; track m.id) {
+              <tr>
+                <td class="med-name">{{ m.name }}</td>
+                <td class="muted">{{ m.genericName || '—' }}</td>
+                <td><span class="cat-chip">{{ m.category || '—' }}</span></td>
+                <td class="muted">{{ m.manufacturer || '—' }}</td>
+                <td class="muted">{{ m.dosageForm || '—' }}</td>
+                <td class="muted">{{ m.strength || '—' }}</td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    }
+  </div>
+</div>

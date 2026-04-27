@@ -1,17 +1,30 @@
 import { Component } from '@angular/core';
-import { CommonModule } from '@angular/common'; // 1. Add this import
+import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
+import { ThemeService } from '../../services/theme.service';
+
 @Component({
   selector: 'app-landing-page',
   imports: [CommonModule],
   templateUrl: './landing-page.html',
   styleUrl: './landing-page.css',
 })
-
 export class LandingPage {
-  isDarkMode = false;
+  constructor(private router: Router, public themeService: ThemeService) {}
 
-    toggleTheme() {
-        this.isDarkMode = !this.isDarkMode;
-        document.body.classList.toggle('dark-theme');
-      }
+  toggleTheme() {
+    this.themeService.toggle();
+  }
+
+  goToLogin() {
+    this.router.navigate(['/login']);
+  }
+
+  goToSearch() {
+    this.router.navigate(['/search']);
+  }
+
+  goToRegister() {
+    this.router.navigate(['/register-pharmacy']);
+  }
 }

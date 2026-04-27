@@ -1,0 +1,75 @@
+.page-wrapper { min-height: 100vh; background: var(--bg-soft); font-family: 'Inter', system-ui, sans-serif; }
+
+.top-nav { background: var(--nav-bg); border-bottom: 1px solid var(--border-color); box-shadow: 0 1px 6px rgba(0,0,0,0.06); height: 60px; padding: 0 2rem; display: flex; align-items: center; gap: 2rem; position: sticky; top: 0; z-index: 100; }
+.logo { font-size: 1.25rem; font-weight: 800; color: var(--text-main); flex-shrink: 0; }
+.logo span { color: var(--secondary-gold); }
+.nav-links { display: flex; gap: 1.5rem; flex: 1; }
+.nav-link { text-decoration: none; color: var(--text-muted); font-size: 0.875rem; font-weight: 500; padding-bottom: 2px; border-bottom: 2px solid transparent; transition: color 0.2s, border-color 0.2s; }
+.nav-link:hover, .nav-link.active { color: var(--primary-green); border-bottom-color: var(--primary-green); }
+.nav-right { display: flex; align-items: center; gap: 0.75rem; flex-shrink: 0; }
+.user-name { font-size: 0.85rem; color: var(--text-muted); }
+.btn-logout { border: 1.5px solid var(--border-color); background: transparent; color: var(--text-muted); border-radius: 6px; padding: 0.3rem 0.8rem; font-size: 0.82rem; cursor: pointer; transition: all 0.2s; }
+.btn-logout:hover { border-color: var(--primary-green); color: var(--primary-green); }
+
+.theme-orb { width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid var(--border-color); background: var(--card-bg); cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.3s; position: relative; overflow: hidden; }
+.orb-content { display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; }
+.sun-icon { width: 14px; height: 14px; color: var(--secondary-gold); display: block; }
+.moon-icon { width: 13px; height: 13px; color: var(--primary-green); display: none; }
+.theme-orb.dark .sun-icon { display: none; }
+.theme-orb.dark .moon-icon { display: block; }
+.orb-glow { position: absolute; inset: 0; border-radius: 50%; background: radial-gradient(circle, rgba(46,125,50,0.15), transparent); opacity: 0; transition: opacity 0.3s; }
+.theme-orb:hover .orb-glow { opacity: 1; }
+
+.toast { position: fixed; top: 70px; left: 50%; transform: translateX(-50%); z-index: 200; padding: 0.75rem 1.5rem; border-radius: 8px; font-size: 0.9rem; box-shadow: 0 4px 16px rgba(0,0,0,0.15); animation: slideDown 0.25s ease; }
+@keyframes slideDown { from { opacity: 0; transform: translateX(-50%) translateY(-8px); } }
+.toast-success { background: var(--green-bg); color: var(--green-dark); border: 1px solid var(--green-light); }
+.toast-error   { background: #fef2f2; color: #dc2626; border: 1px solid #fca5a5; }
+
+.page-header { background: var(--card); border-bottom: 1px solid var(--border); padding: 1.25rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+.page-header h1 { margin: 0 0 0.2rem; font-size: 1.5rem; font-weight: 700; color: var(--text); }
+.page-header p { margin: 0; font-size: 0.875rem; color: var(--text-muted); }
+.pending-count { background: var(--gold-light); color: #92400e; border-radius: 50px; padding: 0.3rem 1rem; font-size: 0.82rem; font-weight: 700; white-space: nowrap; flex-shrink: 0; }
+
+.page-content { max-width: 900px; margin: 2rem auto; padding: 0 2rem; }
+.state-center { text-align: center; padding: 3rem 2rem; color: var(--text-muted); }
+.spinner { width: 36px; height: 36px; border: 3px solid var(--border-color); border-top-color: var(--primary-green); border-radius: 50%; animation: spin 0.8s linear infinite; margin: 0 auto 1rem; }
+@keyframes spin { to { transform: rotate(360deg); } }
+.err-msg { color: #c62828; }
+.empty-state { text-align: center; padding: 4rem 1rem; color: var(--text-muted); }
+.empty-icon { font-size: 3rem; margin-bottom: 1rem; }
+.empty-state h3 { font-size: 1.1rem; color: var(--text-main); margin: 0 0 0.4rem; }
+.empty-state p { font-size: 0.9rem; margin: 0; }
+
+.cards-list { display: flex; flex-direction: column; gap: 1.25rem; }
+
+.doc-card { background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; overflow: hidden; box-shadow: 0 2px 10px rgba(0,0,0,0.06); }
+
+.doc-header { display: flex; justify-content: space-between; align-items: flex-start; padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); gap: 1rem; }
+.doc-title { flex: 1; }
+.doc-type { font-size: 1.05rem; font-weight: 700; color: var(--text-main); margin: 0 0 0.25rem; }
+.ph-name { font-size: 0.875rem; color: var(--text-muted); }
+.status-chip { padding: 0.25rem 0.65rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; }
+.chip-pending { background: #fff3e0; color: #e65100; }
+
+.doc-meta { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.6rem; }
+.meta-row { display: flex; gap: 1rem; align-items: center; }
+.meta-key { font-size: 0.8rem; color: var(--text-muted); width: 90px; flex-shrink: 0; }
+.meta-val { font-size: 0.875rem; color: var(--text-main); font-weight: 500; font-family: monospace; }
+.file-link { font-size: 0.875rem; color: var(--primary-green); font-weight: 600; text-decoration: none; }
+.file-link:hover { text-decoration: underline; }
+
+.doc-actions { display: flex; align-items: center; gap: 0.75rem; padding: 1.1rem 1.5rem; background: var(--bg-soft); flex-wrap: wrap; }
+.btn-approve { background: var(--primary-green); color: white; border: none; border-radius: 9px; padding: 0.6rem 1.4rem; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+.btn-approve:hover:not(:disabled) { opacity: 0.88; }
+.btn-approve:disabled { opacity: 0.5; cursor: not-allowed; }
+.btn-reject { background: transparent; border: 1.5px solid #c62828; color: #c62828; border-radius: 9px; padding: 0.6rem 1.4rem; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: all 0.2s; }
+.btn-reject:hover:not(:disabled) { background: #c62828; color: white; }
+.btn-reject:disabled { opacity: 0.5; cursor: not-allowed; }
+
+@media (max-width: 700px) {
+  .top-nav { padding: 0 1rem; gap: 1rem; }
+  .user-name { display: none; }
+  .page-header { flex-direction: column; align-items: flex-start; padding: 1.25rem 1rem; }
+  .page-content { padding: 0 1rem; }
+  .doc-actions { padding: 1rem; }
+}

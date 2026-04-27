@@ -10,7 +10,7 @@ pc/target/
 *.war
 
 pharma_connect_context.md
-
+Pharma Connect Pictures
 # IDE settings
 .idea/
 *.iml

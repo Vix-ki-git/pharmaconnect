@@ -1,38 +1,154 @@
 <div class="landing-wrapper">
+
+  <!-- Nav -->
   <nav class="top-nav">
     <div class="logo">Pharma<span>Connect</span></div>
-
-    <button class="theme-orb" (click)="toggleTheme()" [class.dark]="isDarkMode" aria-label="Toggle Theme">
-      <div class="orb-content">
-        <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <circle cx="12" cy="12" r="5"></circle>
-          <line x1="12" y1="1" x2="12" y2="3"></line>
-          <line x1="12" y1="21" x2="12" y2="23"></line>
-          <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
-          <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
-          <line x1="1" y1="12" x2="3" y2="12"></line>
-          <line x1="21" y1="12" x2="23" y2="12"></line>
-          <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
-          <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
-        </svg>
-        <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-        </svg>
-      </div>
-      <div class="orb-glow"></div>
-    </button>
+    <div class="nav-actions">
+      <button class="theme-orb" (click)="toggleTheme()" [class.dark]="themeService.isDark" aria-label="Toggle Theme">
+        <div class="orb-content">
+          <svg class="sun-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/>
+            <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/>
+            <line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/>
+            <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>
+          </svg>
+          <svg class="moon-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
+          </svg>
+        </div>
+        <div class="orb-glow"></div>
+      </button>
+      <a class="nav-login-btn" (click)="goToLogin()">Login</a>
+    </div>
   </nav>
 
+  <!-- Hero -->
   <header class="hero">
-    <div class="badge">By Spring Explorers</div>
-    <h1>Your Health, <br><span class="highlight">Connected.</span></h1>
-    <p>The smartest way to bridge the gap between patients and local medicine providers.</p>
-
-    <div class="cta-group">
-      <button class="btn btn-gold">I am a Patient</button>
-      <button class="btn btn-outline">I am a Pharmacy</button>
+    <div class="hero-inner">
+      <div class="badge">Connecting Patients &amp; Pharmacies</div>
+      <h1>Find Medicines.<br><span class="highlight">Reserve Instantly.</span></h1>
+      <p class="hero-sub">Search live stock across local pharmacies, reserve your medicine in 30 seconds, and pick it up in person — no more wasted trips.</p>
+      <div class="cta-group">
+        <button class="btn btn-gold" (click)="goToSearch()">Find Medicines Now</button>
+        <button class="btn btn-outline" (click)="goToRegister()">Register Your Pharmacy</button>
+      </div>
+      <p class="login-hint">Already have an account? <a (click)="goToLogin()">Login here</a></p>
+    </div>
+    <div class="hero-visual">
+      <div class="mock-card">
+        <div class="mock-top">
+          <div class="mock-pill"></div>
+          <div class="mock-dist">1.2 km</div>
+        </div>
+        <div class="mock-name"></div>
+        <div class="mock-sub"></div>
+        <div class="mock-row">
+          <div class="mock-price"></div>
+          <div class="mock-stock"></div>
+        </div>
+        <div class="mock-btn"></div>
+      </div>
     </div>
   </header>
 
-  <div class="floating-blob"></div>
+  <!-- How it works -->
+  <section class="section how-section">
+    <div class="section-inner">
+      <div class="section-label">Simple &amp; Fast</div>
+      <h2 class="section-title">How it works</h2>
+      <div class="steps-grid">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-icon">🔍</div>
+          <h3>Search</h3>
+          <p>Type a medicine name. We scan real-time stock across all verified pharmacies near you.</p>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-icon">📌</div>
+          <h3>Reserve</h3>
+          <p>Pick a pharmacy and reserve your quantity. We hold it for 30 minutes — no payment needed.</p>
+        </div>
+        <div class="step-divider"></div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-icon">🏪</div>
+          <h3>Pick Up</h3>
+          <p>Walk in, show your reservation, and collect your medicine. Fast, confirmed, no surprises.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Features -->
+  <section class="section features-section">
+    <div class="section-inner">
+      <div class="section-label">Why PharmaConnect</div>
+      <h2 class="section-title">Everything you need in a health emergency</h2>
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon green">📍</div>
+          <h3>Nearest First</h3>
+          <p>GPS-based sorting shows you the closest pharmacy with stock, cutting down travel time.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon amber">🚨</div>
+          <h3>Emergency 24/7</h3>
+          <p>Filter for pharmacies open round the clock — critical for urgent midnight medicine runs.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon blue">⏱</div>
+          <h3>30-Min Hold</h3>
+          <p>Reservations hold stock for 30 minutes so it's waiting for you when you arrive.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon purple">💊</div>
+          <h3>Generic Alternatives</h3>
+          <p>See cheaper generic equivalents side by side, so you can make an informed choice.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon teal">📦</div>
+          <h3>Live Inventory</h3>
+          <p>Pharmacies update stock in real time. What you see is what's actually on the shelf.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon rose">🔒</div>
+          <h3>Verified Pharmacies</h3>
+          <p>Every pharmacy is admin-verified before appearing in search results. No fake listings.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- For Pharmacies CTA -->
+  <section class="section pharmacy-cta-section">
+    <div class="cta-card">
+      <div class="cta-left">
+        <h2>Own a pharmacy?</h2>
+        <p>Join PharmaConnect to reach more patients, manage inventory in one place, and track demand analytics for your store.</p>
+        <ul class="cta-list">
+          <li>✓ Free to register</li>
+          <li>✓ Bulk CSV inventory upload</li>
+          <li>✓ Real-time reservation alerts</li>
+          <li>✓ Demand analytics dashboard</li>
+        </ul>
+      </div>
+      <button class="btn btn-green" (click)="goToRegister()">Register Your Pharmacy →</button>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <div class="footer-inner">
+      <div class="footer-logo">Pharma<span>Connect</span></div>
+      <div class="footer-links">
+        <a (click)="goToSearch()">Find Medicines</a>
+        <a (click)="goToLogin()">Login</a>
+        <a (click)="goToRegister()">Register Pharmacy</a>
+      </div>
+      <p class="footer-copy">Built by Spring Explorers · 2025</p>
+    </div>
+  </footer>
+
 </div>

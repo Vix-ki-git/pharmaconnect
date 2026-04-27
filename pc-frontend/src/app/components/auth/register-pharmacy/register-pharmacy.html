@@ -1,0 +1,154 @@
+<div class="pc-auth-page">
+
+  <a class="pc-auth-back" href="/">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><polyline points="15 18 9 12 15 6"/></svg>
+    Back to Home
+  </a>
+
+  <div class="pc-auth-card pc-auth-card-lg">
+
+    <div class="pc-auth-icon">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+        <polyline points="9 22 9 12 15 12 15 22"/>
+      </svg>
+    </div>
+
+    <h1 class="pc-auth-title">Register Your Pharmacy</h1>
+    <p class="pc-auth-sub">Join PharmaConnect and reach more customers</p>
+
+    @if (errorMessage) {
+      <div class="pc-alert pc-alert-error">{{ errorMessage }}</div>
+    }
+    @if (successMessage) {
+      <div class="pc-alert pc-alert-success">{{ successMessage }}</div>
+    }
+
+    <form (ngSubmit)="onSubmit()">
+
+      <!-- Section: Pharmacy Information -->
+      <div class="pc-section-hdr" style="margin-top:0.5rem">
+        <h3>Pharmacy Information</h3>
+        <p>Details about your pharmacy business</p>
+      </div>
+
+      <div class="pc-auth-form-grid">
+        <div class="pc-form-group">
+          <label class="pc-label">Pharmacy Name *</label>
+          <input class="pc-input" type="text" [(ngModel)]="pharmacyName" name="pharmacyName" placeholder="Apollo Pharmacy" required />
+          <span class="pc-hint">Registered pharmacy name</span>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Owner Name *</label>
+          <input class="pc-input" type="text" [(ngModel)]="ownerName" name="ownerName" placeholder="Dr. Rajesh Kumar" required />
+          <span class="pc-hint">Pharmacy owner's name</span>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Pharmacy License Number *</label>
+          <input class="pc-input" type="text" [(ngModel)]="licenseNumber" name="licenseNumber" placeholder="PH/2024/123456" />
+          <span class="pc-hint">Valid license number</span>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">GST Number *</label>
+          <input class="pc-input" type="text" [(ngModel)]="gstNumber" name="gstNumber" placeholder="29ABCDE1234F1Z5" />
+          <span class="pc-hint">15-character GST number</span>
+        </div>
+      </div>
+
+      <!-- Section: Contact Information -->
+      <div class="pc-section-hdr">
+        <h3>Contact Information</h3>
+        <p>How customers can reach you</p>
+      </div>
+
+      <div class="pc-auth-form-grid">
+        <div class="pc-form-group">
+          <label class="pc-label">Email Address *</label>
+          <input class="pc-input" type="email" [(ngModel)]="email" name="email" placeholder="contact@pharmacy.com" required />
+          <span class="pc-hint">For login and notifications</span>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Phone Number *</label>
+          <input class="pc-input" type="tel" [(ngModel)]="phone" name="phone" placeholder="+91 98765 43210" required />
+          <span class="pc-hint">Contact number</span>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Address *</label>
+          <input class="pc-input" type="text" [(ngModel)]="address" name="address" placeholder="123 Main Street" required />
+          <span class="pc-hint">Street address</span>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">City *</label>
+          <input class="pc-input" type="text" [(ngModel)]="city" name="city" placeholder="Bangalore" />
+          <span class="pc-hint">City name</span>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Pincode *</label>
+          <input class="pc-input" type="text" [(ngModel)]="pincode" name="pincode" placeholder="560001" />
+          <span class="pc-hint">6-digit PIN code</span>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Operating Hours *</label>
+          <input class="pc-input" type="text" [(ngModel)]="operatingHours" name="operatingHours" placeholder="9 AM - 9 PM" />
+          <span class="pc-hint">Business hours</span>
+        </div>
+      </div>
+
+      <div class="pc-check-row" style="margin-bottom:1.25rem">
+        <input type="checkbox" [(ngModel)]="isOperated247" name="isOperated247" id="open247" />
+        <label for="open247">My pharmacy is open 24x7</label>
+      </div>
+
+      <!-- Location (optional) -->
+      <div class="pc-auth-form-grid" style="margin-bottom:1.25rem">
+        <div class="pc-form-group">
+          <label class="pc-label">Latitude <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+          <input class="pc-input" type="number" [(ngModel)]="locationLatitude" name="locationLatitude" placeholder="e.g. 12.9716" step="any" />
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Longitude <span style="font-weight:400;color:var(--text-muted)">(optional)</span></label>
+          <input class="pc-input" type="number" [(ngModel)]="locationLongitude" name="locationLongitude" placeholder="e.g. 77.5946" step="any" />
+        </div>
+        <div class="pc-form-group pc-auth-form-full">
+          <button type="button" class="pc-btn pc-btn-outline" style="width:100%;" (click)="useMyLocation()" [disabled]="locating">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {{ locating ? 'Detecting location...' : 'Use My Current Location' }}
+          </button>
+        </div>
+      </div>
+
+      <!-- Section: Account Security -->
+      <div class="pc-section-hdr">
+        <h3>Account Security</h3>
+        <p>Set up your login credentials</p>
+      </div>
+
+      <div class="pc-auth-form-grid" style="margin-bottom:1.25rem">
+        <div class="pc-form-group">
+          <label class="pc-label">Password *</label>
+          <input class="pc-input" type="password" [(ngModel)]="password" name="password" placeholder="Create password" required />
+          <span class="pc-hint">Minimum 8 characters</span>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Confirm Password *</label>
+          <input class="pc-input" type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Re-enter password" required />
+          <span class="pc-hint">Must match password</span>
+        </div>
+      </div>
+
+      <div class="pc-terms" style="margin-bottom:1.5rem">
+        <input type="checkbox" [(ngModel)]="agreedToTerms" name="agreedToTerms" id="terms" />
+        <label for="terms">I confirm that all information provided is accurate and I have the legal authority to register this pharmacy. I agree to the Terms of Service and Privacy Policy.</label>
+      </div>
+
+      <button type="submit" class="pc-auth-submit" [disabled]="loading">
+        @if (loading) { Registering... } @else { Register Pharmacy }
+      </button>
+    </form>
+
+    <div class="pc-auth-switch" style="margin-top:1.25rem">
+      Already registered? <a routerLink="/login">Login</a>
+    </div>
+
+  </div>
+</div>
