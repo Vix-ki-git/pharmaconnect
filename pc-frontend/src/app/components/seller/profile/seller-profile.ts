@@ -1,12 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { SellerService } from '../../../services/seller.service';
 
 @Component({
   selector: 'app-seller-profile',
-  imports: [CommonModule, RouterLink],
+  imports: [CommonModule, RouterLink, DatePipe],
   templateUrl: './seller-profile.html',
   styleUrl: './seller-profile.css'
 })

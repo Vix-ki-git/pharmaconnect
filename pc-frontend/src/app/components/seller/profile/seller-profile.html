@@ -60,11 +60,19 @@
           <div class="info-grid">
             <div class="info-row">
               <span class="info-label">Full Name</span>
-              <span class="info-val">{{ user?.name }}</span>
+              <span class="info-val">{{ user?.name || '—' }}</span>
             </div>
             <div class="info-row">
               <span class="info-label">Email Address</span>
-              <span class="info-val">{{ user?.email }}</span>
+              <span class="info-val">{{ user?.email || '—' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Phone Number</span>
+              <span class="info-val">{{ user?.phone || (dashboard?.ownerPhone) || '—' }}</span>
+            </div>
+            <div class="info-row">
+              <span class="info-label">Member Since</span>
+              <span class="info-val">{{ dashboard?.memberSince ? (dashboard.memberSince | date:'MMMM d, y') : '—' }}</span>
             </div>
             <div class="info-row">
               <span class="info-label">Account ID</span>
@@ -94,8 +102,22 @@
             </div>
             <div class="info-grid">
               <div class="info-row">
-                <span class="info-label">Pharmacy ID</span>
-                <span class="info-val info-mono">{{ dashboard.pharmacyId }}</span>
+                <span class="info-label">Address</span>
+                <span class="info-val">{{ dashboard.pharmacyAddress || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Phone</span>
+                <span class="info-val">{{ dashboard.pharmacyPhone || '—' }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">24×7 Open</span>
+                <span class="info-val">
+                  @if (dashboard.is247Open) {
+                    <span class="pc-chip pc-chip-green">Yes</span>
+                  } @else {
+                    <span class="pc-chip">No</span>
+                  }
+                </span>
               </div>
               <div class="info-row">
                 <span class="info-label">Status</span>
@@ -106,8 +128,16 @@
                 <span class="info-val">{{ dashboard.totalStockItems ?? 0 }}</span>
               </div>
               <div class="info-row">
+                <span class="info-label">Low Stock Items</span>
+                <span class="info-val">{{ dashboard.lowStockItems ?? 0 }}</span>
+              </div>
+              <div class="info-row">
                 <span class="info-label">Active Reservations</span>
                 <span class="info-val">{{ dashboard.activeReservationsCount ?? 0 }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Pharmacy ID</span>
+                <span class="info-val info-mono">{{ dashboard.pharmacyId }}</span>
               </div>
             </div>
 

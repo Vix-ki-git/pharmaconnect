@@ -1,3 +1,22 @@
+@if (registered) {
+  <div class="pc-auth-page">
+    <div class="pc-auth-card" style="text-align:center;padding:3rem 2rem;max-width:480px">
+      <div class="reg-success-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" width="36" height="36"><polyline points="20 6 9 17 4 12"/></svg>
+      </div>
+      <h1 class="pc-auth-title" style="margin-bottom:0.75rem">Pharmacy Registered!</h1>
+      <p style="color:var(--text-muted);margin-bottom:1rem;line-height:1.6">
+        Your pharmacy has been submitted for admin verification. You can start uploading documents from your seller dashboard.
+      </p>
+      <div class="pc-alert pc-alert-warn" style="text-align:left;margin-bottom:1.25rem">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="16" height="16"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+        Pending admin approval — your pharmacy will appear in search results once verified.
+      </div>
+      <p style="color:var(--text-muted);font-size:0.875rem">Taking you to your dashboard...</p>
+    </div>
+  </div>
+} @else {
+
 <div class="pc-auth-page">
 
   <a class="pc-auth-back" href="/">
@@ -19,9 +38,6 @@
 
     @if (errorMessage) {
       <div class="pc-alert pc-alert-error">{{ errorMessage }}</div>
-    }
-    @if (successMessage) {
-      <div class="pc-alert pc-alert-success">{{ successMessage }}</div>
     }
 
     <form (ngSubmit)="onSubmit()">
@@ -152,3 +168,5 @@
 
   </div>
 </div>
+
+}

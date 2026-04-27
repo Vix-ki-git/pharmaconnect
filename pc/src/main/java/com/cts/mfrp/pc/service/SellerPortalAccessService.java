@@ -27,8 +27,17 @@ public class SellerPortalAccessService {
         SellerPortalDashboardResponseDto dto = new SellerPortalDashboardResponseDto();
         dto.setPharmacyId(sellerPharmacy.getId());
         dto.setPharmacyName(sellerPharmacy.getName());
+        dto.setPharmacyAddress(sellerPharmacy.getAddress());
+        dto.setPharmacyPhone(sellerPharmacy.getPhone());
+        dto.setIs247Open(Boolean.TRUE.equals(sellerPharmacy.getIs247()));
         dto.setIsPharmacyVerified(sellerPharmacy.getIsVerified());
         dto.setIsPharmacyActive(sellerPharmacy.getIsActive());
+        if (sellerPharmacy.getOwner() != null) {
+            dto.setOwnerPhone(sellerPharmacy.getOwner().getPhone());
+            if (sellerPharmacy.getOwner().getCreatedAt() != null) {
+                dto.setMemberSince(sellerPharmacy.getOwner().getCreatedAt().toLocalDate().toString());
+            }
+        }
 
         if (Boolean.TRUE.equals(sellerPharmacy.getIsVerified())) {
             dto.setPortalAccessMessage("Welcome to your Seller Portal. You have full access.");

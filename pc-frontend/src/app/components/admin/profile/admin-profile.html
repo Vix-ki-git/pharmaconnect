@@ -52,15 +52,27 @@
       <div class="info-grid">
         <div class="info-row">
           <span class="info-label">Full Name</span>
-          <span class="info-val">{{ user?.name }}</span>
+          <span class="info-val">{{ user?.name || '—' }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Email Address</span>
-          <span class="info-val">{{ user?.email }}</span>
+          <span class="info-val">{{ user?.email || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Phone Number</span>
+          <span class="info-val">{{ user?.phone || '—' }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Role</span>
           <span class="info-val">System Administrator</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Permissions</span>
+          <span class="info-val">Full access — manage pharmacies, medicines, documents &amp; analytics</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Member Since</span>
+          <span class="info-val">{{ formatDate(user?.createdAt) }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Account ID</span>

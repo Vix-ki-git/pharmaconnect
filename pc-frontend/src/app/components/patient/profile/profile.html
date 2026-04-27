@@ -50,15 +50,23 @@
       <div class="info-grid">
         <div class="info-row">
           <span class="info-label">Full Name</span>
-          <span class="info-val">{{ user?.name }}</span>
+          <span class="info-val">{{ user?.name || '—' }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Email Address</span>
-          <span class="info-val">{{ user?.email }}</span>
+          <span class="info-val">{{ user?.email || '—' }}</span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Phone Number</span>
+          <span class="info-val">{{ user?.phone || '—' }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Account Role</span>
           <span class="info-val"><span class="pc-chip pc-chip-green">Patient</span></span>
+        </div>
+        <div class="info-row">
+          <span class="info-label">Member Since</span>
+          <span class="info-val">{{ formatDate(user?.createdAt) }}</span>
         </div>
         <div class="info-row">
           <span class="info-label">Account ID</span>

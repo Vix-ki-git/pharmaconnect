@@ -22,8 +22,8 @@ export class Register {
   agreedToTerms = false;
 
   errorMessage = '';
-  successMessage = '';
   loading = false;
+  registered = false;
 
   constructor(
     private authService: AuthService,
@@ -59,13 +59,13 @@ export class Register {
         this.authService.login(this.email, this.password).subscribe({
           next: () => {
             this.loading = false;
-            this.successMessage = 'Account created! Taking you to search...';
-            setTimeout(() => this.router.navigate(['/search']), 800);
+            this.registered = true;
+            setTimeout(() => this.router.navigate(['/search']), 3000);
           },
           error: () => {
             this.loading = false;
-            this.successMessage = 'Account created! Please sign in.';
-            setTimeout(() => this.router.navigate(['/login']), 1200);
+            this.registered = true;
+            setTimeout(() => this.router.navigate(['/login']), 3000);
           }
         });
       },

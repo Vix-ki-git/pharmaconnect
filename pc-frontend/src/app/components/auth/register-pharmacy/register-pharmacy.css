@@ -1,1 +1,8 @@
-/* No component-specific styles needed — all layout handled by styles.css pc-* classes */
+.reg-success-icon {
+  width: 80px; height: 80px;
+  background: var(--green);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  margin: 0 auto 1.75rem;
+  color: white;
+}
