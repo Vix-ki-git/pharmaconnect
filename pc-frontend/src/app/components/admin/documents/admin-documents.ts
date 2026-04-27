@@ -88,6 +88,15 @@ export class AdminDocuments implements OnInit {
     return new Date(dt).toLocaleString([], { dateStyle: 'medium', timeStyle: 'short' });
   }
 
+  getDocUrl(path: string): string {
+    if (!path) return '';
+    return `http://localhost:8082/${path.replace(/\\/g, '/')}`;
+  }
+
+  isPdf(path: string): boolean {
+    return path?.toLowerCase().endsWith('.pdf') ?? false;
+  }
+
   private showToast(msg: string, type: 'success' | 'error') {
     clearTimeout(this.toastTimer);
     this.toast = { msg, type };

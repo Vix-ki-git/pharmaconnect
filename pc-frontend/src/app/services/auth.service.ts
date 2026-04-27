@@ -15,12 +15,14 @@ export class AuthService {
         localStorage.setItem('userEmail', user.email);
         localStorage.setItem('userName', user.name);
         localStorage.setItem('userRole', user.role);
+        if (user.phone) localStorage.setItem('userPhone', user.phone);
+        if (user.createdAt) localStorage.setItem('userCreatedAt', user.createdAt);
       })
     );
   }
 
   register(name: string, email: string, password: string, phone: string): Observable<any> {
-    return this.http.post<any>(`${this.base}/register`, { name, email, password, phone });
+    return this.http.post(`${this.base}/register`, { name, email, password, phone }, { responseType: 'text' }) as Observable<any>;
   }
 
   registerPharmacy(dto: {
@@ -44,7 +46,9 @@ export class AuthService {
       id: localStorage.getItem('userId'),
       email: localStorage.getItem('userEmail'),
       name: localStorage.getItem('userName'),
-      role: localStorage.getItem('userRole')
+      role: localStorage.getItem('userRole'),
+      phone: localStorage.getItem('userPhone'),
+      createdAt: localStorage.getItem('userCreatedAt')
     };
   }
 
@@ -71,6 +75,8 @@ export class AuthService {
         localStorage.setItem('userEmail', user.email);
         localStorage.setItem('userName', user.name);
         localStorage.setItem('userRole', user.role);
+        if (user.phone) localStorage.setItem('userPhone', user.phone);
+        if (user.createdAt) localStorage.setItem('userCreatedAt', user.createdAt);
       })
     );
   }

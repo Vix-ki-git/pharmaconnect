@@ -38,7 +38,7 @@ export class RegisterPharmacy {
   loading = false;
   locating = false;
   errorMessage = '';
-  successMessage = '';
+  registered = false;
 
   constructor(
     private authService: AuthService,
@@ -112,13 +112,13 @@ export class RegisterPharmacy {
             this.authService.login(this.email, this.password).subscribe({
               next: () => {
                 this.loading = false;
-                this.successMessage = 'Pharmacy registered! Taking you to your dashboard...';
-                setTimeout(() => this.router.navigate(['/seller/dashboard']), 1000);
+                this.registered = true;
+                setTimeout(() => this.router.navigate(['/seller/dashboard']), 3500);
               },
               error: () => {
                 this.loading = false;
-                this.successMessage = 'Pharmacy registered! Pending admin approval. Please sign in.';
-                setTimeout(() => this.router.navigate(['/login']), 2000);
+                this.registered = true;
+                setTimeout(() => this.router.navigate(['/login']), 3500);
               }
             });
           },

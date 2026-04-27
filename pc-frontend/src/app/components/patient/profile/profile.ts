@@ -23,5 +23,11 @@ export class Profile {
     return name.split(' ').map((n: string) => n[0]).join('').toUpperCase().slice(0, 2);
   }
 
+  formatDate(d: string | null): string {
+    if (!d) return '—';
+    try { return new Date(d).toLocaleDateString('en-IN', { year: 'numeric', month: 'long', day: 'numeric' }); }
+    catch { return d; }
+  }
+
   logout() { this.authService.logout(); this.router.navigate(['/']); }
 }

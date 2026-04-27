@@ -6,9 +6,14 @@ import lombok.Data;
 public class SellerPortalDashboardResponseDto {
     private String pharmacyId;
     private String pharmacyName;
+    private String pharmacyAddress;
+    private String pharmacyPhone;
+    private Boolean is247Open;
     private Boolean isPharmacyVerified;
     private Boolean isPharmacyActive;
     private String portalAccessMessage;
+    private String ownerPhone;
+    private String memberSince;
 
     // US-11: Stock summary
     private int totalStockItems;

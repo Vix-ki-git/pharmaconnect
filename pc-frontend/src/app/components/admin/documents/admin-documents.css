@@ -51,12 +51,16 @@
 .status-chip { padding: 0.25rem 0.65rem; border-radius: 50px; font-size: 0.75rem; font-weight: 600; flex-shrink: 0; }
 .chip-pending { background: #fff3e0; color: #e65100; }
 
+.doc-preview-area { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.75rem; }
+.doc-img-thumb { width: 100%; max-height: 220px; object-fit: contain; border: 1px solid var(--border-color); border-radius: 8px; background: var(--bg-soft); display: block; }
+.pdf-placeholder { display: flex; align-items: center; gap: 0.75rem; padding: 1rem; background: #fef2f2; border: 1px solid #fca5a5; border-radius: 8px; color: #dc2626; font-size: 0.9rem; font-weight: 600; }
+.btn-view-doc { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--primary-green); color: white; padding: 0.55rem 1.25rem; border-radius: 8px; font-size: 0.85rem; font-weight: 600; text-decoration: none; transition: opacity 0.2s; width: fit-content; }
+.btn-view-doc:hover { opacity: 0.88; }
+
 .doc-meta { padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 0.6rem; }
 .meta-row { display: flex; gap: 1rem; align-items: center; }
 .meta-key { font-size: 0.8rem; color: var(--text-muted); width: 90px; flex-shrink: 0; }
 .meta-val { font-size: 0.875rem; color: var(--text-main); font-weight: 500; font-family: monospace; }
-.file-link { font-size: 0.875rem; color: var(--primary-green); font-weight: 600; text-decoration: none; }
-.file-link:hover { text-decoration: underline; }
 
 .doc-actions { display: flex; align-items: center; gap: 0.75rem; padding: 1.1rem 1.5rem; background: var(--bg-soft); flex-wrap: wrap; }
 .btn-approve { background: var(--primary-green); color: white; border: none; border-radius: 9px; padding: 0.6rem 1.4rem; font-size: 0.9rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }

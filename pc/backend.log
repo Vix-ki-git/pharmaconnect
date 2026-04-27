@@ -1,0 +1,288 @@
+[INFO] Scanning for projects...
+[INFO] 
+[INFO] --------------------------< com.cts.mfrp:pc >---------------------------
+[INFO] Building  0.0.1-SNAPSHOT
+[INFO]   from pom.xml
+[INFO] --------------------------------[ jar ]---------------------------------
+[INFO] 
+[INFO] >>> spring-boot:4.0.3:run (default-cli) > test-compile @ pc >>>
+[INFO] 
+[INFO] --- resources:3.3.1:resources (default-resources) @ pc ---
+[INFO] Copying 1 resource from src\main\resources to target\classes
+[INFO] Copying 3 resources from src\main\resources to target\classes
+[INFO] 
+[INFO] --- compiler:3.14.1:compile (default-compile) @ pc ---
+[INFO] Recompiling the module because of changed source code.
+[INFO] Compiling 67 source files with javac [debug parameters release 21] to target\classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[INFO] 
+[INFO] --- resources:3.3.1:testResources (default-testResources) @ pc ---
+[INFO] skip non existing resourceDirectory C:\Users\2480176\Documents\pharmaconnect\pc\src\test\resources
+[INFO] 
+[INFO] --- compiler:3.14.1:testCompile (default-testCompile) @ pc ---
+[INFO] Recompiling the module because of changed dependency.
+[INFO] Compiling 1 source file with javac [debug parameters release 21] to target\test-classes
+[INFO] Annotation processing is enabled because one or more processors were found
+  on the class path. A future release of javac may disable annotation processing
+  unless at least one processor is specified by name (-processor), or a search
+  path is specified (--processor-path, --processor-module-path), or annotation
+  processing is enabled explicitly (-proc:only, -proc:full).
+  Use -Xlint:-options to suppress this message.
+  Use -proc:none to disable annotation processing.
+[INFO] 
+[INFO] <<< spring-boot:4.0.3:run (default-cli) < test-compile @ pc <<<
+[INFO] 
+[INFO] 
+[INFO] --- spring-boot:4.0.3:run (default-cli) @ pc ---
+[INFO] Attaching agents: []
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+
+ :: Spring Boot ::                (v4.0.3)
+
+2026-04-27T10:53:48.435+05:30  INFO 32788 --- [pharmaconnect] [           main] com.cts.mfrp.pc.Application              : Starting Application using Java 21.0.2 with PID 32788 (C:\Users\2480176\Documents\pharmaconnect\pc\target\classes started by 2480176 in C:\Users\2480176\Documents\pharmaconnect\pc)
+2026-04-27T10:53:48.448+05:30  INFO 32788 --- [pharmaconnect] [           main] com.cts.mfrp.pc.Application              : No active profile set, falling back to 1 default profile: "default"
+2026-04-27T10:53:49.903+05:30  INFO 32788 --- [pharmaconnect] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2026-04-27T10:53:50.056+05:30  INFO 32788 --- [pharmaconnect] [           main] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 138 ms. Found 10 JPA repository interfaces.
+2026-04-27T10:53:50.821+05:30  INFO 32788 --- [pharmaconnect] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat initialized with port 8082 (http)
+2026-04-27T10:53:50.840+05:30  INFO 32788 --- [pharmaconnect] [           main] o.apache.catalina.core.StandardService   : Starting service [Tomcat]
+2026-04-27T10:53:50.841+05:30  INFO 32788 --- [pharmaconnect] [           main] o.apache.catalina.core.StandardEngine    : Starting Servlet engine: [Apache Tomcat/11.0.18]
+2026-04-27T10:53:50.928+05:30  INFO 32788 --- [pharmaconnect] [           main] b.w.c.s.WebApplicationContextInitializer : Root WebApplicationContext: initialization completed in 2402 ms
+2026-04-27T10:53:51.154+05:30  INFO 32788 --- [pharmaconnect] [           main] org.hibernate.orm.jpa                    : HHH008540: Processing PersistenceUnitInfo [name: default]
+2026-04-27T10:53:51.232+05:30  INFO 32788 --- [pharmaconnect] [           main] org.hibernate.orm.core                   : HHH000001: Hibernate ORM core version 7.2.4.Final
+2026-04-27T10:53:51.964+05:30  INFO 32788 --- [pharmaconnect] [           main] o.s.o.j.p.SpringPersistenceUnitInfo      : No LoadTimeWeaver setup: ignoring JPA class transformer
+2026-04-27T10:53:52.007+05:30  INFO 32788 --- [pharmaconnect] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2026-04-27T10:53:52.296+05:30  INFO 32788 --- [pharmaconnect] [           main] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Added connection com.mysql.cj.jdbc.ConnectionImpl@33eab2e8
+2026-04-27T10:53:52.299+05:30  INFO 32788 --- [pharmaconnect] [           main] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2026-04-27T10:53:52.421+05:30  INFO 32788 --- [pharmaconnect] [           main] org.hibernate.orm.connections.pooling    : HHH10001005: Database info:
+	Database JDBC URL [jdbc:mysql://localhost:3306/pharmaconnect?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true]
+	Database driver: MySQL Connector/J
+	Database dialect: MySQLDialect
+	Database version: 8.0.44
+	Default catalog/schema: pharmaconnect/undefined
+	Autocommit mode: undefined/unknown
+	Isolation level: REPEATABLE_READ [default REPEATABLE_READ]
+	JDBC fetch size: none
+	Pool: DataSourceConnectionProvider
+	Minimum pool size: undefined/unknown
+	Maximum pool size: undefined/unknown
+2026-04-27T10:53:54.228+05:30  INFO 32788 --- [pharmaconnect] [           main] org.hibernate.orm.core                   : HHH000489: No JTA platform available (set 'hibernate.transaction.jta.platform' to enable JTA platform integration)
+Hibernate: 
+    alter table demand_analytics 
+       modify column id VARCHAR(36) not null
+Hibernate: 
+    alter table demand_analytics 
+       modify column medicine_id VARCHAR(36) not null
+Hibernate: 
+    alter table demand_analytics 
+       modify column pharmacy_id VARCHAR(36) not null
+Hibernate: 
+    alter table medicine 
+       modify column id VARCHAR(36) not null
+Hibernate: 
+    alter table medicine_alternative 
+       modify column id VARCHAR(36) not null
+Hibernate: 
+    alter table medicine_alternative 
+       modify column alternative_id VARCHAR(36) not null
+Hibernate: 
+    alter table medicine_alternative 
+       modify column medicine_id VARCHAR(36) not null
+Hibernate: 
+    alter table pharmacy 
+       modify column id VARCHAR(36) not null
+Hibernate: 
+    alter table pharmacy 
+       modify column owner_id VARCHAR(36) not null
+Hibernate: 
+    alter table pharmacy_documents 
+       modify column id VARCHAR(36) not null
+Hibernate: 
+    alter table pharmacy_documents 
+       modify column pharmacy_id VARCHAR(36) not null
+Hibernate: 
+    alter table pharmacy_stock 
+       modify column id VARCHAR(36) not null
+Hibernate: 
+    alter table pharmacy_stock 
+       modify column medicine_id VARCHAR(36) not null
+Hibernate: 
+    alter table pharmacy_stock 
+       modify column pharmacy_id VARCHAR(36) not null
+Hibernate: 
+    alter table predictive_alert 
+       modify column id VARCHAR(36) not null
+Hibernate: 
+    alter table predictive_alert 
+       modify column medicine_id VARCHAR(36) not null
+Hibernate: 
+    alter table predictive_alert 
+       modify column pharmacy_id VARCHAR(36) not null
+Hibernate: 
+    alter table reservation 
+       modify column id VARCHAR(36) not null
+Hibernate: 
+    alter table reservation 
+       modify column medicine_id VARCHAR(36) not null
+Hibernate: 
+    alter table reservation 
+       modify column pharmacy_id VARCHAR(36) not null
+Hibernate: 
+    alter table reservation 
+       modify column user_id VARCHAR(36) not null
+Hibernate: 
+    alter table search_log 
+       modify column id VARCHAR(36) not null
+Hibernate: 
+    alter table search_log 
+       modify column user_id VARCHAR(36)
+Hibernate: 
+    alter table users 
+       modify column id VARCHAR(36) not null
+2026-04-27T10:53:55.185+05:30  INFO 32788 --- [pharmaconnect] [           main] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2026-04-27T10:53:55.317+05:30  INFO 32788 --- [pharmaconnect] [           main] o.s.d.j.r.query.QueryEnhancerFactories   : Hibernate is in classpath; If applicable, HQL parser will be used.
+2026-04-27T10:53:57.249+05:30  WARN 32788 --- [pharmaconnect] [           main] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2026-04-27T10:53:58.020+05:30  INFO 32788 --- [pharmaconnect] [           main] o.s.boot.tomcat.TomcatWebServer          : Tomcat started on port 8082 (http) with context path '/'
+2026-04-27T10:53:58.035+05:30  INFO 32788 --- [pharmaconnect] [           main] com.cts.mfrp.pc.Application              : Started Application in 10.306 seconds (process running for 11.101)
+Something
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.created_at,
+        r1_0.expires_at,
+        r1_0.hold_at,
+        r1_0.medicine_id,
+        r1_0.pharmacy_id,
+        r1_0.quantity,
+        r1_0.status,
+        r1_0.updated_at,
+        r1_0.user_id 
+    from
+        reservation r1_0 
+    where
+        r1_0.status=? 
+        and r1_0.expires_at<?
+2026-04-27T10:54:21.457+05:30  INFO 32788 --- [pharmaconnect] [nio-8082-exec-1] o.a.c.c.C.[Tomcat].[localhost].[/]       : Initializing Spring DispatcherServlet 'dispatcherServlet'
+2026-04-27T10:54:21.464+05:30  INFO 32788 --- [pharmaconnect] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Initializing Servlet 'dispatcherServlet'
+2026-04-27T10:54:21.466+05:30  INFO 32788 --- [pharmaconnect] [nio-8082-exec-1] o.s.web.servlet.DispatcherServlet        : Completed initialization in 1 ms
+2026-04-27T10:54:21.660+05:30  WARN 32788 --- [pharmaconnect] [nio-8082-exec-1] .w.s.m.s.DefaultHandlerExceptionResolver : Resolved [org.springframework.web.bind.MethodArgumentNotValidException: Validation failed for argument [0] in public org.springframework.http.ResponseEntity<?> com.cts.mfrp.pc.controller.AuthController.login(com.cts.mfrp.pc.dto.LoginRequest): [Field error in object 'loginRequest' on field 'email': rejected value [x]; codes [Email.loginRequest.email,Email.email,Email.java.lang.String,Email]; arguments [org.springframework.context.support.DefaultMessageSourceResolvable: codes [loginRequest.email,email]; arguments []; default message [email],[Ljakarta.validation.constraints.Pattern$Flag;@426178da,.*]; default message [Invalid email]] ]
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.lat,
+        u1_0.lng,
+        u1_0.name,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.reset_token,
+        u1_0.reset_token_expiry,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.email=?
+Hibernate: 
+    insert 
+    into
+        users
+        (created_at, email, lat, lng, name, password_hash, phone, reset_token, reset_token_expiry, role, id) 
+    values
+        (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+Hibernate: 
+    select
+        p1_0.id,
+        p1_0.address,
+        p1_0.created_at,
+        p1_0.is_24_7,
+        p1_0.is_active,
+        p1_0.is_verified,
+        p1_0.lat,
+        p1_0.lng,
+        p1_0.name,
+        p1_0.owner_id,
+        p1_0.phone 
+    from
+        pharmacy p1_0 
+    left join
+        users o1_0 
+            on o1_0.id=p1_0.owner_id 
+    where
+        o1_0.email=?
+Hibernate: 
+    select
+        u1_0.id,
+        u1_0.created_at,
+        u1_0.email,
+        u1_0.lat,
+        u1_0.lng,
+        u1_0.name,
+        u1_0.password_hash,
+        u1_0.phone,
+        u1_0.reset_token,
+        u1_0.reset_token_expiry,
+        u1_0.role 
+    from
+        users u1_0 
+    where
+        u1_0.id=?
+Hibernate: 
+    select
+        ps1_0.id,
+        ps1_0.expiry_date,
+        ps1_0.last_updated,
+        ps1_0.manufacturing_date,
+        ps1_0.medicine_id,
+        ps1_0.pharmacy_id,
+        ps1_0.price,
+        ps1_0.quantity 
+    from
+        pharmacy_stock ps1_0 
+    where
+        ps1_0.pharmacy_id=?
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.created_at,
+        r1_0.expires_at,
+        r1_0.hold_at,
+        r1_0.medicine_id,
+        r1_0.pharmacy_id,
+        r1_0.quantity,
+        r1_0.status,
+        r1_0.updated_at,
+        r1_0.user_id 
+    from
+        reservation r1_0 
+    where
+        r1_0.pharmacy_id=?
+2026-04-27T10:57:52.908+05:30  WARN 32788 --- [pharmaconnect] [l-1:housekeeper] com.zaxxer.hikari.pool.HikariPool        : HikariPool-1 - Thread starvation or clock leap detected (housekeeper delta=1m444ms132µs600ns).
+Hibernate: 
+    select
+        r1_0.id,
+        r1_0.created_at,
+        r1_0.expires_at,
+        r1_0.hold_at,
+        r1_0.medicine_id,
+        r1_0.pharmacy_id,
+        r1_0.quantity,
+        r1_0.status,
+        r1_0.updated_at,
+        r1_0.user_id 
+    from
+        reservation r1_0 
+    where
+        r1_0.status=? 
+        and r1_0.expires_at<?
