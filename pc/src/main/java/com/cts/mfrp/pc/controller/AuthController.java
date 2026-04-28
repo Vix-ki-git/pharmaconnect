@@ -59,7 +59,7 @@ public class AuthController {
     public ResponseEntity<?> registerUser(@Valid @RequestBody RegistrationRequest regRequest) {
         try {
             User newUser = authService.registerNewUser(regRequest);
-            return ResponseEntity.status(201).body("Registration successful for: " + newUser.getEmail());
+            return ResponseEntity.status(201).body(Map.of("message", "Registration successful", "email", newUser.getEmail()));
         } catch (RuntimeException e) {
             return ResponseEntity.status(400).body(e.getMessage());
         }

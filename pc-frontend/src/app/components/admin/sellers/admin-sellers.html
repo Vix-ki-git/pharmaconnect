@@ -1,0 +1,210 @@
+<div class="pc-page">
+
+  <!-- Nav -->
+  <nav class="pc-nav">
+    <div class="pc-nav-left">
+      <button class="pc-hamburger" (click)="sidebarOpen = true" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <a class="pc-logo" routerLink="/admin/sellers">
+        <div class="pc-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <span class="pc-logo-text">PharmaConnect</span>
+      </a>
+    </div>
+    <button class="pc-logout" (click)="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </button>
+  </nav>
+
+  <!-- Sidebar -->
+  @if (sidebarOpen) {
+    <div class="pc-sidebar-backdrop" (click)="sidebarOpen = false"></div>
+    <aside class="pc-sidebar">
+      <div class="pc-sidebar-head">
+        <div class="pc-logo">
+          <div class="pc-logo-icon">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          </div>
+          <span class="pc-logo-text">PharmaConnect</span>
+        </div>
+        <button class="pc-sidebar-close" (click)="sidebarOpen = false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+        </button>
+      </div>
+      <nav class="pc-sidebar-nav">
+        <a routerLink="/admin/sellers" class="pc-sidebar-link active" (click)="sidebarOpen = false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          Manage Pharmacies
+        </a>
+        <a routerLink="/admin/medicines" class="pc-sidebar-link" (click)="sidebarOpen = false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          Manage Medicines
+        </a>
+        <a routerLink="/admin/documents" class="pc-sidebar-link" (click)="sidebarOpen = false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>
+          Documents
+        </a>
+        <a routerLink="/admin/analytics" class="pc-sidebar-link" (click)="sidebarOpen = false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          Analytics
+        </a>
+        <a routerLink="/admin/profile" class="pc-sidebar-link" (click)="sidebarOpen = false">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          Profile
+        </a>
+      </nav>
+    </aside>
+  }
+
+  <!-- Toast -->
+  @if (toast) {
+    <div class="pc-toast" [class.pc-toast-success]="toast.type === 'success'" [class.pc-toast-error]="toast.type === 'error'">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="16" height="16">
+        @if (toast.type === 'success') { <polyline points="20 6 9 17 4 12"/> }
+        @else { <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/> }
+      </svg>
+      {{ toast.msg }}
+    </div>
+  }
+
+  <div class="pc-page-inner">
+
+    <!-- Page header -->
+    <div class="pc-page-header">
+      <div>
+        <h1 class="pc-page-title">Pending Seller Applications</h1>
+        <p class="pc-page-subtitle">Review pharmacy registrations and approve or reject access</p>
+      </div>
+      @if (!loading) {
+        <span class="pc-chip" [class.pc-chip-amber]="pending.length > 0" [class.pc-chip-green]="pending.length === 0">
+          {{ pending.length }} pending
+        </span>
+      }
+    </div>
+
+    <!-- Loading -->
+    @if (loading) {
+      <div class="pc-state">
+        <div class="pc-spinner"></div>
+        <p>Loading applications...</p>
+      </div>
+    }
+
+    <!-- Error -->
+    @if (!loading && error) {
+      <div class="pc-state">
+        <div class="pc-state-icon">⚠️</div>
+        <h3>Could not load applications</h3>
+        <p class="pc-err">{{ error }}</p>
+      </div>
+    }
+
+    <!-- Empty -->
+    @if (!loading && pending.length === 0 && !error) {
+      <div class="pc-state">
+        <div class="pc-state-icon">✅</div>
+        <h3>All caught up!</h3>
+        <p>No pending pharmacy applications right now.</p>
+      </div>
+    }
+
+    <!-- Application cards -->
+    <div class="asl-list">
+      @for (p of pending; track p.pharmacyId) {
+        <div class="pc-card asl-card">
+
+          <!-- Card header -->
+          <div class="asl-header">
+            <div class="asl-title-block">
+              <h3 class="asl-ph-name">{{ p.pharmacyName }}</h3>
+              <span class="asl-ph-addr">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                {{ p.pharmacyAddress }}
+              </span>
+            </div>
+            <div class="asl-badges">
+              @if (p.is247) {
+                <span class="pc-chip pc-chip-gold">24/7</span>
+              }
+              <span class="pc-chip"
+                [class.pc-chip-amber]="p.overallStatus === 'PENDING' || p.overallStatus === 'NO_DOCUMENTS'"
+                [class.pc-chip-blue]="p.overallStatus === 'PARTIALLY_REVIEWED'"
+                [class.pc-chip-green]="p.overallStatus === 'APPROVED'">
+                {{ p.overallStatus?.replace('_', ' ') }}
+              </span>
+            </div>
+          </div>
+
+          <!-- Info grid -->
+          <div class="asl-info-grid">
+            <div class="asl-info-section">
+              <span class="asl-info-label">Pharmacy Details</span>
+              <div class="asl-info-rows">
+                <div class="asl-info-row">
+                  <span class="asl-ir-key">Phone</span>
+                  <span class="asl-ir-val">{{ p.pharmacyPhone }}</span>
+                </div>
+                <div class="asl-info-row">
+                  <span class="asl-ir-key">Registered</span>
+                  <span class="asl-ir-val">{{ parseDate(p.registeredAt) }}</span>
+                </div>
+              </div>
+            </div>
+            <div class="asl-info-section">
+              <span class="asl-info-label">Owner Information</span>
+              <div class="asl-info-rows">
+                <div class="asl-info-row">
+                  <span class="asl-ir-key">Name</span>
+                  <span class="asl-ir-val asl-owner-name">{{ p.ownerName }}</span>
+                </div>
+                <div class="asl-info-row">
+                  <span class="asl-ir-key">Email</span>
+                  <span class="asl-ir-val">{{ p.ownerEmail }}</span>
+                </div>
+                <div class="asl-info-row">
+                  <span class="asl-ir-key">Phone</span>
+                  <span class="asl-ir-val">{{ p.ownerPhone }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Documents -->
+          @if (p.documents && p.documents.length > 0) {
+            <div class="asl-docs-row">
+              <span class="asl-info-label">Submitted Documents ({{ p.documents.length }})</span>
+              <div class="asl-docs-chips">
+                @for (doc of p.documents; track doc.id) {
+                  <span class="pc-chip"
+                    [class.pc-chip-amber]="doc.status === 'PENDING'"
+                    [class.pc-chip-green]="doc.status === 'APPROVED'"
+                    [class.pc-chip-red]="doc.status === 'REJECTED'">
+                    {{ doc.documentType }} · {{ doc.status }}
+                  </span>
+                }
+              </div>
+            </div>
+          }
+
+          <!-- Actions -->
+          <div class="asl-actions">
+            <button class="pc-btn pc-btn-primary" (click)="verify(p.pharmacyId, p.pharmacyName)" [disabled]="actionId === p.pharmacyId">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+              {{ actionId === p.pharmacyId ? 'Processing...' : 'Verify & Approve' }}
+            </button>
+            <button class="pc-btn pc-btn-danger" (click)="reject(p.pharmacyId, p.pharmacyName)" [disabled]="actionId === p.pharmacyId">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+              Reject
+            </button>
+            <span class="asl-id-hint">ID: {{ p.pharmacyId?.substring(0, 12) }}...</span>
+          </div>
+
+        </div>
+      }
+    </div>
+
+  </div>
+</div>

@@ -8,7 +8,9 @@ target/
 pc/target/
 *.jar
 *.war
-
+.claude
+pharma_connect_context.md
+Pharma Connect Pictures
 # IDE settings
 .idea/
 *.iml
@@ -23,3 +25,5 @@ out/
 pc/upload-dir/
 # Ignore the general uploads folder at the root
 uploads/
+
+user_stories.md

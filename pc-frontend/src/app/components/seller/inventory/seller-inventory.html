@@ -1,0 +1,217 @@
+<div class="pc-page">
+  <nav class="pc-nav">
+    <div class="pc-nav-left">
+      <button class="pc-hamburger" (click)="sidebarOpen = true" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <a class="pc-logo" routerLink="/seller/dashboard">
+        <div class="pc-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+        </div>
+        <span class="pc-logo-text">PharmaConnect</span>
+      </a>
+    </div>
+    <button class="pc-logout" (click)="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </button>
+  </nav>
+
+  @if (sidebarOpen) {
+    <div class="pc-sidebar-backdrop" (click)="sidebarOpen = false"></div>
+    <aside class="pc-sidebar">
+      <div class="pc-sidebar-head">
+        <div class="pc-logo">
+          <div class="pc-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+          <span class="pc-logo-text">PharmaConnect</span>
+        </div>
+        <button class="pc-sidebar-close" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <nav class="pc-sidebar-nav">
+        <a routerLink="/seller/dashboard" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>Dashboard</a>
+        <a routerLink="/seller/inventory" class="pc-sidebar-link active" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>Stock Management</a>
+        <a routerLink="/seller/reservations" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>Reservations</a>
+        <a routerLink="/seller/documents" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg>Documents</a>
+        <a routerLink="/seller/profile" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+      </nav>
+    </aside>
+  }
+
+  @if (toast) {
+    <div class="pc-toast" [class.pc-toast-success]="toast.type==='success'" [class.pc-toast-error]="toast.type==='error'">{{ toast.msg }}</div>
+  }
+
+  <div class="pc-page-inner">
+
+  <div class="pc-page-header">
+    <div>
+      <h1 class="pc-page-title">Stock Management</h1>
+      <p class="pc-page-subtitle">Manage your medicine inventory</p>
+    </div>
+    @if (isVerified) {
+      <button class="pc-btn pc-btn-primary" (click)="showAddForm = !showAddForm">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+        {{ showAddForm ? 'Cancel' : 'Add Medicine' }}
+      </button>
+    }
+  </div>
+
+  @if (!isVerified) {
+    <div class="pc-alert pc-alert-warn" style="margin-bottom:1.25rem">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="18" height="18"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/></svg>
+      Pharmacy pending verification. Inventory management will be enabled once an admin approves your application.
+    </div>
+  }
+
+  <!-- Add Item Form -->
+  @if (showAddForm && isVerified) {
+    <div class="pc-card" style="margin-bottom:1.25rem">
+      <h3 style="font-size:0.95rem;font-weight:700;margin:0 0 1rem;color:var(--text)">Add New Stock Item</h3>
+      @if (addError) { <div class="pc-alert pc-alert-error" style="margin-bottom:1rem">{{ addError }}</div> }
+      <div class="pc-form-grid" style="margin-bottom:1rem">
+        <div class="pc-form-group">
+          <label class="pc-label">Medicine</label>
+          <select class="pc-select" [(ngModel)]="addMedicineId">
+            <option value="">— Select Medicine —</option>
+            @for (m of allMedicines; track m.id) {
+              <option [value]="m.id">{{ m.name }} @if (m.genericName) { ({{ m.genericName }}) }</option>
+            }
+          </select>
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Quantity</label>
+          <input class="pc-input" type="number" [(ngModel)]="addQty" min="1" placeholder="e.g. 100" />
+        </div>
+        <div class="pc-form-group">
+          <label class="pc-label">Price (₹)</label>
+          <input class="pc-input" type="number" [(ngModel)]="addPrice" min="0.01" step="0.01" placeholder="e.g. 25.50" />
+        </div>
+      </div>
+      <button class="pc-btn pc-btn-primary" (click)="submitAdd()" [disabled]="addLoading">
+        {{ addLoading ? 'Adding...' : 'Add to Inventory' }}
+      </button>
+    </div>
+  }
+
+  <!-- Bulk Upload -->
+  @if (isVerified) {
+    <div class="pc-card" style="margin-bottom:1.25rem;display:flex;align-items:center;gap:1rem;flex-wrap:wrap">
+      <span style="font-size:0.85rem;font-weight:600;color:var(--text-muted)">Bulk CSV Upload:</span>
+      <input type="file" accept=".csv" (change)="onFileChange($event)" style="font-size:0.85rem;color:var(--text)" />
+      <button class="pc-btn pc-btn-outline" (click)="uploadBulk()" [disabled]="!bulkFile || bulkLoading">
+        {{ bulkLoading ? 'Uploading...' : 'Upload CSV' }}
+      </button>
+      @if (bulkMsg) { <span style="font-size:0.82rem;color:var(--green);font-weight:500">{{ bulkMsg }}</span> }
+    </div>
+  }
+
+  <!-- Search -->
+  <div class="pc-search" style="margin-bottom:1.25rem">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+    <input [(ngModel)]="filterQuery" placeholder="Search medicines..." />
+  </div>
+
+  <!-- Content -->
+  <div>
+    @if (loading) {
+      <div class="pc-state">
+        <div class="pc-spinner"></div>
+        <p>Loading inventory...</p>
+      </div>
+    }
+    @if (!loading && error) {
+      <div class="pc-state"><p class="pc-err">{{ error }}</p></div>
+    }
+    @if (!loading && !error && stock.length === 0) {
+      <div class="pc-state">
+        <div class="pc-state-icon">📦</div>
+        <h3>No inventory yet</h3>
+        <p>Add medicines to your stock using the button above.</p>
+      </div>
+    }
+
+    @if (!loading && stock.length > 0) {
+      <div class="inv-grid">
+        @for (item of stock; track item.stockId) {
+          <div class="inv-card"
+               [class.card-low]="item.quantity > 0 && item.quantity <= 10"
+               [class.card-out]="item.quantity === 0"
+               [class.card-editing]="editingId === item.stockId">
+
+            @if (editingId !== item.stockId) {
+              <!-- View Mode -->
+              <div class="inv-card-header">
+                <h4 class="inv-name">{{ item.medicineName }}</h4>
+                @if (item.quantity === 0) {
+                  <span class="stock-badge badge-out">Out of Stock</span>
+                } @else if (item.quantity <= 10) {
+                  <span class="stock-badge badge-low">Low Stock</span>
+                }
+              </div>
+
+              <div class="inv-meta">
+                <span>{{ item.genericName || 'No generic name' }}</span>
+                @if (item.manufacturer) { <span class="meta-sep">·</span><span>{{ item.manufacturer }}</span> }
+              </div>
+
+              <div class="inv-stats">
+                <div class="stat-block">
+                  <span class="stat-label">Qty</span>
+                  <span class="stat-val"
+                        [class.val-low]="item.quantity > 0 && item.quantity <= 10"
+                        [class.val-out]="item.quantity === 0">{{ item.quantity }}</span>
+                </div>
+                <div class="stat-block">
+                  <span class="stat-label">Price</span>
+                  <span class="stat-val">₹{{ item.price }}</span>
+                </div>
+                <div class="stat-block">
+                  <span class="stat-label">Updated</span>
+                  <span class="stat-val small">{{ parseDate(item.lastUpdated) }}</span>
+                </div>
+              </div>
+
+              <div class="inv-card-actions">
+                <div class="adj-group">
+                  <button class="btn-adj" (click)="adjust(item, -1)" title="Remove 1">−</button>
+                  <span class="adj-qty">{{ item.quantity }}</span>
+                  <button class="btn-adj" (click)="adjust(item, 1)" title="Add 1">+</button>
+                </div>
+                <button class="btn-edit" (click)="startEdit(item)" title="Edit">✎ Edit</button>
+                <button class="btn-del" (click)="deleteItem(item)" title="Delete">🗑</button>
+              </div>
+
+            } @else {
+              <!-- Edit Mode -->
+              <div class="inv-card-header">
+                <h4 class="inv-name">{{ item.medicineName }}</h4>
+                <span class="stock-badge badge-editing">Editing</span>
+              </div>
+
+              <div class="edit-form-grid">
+                <div class="form-group">
+                  <label>Quantity</label>
+                  <input class="edit-input" type="number" [(ngModel)]="editQty" min="0" />
+                </div>
+                <div class="form-group">
+                  <label>Price (₹)</label>
+                  <input class="edit-input" type="number" [(ngModel)]="editPrice" min="0" step="0.01" />
+                </div>
+              </div>
+
+              <div class="edit-actions">
+                <button class="btn-save" (click)="saveEdit(item)" [disabled]="savingId === item.stockId">
+                  {{ savingId === item.stockId ? 'Saving...' : '✓ Save Changes' }}
+                </button>
+                <button class="btn-cancel" (click)="cancelEdit()">Cancel</button>
+              </div>
+            }
+
+          </div>
+        }
+      </div>
+    }
+  </div>
+
+  </div><!-- /pc-page-inner -->
+</div>

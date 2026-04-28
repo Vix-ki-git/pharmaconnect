@@ -1,0 +1,48 @@
+/* Admin Sellers — card layout only; navigation uses global pc-* classes */
+
+.asl-list { display: flex; flex-direction: column; gap: 1rem; }
+
+.asl-card { padding: 0; overflow: hidden; }
+
+.asl-header {
+  display: flex; justify-content: space-between; align-items: flex-start;
+  padding: 1.25rem 1.5rem; border-bottom: 1px solid var(--border); gap: 1rem;
+}
+.asl-title-block { flex: 1; }
+.asl-ph-name { font-size: 1.1rem; font-weight: 700; color: var(--text); margin: 0 0 0.3rem; }
+.asl-ph-addr { display: flex; align-items: center; gap: 0.35rem; font-size: 0.82rem; color: var(--text-muted); }
+.asl-badges { display: flex; gap: 0.5rem; flex-shrink: 0; flex-wrap: wrap; align-items: center; }
+
+.asl-info-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  border-bottom: 1px solid var(--border);
+}
+.asl-info-section { padding: 1.25rem 1.5rem; }
+.asl-info-section + .asl-info-section { border-left: 1px solid var(--border); }
+
+.asl-info-label {
+  font-size: 0.7rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--text-muted); display: block; margin-bottom: 0.75rem;
+}
+.asl-info-rows { display: flex; flex-direction: column; gap: 0.45rem; }
+.asl-info-row { display: flex; gap: 0.75rem; align-items: baseline; }
+.asl-ir-key { font-size: 0.78rem; color: var(--text-muted); width: 80px; flex-shrink: 0; }
+.asl-ir-val { font-size: 0.875rem; color: var(--text); font-weight: 500; }
+.asl-owner-name { font-weight: 700; }
+
+.asl-docs-row { padding: 1rem 1.5rem; border-bottom: 1px solid var(--border); }
+.asl-docs-chips { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem; }
+
+.asl-actions {
+  display: flex; align-items: center; gap: 0.75rem;
+  padding: 1.25rem 1.5rem; background: var(--input-bg); flex-wrap: wrap;
+}
+.asl-id-hint { margin-left: auto; font-size: 0.75rem; color: var(--text-muted); font-family: monospace; }
+
+@media (max-width: 640px) {
+  .asl-info-grid { grid-template-columns: 1fr; }
+  .asl-info-section + .asl-info-section { border-left: none; border-top: 1px solid var(--border); }
+  .asl-header { flex-direction: column; }
+  .asl-actions { padding: 1rem; }
+  .asl-id-hint { display: none; }
+}

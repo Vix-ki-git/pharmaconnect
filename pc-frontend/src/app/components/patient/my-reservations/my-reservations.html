@@ -1,0 +1,128 @@
+<div class="pc-page">
+
+  <nav class="pc-nav">
+    <div class="pc-nav-left">
+      <button class="pc-hamburger" (click)="sidebarOpen = true" aria-label="Menu">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <a class="pc-logo" routerLink="/search">
+        <div class="pc-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div>
+        <span class="pc-logo-text">PharmaConnect</span>
+      </a>
+    </div>
+    <button class="pc-logout" (click)="logout()">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      Logout
+    </button>
+  </nav>
+
+  @if (sidebarOpen) {
+    <div class="pc-sidebar-backdrop" (click)="sidebarOpen = false"></div>
+    <aside class="pc-sidebar">
+      <div class="pc-sidebar-head">
+        <div class="pc-logo"><div class="pc-logo-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg></div><span class="pc-logo-text">PharmaConnect</span></div>
+        <button class="pc-sidebar-close" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
+      </div>
+      <nav class="pc-sidebar-nav">
+        <a routerLink="/search" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>Search</a>
+        <a routerLink="/my-reservations" class="pc-sidebar-link active" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>My Reservations</a>
+        <a routerLink="/profile" class="pc-sidebar-link" (click)="sidebarOpen = false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>Profile</a>
+      </nav>
+    </aside>
+  }
+
+  <div class="page-header">
+    <div>
+      <h1>My Reservations</h1>
+      <p>Active holds expire after 30 minutes — pick up before they lapse.</p>
+    </div>
+    <span class="res-count">{{ reservations.length }} total</span>
+  </div>
+
+  @if (error)   { <div class="flash flash-error">{{ error }}</div> }
+  @if (message) { <div class="flash flash-success">{{ message }}</div> }
+
+  <div class="page-content">
+
+    @if (loading) {
+      <div class="skeletons">
+        @for (_ of [1,2,3]; track $index) {
+          <div class="res-card skeleton-card">
+            <div class="sk sk-title"></div>
+            <div class="sk sk-sub"></div>
+            <div class="sk sk-row"></div>
+          </div>
+        }
+      </div>
+    }
+
+    @if (!loading && reservations.length === 0) {
+      <div class="empty-state">
+        <div class="empty-icon">🧾</div>
+        <h3>No reservations yet</h3>
+        <p>Search for a medicine and reserve it — it'll appear here.</p>
+        <a routerLink="/search" class="btn-search-link">Find Medicines</a>
+      </div>
+    }
+
+    <div class="res-list">
+      @for (r of reservations; track r.id) {
+        <div class="res-card" [class]="'card-' + r.status.toLowerCase()">
+
+          <div class="card-status-bar"></div>
+
+          <div class="card-body">
+            <div class="card-top">
+              <div class="card-title-group">
+                <h3 class="med-name">{{ r.medicineName }}</h3>
+                <span class="ph-name">{{ r.pharmacyName }}</span>
+              </div>
+              <span class="status-chip chip-{{ r.status.toLowerCase() }}">
+                {{ r.status }}
+              </span>
+            </div>
+
+            <div class="card-details">
+              <div class="detail-pill">
+                <span class="d-icon">💊</span>
+                <span class="d-text">Qty <strong>{{ r.quantity }}</strong></span>
+              </div>
+              @if (r.holdAt) {
+                <div class="detail-pill">
+                  <span class="d-icon">🕐</span>
+                  <span class="d-text">Reserved <strong>{{ formatTime(r.holdAt) }}</strong></span>
+                </div>
+              }
+              @if (r.status === 'PENDING' && r.expiresAt) {
+                <div class="detail-pill expiry-pill">
+                  <span class="d-icon">⏳</span>
+                  <span class="d-text">Expires <strong>{{ formatTime(r.expiresAt) }}</strong></span>
+                </div>
+              }
+            </div>
+
+            @if (r.status === 'PENDING') {
+              <div class="card-footer">
+                <p class="pickup-hint">Head to {{ r.pharmacyName }} and show this reservation to claim your medicine.</p>
+                <button class="btn-cancel" (click)="cancel(r.id)">Cancel Reservation</button>
+              </div>
+            }
+            @if (r.status === 'CLAIMED') {
+              <div class="card-footer claimed-footer">
+                <span class="claimed-msg">✓ Picked up successfully</span>
+              </div>
+            }
+            @if (r.status === 'EXPIRED') {
+              <div class="card-footer expired-footer">
+                <span class="expired-msg">Hold expired — search again to reserve fresh stock.</span>
+              </div>
+            }
+          </div>
+
+        </div>
+      }
+    </div>
+
+  </div>
+
+</div>
