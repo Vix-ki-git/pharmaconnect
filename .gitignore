@@ -25,3 +25,5 @@ out/
 pc/upload-dir/
 # Ignore the general uploads folder at the root
 uploads/
+
+user_stories.md
