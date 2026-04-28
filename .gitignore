@@ -8,7 +8,7 @@ target/
 pc/target/
 *.jar
 *.war
-
+.claude
 pharma_connect_context.md
 Pharma Connect Pictures
 # IDE settings
