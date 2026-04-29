@@ -23,7 +23,7 @@ public class AdminMedicineService {
 
     // US-08: Add a new medicine to the master list
     public Medicine addMedicine(MedicineRequestDto dto) {
-        medicineRepository.findByNameIgnoreCase(dto.getName()).ifPresent(existing -> {
+        medicineRepository.findFirstByNameIgnoreCase(dto.getName()).ifPresent(existing -> {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Medicine already exists: " + dto.getName());
         });

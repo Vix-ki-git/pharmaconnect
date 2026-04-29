@@ -2,11 +2,14 @@ package com.cts.mfrp.pc.service;
 
 import com.cts.mfrp.pc.dto.DocumentSummaryDto;
 import com.cts.mfrp.pc.dto.PendingSellerApplicationDto;
+import com.cts.mfrp.pc.dto.SellerListItemDto;
 import com.cts.mfrp.pc.model.Pharmacy;
 import com.cts.mfrp.pc.model.PharmacyDocument;
 import com.cts.mfrp.pc.model.User;
 import com.cts.mfrp.pc.repository.PharmacyDocumentRepository;
 import com.cts.mfrp.pc.repository.PharmacyRepository;
+import com.cts.mfrp.pc.repository.PharmacyStockRepository;
+import com.cts.mfrp.pc.repository.ReservationRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,6 +26,8 @@ public class AdminApprovalService {
 
     private final PharmacyDocumentRepository documentRepository;
     private final PharmacyRepository pharmacyRepository;
+    private final PharmacyStockRepository stockRepository;
+    private final ReservationRepository reservationRepository;
 
     /**
      * Fetches all documents that are currently in PENDING status for Admin review.
@@ -143,5 +148,47 @@ public class AdminApprovalService {
         pharmacyRepository.save(pharmacy);
 
         return Map.of("message", "Pharmacy rejected", "pharmacyId", pharmacyId);
+    }
+
+    public List<SellerListItemDto> getAllSellers() {
+        return pharmacyRepository.findAll().stream()
+                .map(pharmacy -> {
+                    User owner = pharmacy.getOwner();
+                    int stockCount = stockRepository.findByPharmacyId(pharmacy.getId()).size();
+                    int activeReservations = (int) reservationRepository.findByPharmacyId(pharmacy.getId())
+                            .stream().filter(r -> "PENDING".equals(r.getStatus())).count();
+
+                    return SellerListItemDto.builder()
+                            .pharmacyId(pharmacy.getId())
+                            .pharmacyName(pharmacy.getName())
+                            .pharmacyAddress(pharmacy.getAddress())
+                            .pharmacyPhone(pharmacy.getPhone())
+                            .is247(Boolean.TRUE.equals(pharmacy.getIs247()))
+                            .isVerified(pharmacy.getIsVerified())
+                            .isActive(pharmacy.getIsActive())
+                            .registeredAt(pharmacy.getCreatedAt())
+                            .ownerName(owner != null ? owner.getName() : null)
+                            .ownerEmail(owner != null ? owner.getEmail() : null)
+                            .ownerPhone(owner != null ? owner.getPhone() : null)
+                            .totalStockItems(stockCount)
+                            .activeReservationsCount(activeReservations)
+                            .build();
+                })
+                .toList();
+    }
+
+    @Transactional
+    public Map<String, String> setPharmacyActive(String pharmacyId, boolean active) {
+        Pharmacy pharmacy = pharmacyRepository.findById(pharmacyId)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pharmacy not found: " + pharmacyId));
+
+        pharmacy.setIsActive(active);
+        pharmacyRepository.save(pharmacy);
+
+        return Map.of(
+                "message", active ? "Pharmacy reactivated" : "Pharmacy deactivated",
+                "pharmacyId", pharmacyId,
+                "isActive", String.valueOf(active)
+        );
     }
 }

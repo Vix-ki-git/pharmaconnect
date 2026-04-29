@@ -15,12 +15,27 @@ export class AdminService {
     return this.http.get<any[]>(`${this.sellerBase}/pending`);
   }
 
+  // SellerListItemDto: pharmacyId, pharmacyName, pharmacyAddress, pharmacyPhone, is247,
+  //   isVerified, isActive, registeredAt, ownerName, ownerEmail, ownerPhone,
+  //   totalStockItems, activeReservationsCount
+  getAllSellers(): Observable<any[]> {
+    return this.http.get<any[]>(`${this.sellerBase}/all`);
+  }
+
   verifySeller(pharmacyId: string): Observable<any> {
     return this.http.patch<any>(`${this.sellerBase}/${pharmacyId}/verify`, {});
   }
 
   rejectSeller(pharmacyId: string): Observable<any> {
     return this.http.patch<any>(`${this.sellerBase}/${pharmacyId}/reject`, {});
+  }
+
+  deactivatePharmacy(pharmacyId: string): Observable<any> {
+    return this.http.patch<any>(`${this.sellerBase}/${pharmacyId}/deactivate`, {});
+  }
+
+  activatePharmacy(pharmacyId: string): Observable<any> {
+    return this.http.patch<any>(`${this.sellerBase}/${pharmacyId}/activate`, {});
   }
 
   // Medicine: id, name, genericName, category, manufacturer, dosageForm, strength

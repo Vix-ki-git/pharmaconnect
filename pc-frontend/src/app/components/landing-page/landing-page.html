@@ -2,7 +2,12 @@
 
   <!-- Nav -->
   <nav class="top-nav">
-    <div class="logo">Pharma<span>Connect</span></div>
+    <div class="logo">
+      <span class="logo-icon">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="22" height="22"><path d="M4 14h16"/><path d="M6 14c0 3 2.5 5 6 5s6-2 6-5"/><path d="M12 14 C 14 12 14 10 12 9 C 10 8 10 6 12 5"/><circle cx="12" cy="4.5" r="1.2" fill="currentColor"/></svg>
+      </span>
+      <span class="logo-text">Pharma<span>Connect</span></span>
+    </div>
     <div class="nav-actions">
       <button class="theme-orb" (click)="toggleTheme()" [class.dark]="themeService.isDark" aria-label="Toggle Theme">
         <div class="orb-content">
@@ -141,13 +146,18 @@
   <!-- Footer -->
   <footer class="footer">
     <div class="footer-inner">
-      <div class="footer-logo">Pharma<span>Connect</span></div>
+      <div class="footer-logo">
+        <span class="footer-logo-icon">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" width="20" height="20"><path d="M4 14h16"/><path d="M6 14c0 3 2.5 5 6 5s6-2 6-5"/><path d="M12 14 C 14 12 14 10 12 9 C 10 8 10 6 12 5"/><circle cx="12" cy="4.5" r="1.2" fill="currentColor"/></svg>
+        </span>
+        <span>Pharma<span>Connect</span></span>
+      </div>
       <div class="footer-links">
         <a (click)="goToSearch()">Find Medicines</a>
         <a (click)="goToLogin()">Login</a>
         <a (click)="goToRegister()">Register Pharmacy</a>
       </div>
-      <p class="footer-copy">Built by Spring Explorers · 2025</p>
+      <p class="footer-copy">Built by Spring Explorers · 2026</p>
     </div>
   </footer>
 

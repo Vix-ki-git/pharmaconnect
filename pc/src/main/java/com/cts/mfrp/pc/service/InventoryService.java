@@ -95,11 +95,13 @@ public class InventoryService {
         return InventoryResponseDTO.builder()
                 .stockId(stock.getId())
                 .medicineName(stock.getMedicine().getName())
-                .genericName(stock.getMedicine().getGenericName()) // Added this
-                .manufacturer(stock.getMedicine().getManufacturer()) // Added this
+                .genericName(stock.getMedicine().getGenericName())
+                .manufacturer(stock.getMedicine().getManufacturer())
                 .quantity(stock.getQuantity())
                 .price(stock.getPrice())
                 .lastUpdated(stock.getLastUpdated())
+                .manufacturingDate(stock.getManufacturingDate())
+                .expiryDate(stock.getExpiryDate())
                 .build();
     }
 }

@@ -72,6 +72,47 @@
 .srch-ph-name { font-weight: 600; color: var(--text); }
 .srch-sep { color: var(--text-light); }
 
+.srch-distance-row {
+  display: inline-flex; align-items: center; gap: 0.45rem;
+  background: var(--green-light); color: var(--green-dark);
+  padding: 0.45rem 0.85rem; border-radius: 50px;
+  font-size: 0.85rem; margin-bottom: 0.7rem;
+  width: fit-content;
+  border: 1px solid #a7f3d0;
+}
+.srch-distance-row strong { font-weight: 800; font-size: 0.95rem; }
+.srch-distance-row svg { color: var(--green-dark); }
+
+/* Emergency-mode styled result cards */
+.srch-card-emergency {
+  border-left: 4px solid #dc2626;
+  background: linear-gradient(to right, #fff1f2 0%, var(--card) 8%);
+}
+.srch-247-badge {
+  display: inline-flex; align-items: center;
+  background: var(--gold); color: #1a1a1a;
+  font-size: 0.65rem; font-weight: 800;
+  padding: 0.1rem 0.45rem; border-radius: 50px;
+  margin-left: 0.35rem;
+  letter-spacing: 0.04em;
+}
+
+/* Alternatives panel */
+.srch-alt-row {
+  display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
+  padding: 0.7rem 0.85rem; border-radius: 10px;
+  background: var(--bg-soft); border: 1px solid var(--border);
+  margin-bottom: 0.5rem;
+}
+.srch-alt-row:last-child { margin-bottom: 0; }
+.srch-alt-left { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; flex: 1; }
+.srch-alt-name { font-weight: 700; font-size: 0.88rem; color: var(--text); }
+.srch-alt-generic { font-size: 0.74rem; color: var(--text-muted); }
+.srch-alt-pharm { font-size: 0.78rem; color: var(--text); }
+.srch-alt-right { display: flex; flex-direction: column; align-items: flex-end; gap: 0.15rem; flex-shrink: 0; }
+.srch-alt-price { font-size: 0.95rem; font-weight: 700; color: var(--green); }
+.srch-alt-stock { font-size: 0.72rem; color: var(--text-muted); }
+
 .srch-stats-row { margin-bottom: 0.75rem; }
 .srch-stock { font-size: 0.82rem; font-weight: 500; color: #16a34a; }
 .srch-stock-low { color: #d97706; }

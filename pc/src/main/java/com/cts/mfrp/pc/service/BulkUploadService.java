@@ -41,8 +41,9 @@ public class BulkUploadService {
 
             // 2. Loop through each DTO row and transform to Entity
             for (InventoryUploadDTO dto : dtos) {
-                // Find medicine by Name (User provides Name, we need the Object/ID)
-                Medicine medicine = medicineRepository.findByNameIgnoreCase(dto.getMedicineName())
+                // Find medicine by Name. If duplicates exist in the catalog, take the first match;
+                // sellers identify medicines by display name in CSVs, not by UUID.
+                Medicine medicine = medicineRepository.findFirstByNameIgnoreCase(dto.getMedicineName())
                         .orElseThrow(() -> new RuntimeException("Medicine not found in system: " + dto.getMedicineName()));
 
                 PharmacyStock stock = new PharmacyStock();
