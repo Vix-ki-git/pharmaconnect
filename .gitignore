@@ -3,6 +3,11 @@ pc-frontend/node_modules/
 pc-frontend/dist/
 pc-frontend/.angular/
 
+# Stray root npm artifacts (these don't belong here — Angular workspace is in pc-frontend/)
+/node_modules/
+/package.json
+/package-lock.json
+
 # --- Backend (Spring Boot / pc) ---
 target/
 pc/target/
