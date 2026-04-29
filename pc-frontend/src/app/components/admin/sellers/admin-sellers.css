@@ -1,5 +1,70 @@
 /* Admin Sellers — card layout only; navigation uses global pc-* classes */
 
+/* Tabs */
+.asl-tabs { display: flex; gap: 0; border-bottom: 1.5px solid var(--border); margin-bottom: 1.5rem; }
+.asl-tab {
+  position: relative; background: transparent; border: none; cursor: pointer;
+  padding: 0.85rem 1.25rem; font-size: 0.92rem; font-weight: 600; color: var(--text-muted);
+  display: inline-flex; align-items: center; gap: 0.5rem; transition: color 0.15s;
+}
+.asl-tab:hover { color: var(--text); }
+.asl-tab.active { color: var(--green); }
+.asl-tab.active::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: -1.5px; height: 2.5px;
+  background: var(--green); border-radius: 2px 2px 0 0;
+}
+.asl-tab-count {
+  background: var(--bg-soft); color: var(--text-muted);
+  padding: 0.1rem 0.55rem; border-radius: 50px; font-size: 0.78rem; font-weight: 700;
+}
+.asl-tab-count.amber { background: var(--gold-light); color: #92400e; }
+.asl-tab.active .asl-tab-count { background: var(--green-light); color: var(--green-dark); }
+
+/* Filter bar */
+.asl-filterbar {
+  display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem; flex-wrap: wrap;
+}
+.asl-filter-chips { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.asl-fchip {
+  display: inline-flex; align-items: center; gap: 0.4rem;
+  padding: 0.4rem 0.85rem; border-radius: 50px;
+  border: 1.5px solid var(--border); background: var(--card); color: var(--text-muted);
+  font-size: 0.82rem; font-weight: 500; cursor: pointer; transition: all 0.15s;
+}
+.asl-fchip:hover { border-color: var(--green); color: var(--green); }
+.asl-fchip.active { background: var(--green); border-color: var(--green); color: white; }
+.asl-fchip span {
+  background: rgba(255,255,255,0.25); padding: 0 0.5rem; border-radius: 50px;
+  font-size: 0.72rem; font-weight: 700;
+}
+.asl-fchip:not(.active) span { background: var(--bg-soft); color: var(--text-muted); }
+
+.asl-search-wrap {
+  flex: 1; min-width: 240px; position: relative;
+  display: flex; align-items: center;
+}
+.asl-search-wrap svg {
+  position: absolute; left: 0.85rem; color: var(--text-muted); pointer-events: none;
+}
+.asl-search {
+  width: 100%; padding: 0.55rem 0.85rem 0.55rem 2.1rem;
+  border: 1.5px solid var(--border); border-radius: 8px;
+  background: var(--card); color: var(--text); font-size: 0.875rem;
+  outline: none; transition: border-color 0.15s;
+}
+.asl-search:focus { border-color: var(--green); }
+
+/* Inactive pharmacy styling */
+.asl-inactive { opacity: 0.7; }
+.asl-inactive .asl-ph-name { color: var(--text-muted); }
+.asl-inactive-tag {
+  display: inline-block; margin-left: 0.5rem;
+  background: #6b7280; color: white;
+  padding: 0.15rem 0.55rem; border-radius: 50px;
+  font-size: 0.65rem; font-weight: 700; vertical-align: middle;
+  text-transform: uppercase; letter-spacing: 0.06em;
+}
+
 .asl-list { display: flex; flex-direction: column; gap: 1rem; }
 
 .asl-card { padding: 0; overflow: hidden; }

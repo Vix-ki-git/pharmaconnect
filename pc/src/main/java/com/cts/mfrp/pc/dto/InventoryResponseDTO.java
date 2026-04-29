@@ -2,6 +2,7 @@ package com.cts.mfrp.pc.dto;
 
 import lombok.Builder;
 import lombok.Data;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
@@ -14,4 +15,6 @@ public class InventoryResponseDTO {
     private Integer quantity;
     private Double price;
     private LocalDateTime lastUpdated;
+    private LocalDate manufacturingDate;
+    private LocalDate expiryDate;
 }

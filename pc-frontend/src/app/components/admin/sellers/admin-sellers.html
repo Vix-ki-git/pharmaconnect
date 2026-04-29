@@ -8,9 +8,9 @@
       </button>
       <a class="pc-logo" routerLink="/admin/sellers">
         <div class="pc-logo-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16"/><path d="M6 14c0 3 2.5 5 6 5s6-2 6-5"/><path d="M12 14 C 14 12 14 10 12 9 C 10 8 10 6 12 5"/><circle cx="12" cy="4.5" r="1.2" fill="currentColor"/></svg>
         </div>
-        <span class="pc-logo-text">PharmaConnect</span>
+        <span class="pc-logo-text">Pharma<span class="pc-logo-accent">Connect</span></span>
       </a>
     </div>
     <button class="pc-logout" (click)="logout()">
@@ -26,9 +26,9 @@
       <div class="pc-sidebar-head">
         <div class="pc-logo">
           <div class="pc-logo-icon">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16"/><path d="M6 14c0 3 2.5 5 6 5s6-2 6-5"/><path d="M12 14 C 14 12 14 10 12 9 C 10 8 10 6 12 5"/><circle cx="12" cy="4.5" r="1.2" fill="currentColor"/></svg>
           </div>
-          <span class="pc-logo-text">PharmaConnect</span>
+          <span class="pc-logo-text">Pharma<span class="pc-logo-accent">Connect</span></span>
         </div>
         <button class="pc-sidebar-close" (click)="sidebarOpen = false">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
@@ -40,7 +40,7 @@
           Manage Pharmacies
         </a>
         <a routerLink="/admin/medicines" class="pc-sidebar-link" (click)="sidebarOpen = false">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 14c1.49-1.46 3-3.21 3-5.5A5.5 5.5 0 0 0 16.5 3c-1.76 0-3 .5-4.5 2-1.5-1.5-2.74-2-4.5-2A5.5 5.5 0 0 0 2 8.5c0 2.3 1.5 4.05 3 5.5l7 7Z"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14h16"/><path d="M6 14c0 3 2.5 5 6 5s6-2 6-5"/><path d="M12 14 C 14 12 14 10 12 9 C 10 8 10 6 12 5"/><circle cx="12" cy="4.5" r="1.2" fill="currentColor"/></svg>
           Manage Medicines
         </a>
         <a routerLink="/admin/documents" class="pc-sidebar-link" (click)="sidebarOpen = false">
@@ -75,21 +75,33 @@
     <!-- Page header -->
     <div class="pc-page-header">
       <div>
-        <h1 class="pc-page-title">Pending Seller Applications</h1>
-        <p class="pc-page-subtitle">Review pharmacy registrations and approve or reject access</p>
+        <span class="pc-page-badge gold">Admin</span>
+        <h1 class="pc-page-title">Manage Pharmacies</h1>
+        <p class="pc-page-subtitle">Review applications, verify pharmacies, and manage activation status</p>
       </div>
-      @if (!loading) {
-        <span class="pc-chip" [class.pc-chip-amber]="pending.length > 0" [class.pc-chip-green]="pending.length === 0">
-          {{ pending.length }} pending
-        </span>
-      }
+    </div>
+
+    <!-- Tabs -->
+    <div class="asl-tabs">
+      <button class="asl-tab" [class.active]="tab === 'pending'" (click)="setTab('pending')">
+        Pending Applications
+        @if (!loading && tab === 'pending') {
+          <span class="asl-tab-count" [class.amber]="pending.length > 0">{{ pending.length }}</span>
+        }
+      </button>
+      <button class="asl-tab" [class.active]="tab === 'all'" (click)="setTab('all')">
+        All Pharmacies
+        @if (!loading && tab === 'all' && all.length > 0) {
+          <span class="asl-tab-count">{{ all.length }}</span>
+        }
+      </button>
     </div>
 
     <!-- Loading -->
     @if (loading) {
       <div class="pc-state">
         <div class="pc-spinner"></div>
-        <p>Loading applications...</p>
+        <p>Loading...</p>
       </div>
     }
 
@@ -97,24 +109,24 @@
     @if (!loading && error) {
       <div class="pc-state">
         <div class="pc-state-icon">⚠️</div>
-        <h3>Could not load applications</h3>
+        <h3>Could not load</h3>
         <p class="pc-err">{{ error }}</p>
       </div>
     }
 
-    <!-- Empty -->
-    @if (!loading && pending.length === 0 && !error) {
-      <div class="pc-state">
-        <div class="pc-state-icon">✅</div>
-        <h3>All caught up!</h3>
-        <p>No pending pharmacy applications right now.</p>
-      </div>
-    }
+    <!-- ===== PENDING TAB ===== -->
+    @if (!loading && tab === 'pending') {
+      @if (pending.length === 0 && !error) {
+        <div class="pc-state">
+          <div class="pc-state-icon">✅</div>
+          <h3>All caught up!</h3>
+          <p>No pending pharmacy applications right now.</p>
+        </div>
+      }
 
-    <!-- Application cards -->
-    <div class="asl-list">
-      @for (p of pending; track p.pharmacyId) {
-        <div class="pc-card asl-card">
+      <div class="asl-list">
+        @for (p of pending; track p.pharmacyId) {
+          <div class="pc-card asl-card">
 
           <!-- Card header -->
           <div class="asl-header">
@@ -203,8 +215,109 @@
           </div>
 
         </div>
+        }
+      </div>
+    }
+
+    <!-- ===== ALL PHARMACIES TAB ===== -->
+    @if (!loading && tab === 'all') {
+      <!-- Filter bar -->
+      <div class="asl-filterbar">
+        <div class="asl-filter-chips">
+          <button class="asl-fchip" [class.active]="statusFilter === 'ALL'" (click)="setStatusFilter('ALL')">
+            All <span>{{ countByStatus('ALL') }}</span>
+          </button>
+          <button class="asl-fchip" [class.active]="statusFilter === 'VERIFIED'" (click)="setStatusFilter('VERIFIED')">
+            Verified <span>{{ countByStatus('VERIFIED') }}</span>
+          </button>
+          <button class="asl-fchip" [class.active]="statusFilter === 'UNVERIFIED'" (click)="setStatusFilter('UNVERIFIED')">
+            Unverified <span>{{ countByStatus('UNVERIFIED') }}</span>
+          </button>
+          <button class="asl-fchip" [class.active]="statusFilter === 'INACTIVE'" (click)="setStatusFilter('INACTIVE')">
+            Inactive <span>{{ countByStatus('INACTIVE') }}</span>
+          </button>
+        </div>
+        <div class="asl-search-wrap">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="14" height="14"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input class="asl-search" [(ngModel)]="searchTerm" (ngModelChange)="onSearchChange()" placeholder="Search by name, owner, email, or address..." />
+        </div>
+      </div>
+
+      @if (filteredAll.length === 0) {
+        <div class="pc-state">
+          <div class="pc-state-icon">🔎</div>
+          <h3>No pharmacies match</h3>
+          <p>Try a different filter or search term.</p>
+        </div>
       }
-    </div>
+
+      <div class="asl-list">
+        @for (p of filteredAll; track p.pharmacyId) {
+          <div class="pc-card asl-card" [class.asl-inactive]="!p.isActive">
+
+            <div class="asl-header">
+              <div class="asl-title-block">
+                <h3 class="asl-ph-name">
+                  {{ p.pharmacyName }}
+                  @if (!p.isActive) { <span class="asl-inactive-tag">Inactive</span> }
+                </h3>
+                <span class="asl-ph-addr">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="12" height="12"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                  {{ p.pharmacyAddress }}
+                </span>
+              </div>
+              <div class="asl-badges">
+                @if (p.is247) { <span class="pc-chip pc-chip-gold">24/7</span> }
+                @if (p.isVerified) {
+                  <span class="pc-chip pc-chip-green">Verified</span>
+                } @else {
+                  <span class="pc-chip pc-chip-amber">Unverified</span>
+                }
+              </div>
+            </div>
+
+            <div class="asl-info-grid">
+              <div class="asl-info-section">
+                <span class="asl-info-label">Pharmacy</span>
+                <div class="asl-info-rows">
+                  <div class="asl-info-row"><span class="asl-ir-key">Phone</span><span class="asl-ir-val">{{ p.pharmacyPhone || '—' }}</span></div>
+                  <div class="asl-info-row"><span class="asl-ir-key">Stock items</span><span class="asl-ir-val">{{ p.totalStockItems }}</span></div>
+                  <div class="asl-info-row"><span class="asl-ir-key">Active reservations</span><span class="asl-ir-val">{{ p.activeReservationsCount }}</span></div>
+                  <div class="asl-info-row"><span class="asl-ir-key">Registered</span><span class="asl-ir-val">{{ parseDate(p.registeredAt) }}</span></div>
+                </div>
+              </div>
+              <div class="asl-info-section">
+                <span class="asl-info-label">Owner</span>
+                <div class="asl-info-rows">
+                  <div class="asl-info-row"><span class="asl-ir-key">Name</span><span class="asl-ir-val asl-owner-name">{{ p.ownerName || '—' }}</span></div>
+                  <div class="asl-info-row"><span class="asl-ir-key">Email</span><span class="asl-ir-val">{{ p.ownerEmail || '—' }}</span></div>
+                  <div class="asl-info-row"><span class="asl-ir-key">Phone</span><span class="asl-ir-val">{{ p.ownerPhone || '—' }}</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="asl-actions">
+              @if (!p.isVerified) {
+                <button class="pc-btn pc-btn-primary" (click)="verify(p.pharmacyId, p.pharmacyName)" [disabled]="actionId === p.pharmacyId">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" width="14" height="14"><polyline points="20 6 9 17 4 12"/></svg>
+                  Verify
+                </button>
+              }
+              @if (p.isActive) {
+                <button class="pc-btn pc-btn-danger" (click)="toggleActive(p)" [disabled]="actionId === p.pharmacyId">
+                  Deactivate
+                </button>
+              } @else {
+                <button class="pc-btn pc-btn-outline" (click)="toggleActive(p)" [disabled]="actionId === p.pharmacyId">
+                  Reactivate
+                </button>
+              }
+              <span class="asl-id-hint">ID: {{ p.pharmacyId?.substring(0, 12) }}...</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
 
   </div>
 </div>

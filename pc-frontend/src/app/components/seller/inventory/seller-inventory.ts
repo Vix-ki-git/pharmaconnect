@@ -36,6 +36,8 @@ export class SellerInventory implements OnInit {
   addMedicineId = '';
   addQty = 0;
   addPrice = 0;
+  addMfgDate = '';
+  addExpDate = '';
   addLoading = false;
   addError = '';
 
@@ -43,6 +45,7 @@ export class SellerInventory implements OnInit {
   bulkFile: File | null = null;
   bulkLoading = false;
   bulkMsg = '';
+  showBulkHelp = false;
 
   filterQuery = '';
 
@@ -155,13 +158,19 @@ export class SellerInventory implements OnInit {
       this.addError = 'Select a medicine and enter valid quantity and price.';
       return;
     }
+    if (this.addMfgDate && this.addExpDate && this.addExpDate < this.addMfgDate) {
+      this.addError = 'Expiry date must be on or after the manufacturing date.';
+      return;
+    }
     this.addLoading = true;
     this.addError = '';
     this.inventoryService.addItem({
       pharmacy: { id: this.pharmacyId },
       medicine: { id: this.addMedicineId },
       quantity: this.addQty,
-      price: this.addPrice
+      price: this.addPrice,
+      manufacturingDate: this.addMfgDate || null,
+      expiryDate: this.addExpDate || null
     }).subscribe({
       next: () => {
         this.addLoading = false;
@@ -169,6 +178,8 @@ export class SellerInventory implements OnInit {
         this.addMedicineId = '';
         this.addQty = 0;
         this.addPrice = 0;
+        this.addMfgDate = '';
+        this.addExpDate = '';
         this.showToast('Item added to inventory.', 'success');
         this.loadStock();
       },
@@ -177,6 +188,48 @@ export class SellerInventory implements OnInit {
         this.addError = typeof err.error === 'string' ? err.error : 'Failed to add item.';
       }
     });
+  }
+
+  isExpired(item: any): boolean {
+    if (!item.expiryDate) return false;
+    const exp = this.toDate(item.expiryDate);
+    if (!exp) return false;
+    return exp.getTime() < Date.now();
+  }
+
+  isExpiringSoon(item: any): boolean {
+    if (!item.expiryDate) return false;
+    const exp = this.toDate(item.expiryDate);
+    if (!exp) return false;
+    const days = (exp.getTime() - Date.now()) / 86400000;
+    return days >= 0 && days <= 30;
+  }
+
+  get expiredCount(): number {
+    return this.stock.filter(s => this.isExpired(s)).length;
+  }
+
+  formatDateOnly(d: any): string {
+    const dt = this.toDate(d);
+    if (!dt) return '—';
+    return dt.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' });
+  }
+
+  private toDate(d: any): Date | null {
+    if (!d) return null;
+    if (Array.isArray(d)) return new Date(d[0], d[1] - 1, d[2] ?? 1);
+    return new Date(d);
+  }
+
+  downloadSampleCsv() {
+    const csv = 'medicineName,quantity,price,manufacturingDate,expiryDate\nParacetamol,100,25.00,2025-01-15,2027-01-15\nIbuprofen,50,42.00,2025-03-01,2027-03-01\n';
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'pharmaconnect-inventory-sample.csv';
+    a.click();
+    URL.revokeObjectURL(url);
   }
 
   onFileChange(event: any) {

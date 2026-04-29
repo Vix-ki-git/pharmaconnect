@@ -60,6 +60,7 @@ export class SearchPage implements OnDestroy {
   private toastTimer: any;
 
   user: any;
+  private cachedCoords: { lat: number; lng: number } | null = null;
 
   constructor(
     private searchService: SearchService,
@@ -121,20 +122,32 @@ export class SearchPage implements OnDestroy {
     this.loading = true;
     this.searchService.searchKeyword(kw).subscribe({
       next: (items) => {
-        this.rawResults = items.map(item => ({
-          stockId: item.id,
-          pharmacyId: item.pharmacy?.id ?? '',
-          medicineId: item.medicine?.id ?? '',
-          medicineName: item.medicine?.name ?? '',
-          genericName: item.medicine?.genericName ?? '',
-          pharmacyName: item.pharmacy?.name ?? '',
-          pharmacyAddress: item.pharmacy?.address ?? '',
-          quantity: item.quantity,
-          price: item.price
-        }));
-        this.applySort();
-        this.loading = false;
-        this.searched = true;
+        this.getCoordsAsync().then(coords => {
+          this.ngZone.run(() => {
+            this.rawResults = items.map(item => {
+              const pLat = item.pharmacy?.lat;
+              const pLng = item.pharmacy?.lng;
+              const distance = (coords && pLat != null && pLng != null)
+                ? this.haversine(coords.lat, coords.lng, pLat, pLng)
+                : undefined;
+              return {
+                stockId: item.id,
+                pharmacyId: item.pharmacy?.id ?? '',
+                medicineId: item.medicine?.id ?? '',
+                medicineName: item.medicine?.name ?? '',
+                genericName: item.medicine?.genericName ?? '',
+                pharmacyName: item.pharmacy?.name ?? '',
+                pharmacyAddress: item.pharmacy?.address ?? '',
+                quantity: item.quantity,
+                price: item.price,
+                distance
+              };
+            });
+            this.applySort();
+            this.loading = false;
+            this.searched = true;
+          });
+        });
       },
       error: (err) => {
         this.loading = false;
@@ -142,6 +155,31 @@ export class SearchPage implements OnDestroy {
         this.showToast(typeof err.error === 'string' ? err.error : 'Search failed. Please try again.', 'error');
       }
     });
+  }
+
+  private getCoordsAsync(): Promise<{ lat: number; lng: number } | null> {
+    if (this.cachedCoords) return Promise.resolve(this.cachedCoords);
+    return new Promise(resolve => {
+      if (!navigator.geolocation) return resolve(null);
+      navigator.geolocation.getCurrentPosition(
+        pos => {
+          this.cachedCoords = { lat: pos.coords.latitude, lng: pos.coords.longitude };
+          resolve(this.cachedCoords);
+        },
+        () => resolve(null),
+        { timeout: 4000, maximumAge: 60000, enableHighAccuracy: false }
+      );
+    });
+  }
+
+  private haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
+    const R = 6371;
+    const toRad = (d: number) => (d * Math.PI) / 180;
+    const dLat = toRad(lat2 - lat1);
+    const dLng = toRad(lng2 - lng1);
+    const a = Math.sin(dLat / 2) ** 2
+      + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    return 2 * R * Math.asin(Math.sqrt(a));
   }
 
   private doGpsSearch(kw: string) {
@@ -155,6 +193,7 @@ export class SearchPage implements OnDestroy {
         this.ngZone.run(() => {
           const lat = pos.coords.latitude;
           const lng = pos.coords.longitude;
+          this.cachedCoords = { lat, lng };
 
           let obs;
           if (this.mode === 'emergency') {
