@@ -43,12 +43,12 @@
     <div class="lookup-card">
       <label class="lookup-label">Pharmacy ID</label>
       <div class="lookup-row">
-        <input
-          class="lookup-input"
-          [(ngModel)]="pharmacyId"
-          placeholder="Paste a pharmacy UUID..."
-          (keyup.enter)="fetch()"
-        />
+        <select class="lookup-input" [(ngModel)]="pharmacyId" (ngModelChange)="fetch()">
+          <option value="">-- Select a pharmacy --</option>
+          @for (p of pharmacies; track p.pharmacyId) {
+          <option [value]="p.pharmacyId">{{ p.pharmacyName }} — {{ p.pharmacyAddress }}</option>
+          }
+        </select>
         <button class="btn-primary" (click)="fetch()" [disabled]="loading || !pharmacyId.trim()">
           {{ loading ? 'Loading...' : 'View Analytics' }}
         </button>

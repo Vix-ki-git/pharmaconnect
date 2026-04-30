@@ -72,8 +72,7 @@
 
     <div class="res-list">
       @for (r of filtered; track r.id) {
-        <div class="res-card" [class]="'card-' + r.status.toLowerCase()">
-
+      <div class="res-card" [class]="'card-' + (isExpiredLocally(r) ? 'expired' : r.status.toLowerCase())">
           <div class="card-accent-bar"></div>
 
           <div class="card-inner">
@@ -82,7 +81,7 @@
                 <h3 class="med-name">{{ r.medicineName }}</h3>
                 <span class="qty-badge">× {{ r.quantity }}</span>
               </div>
-              <span class="status-chip chip-{{ r.status.toLowerCase() }}">{{ r.status }}</span>
+              <span class="status-chip chip-{{ isExpiredLocally(r) ? 'expired' : r.status.toLowerCase() }}">{{ isExpiredLocally(r) ? 'EXPIRED' : r.status }}</span>
             </div>
 
             <div class="card-meta">
@@ -104,7 +103,7 @@
               }
             </div>
 
-            @if (r.status === 'PENDING') {
+            @if (r.status === 'PENDING' && !isExpiredLocally(r)) {
               <div class="card-action">
                 <button class="btn-claim" (click)="claim(r.id)">✓ Mark as Claimed</button>
               </div>
