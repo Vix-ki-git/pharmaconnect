@@ -13,18 +13,51 @@
 .srch-radius { display: flex; align-items: center; gap: 1rem; margin-bottom: 0.85rem; font-size: 0.875rem; color: var(--text); }
 .srch-radius input[type=range] { flex: 1; accent-color: var(--green); }
 
-.srch-row { display: flex; gap: 0.75rem; }
+.srch-row { display: flex; gap: 0.75rem; align-items: flex-start; }
+
+/* Wrapper needed for dropdown positioning */
+.srch-input-wrap { position: relative; flex: 1; }
+
 .srch-input {
-  flex: 1; padding: 0.7rem 1rem; border: 1.5px solid var(--input-border);
+  width: 100%; padding: 0.7rem 1rem; border: 1.5px solid var(--input-border);
   border-radius: 10px; font-size: 0.9rem; background: var(--input-bg); color: var(--text);
-  outline: none; transition: border-color 0.15s;
+  outline: none; transition: border-color 0.15s; box-sizing: border-box;
 }
 .srch-input:focus { border-color: var(--green); background: white; }
+
+/* ── Autocomplete suggestions dropdown ── */
+.srch-suggestions {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: var(--card);
+  border: 1.5px solid var(--border);
+  border-radius: 10px;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+  z-index: 100;
+  overflow: hidden;
+}
+.srch-suggestion-item {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 1rem;
+  font-size: 0.88rem;
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.1s;
+  border-bottom: 1px solid var(--border);
+}
+.srch-suggestion-item:last-child { border-bottom: none; }
+.srch-suggestion-item:hover { background: var(--green-light); color: var(--green-dark); }
+.srch-suggestion-item span { flex: 1; }
+
 .srch-btn {
   display: flex; align-items: center; gap: 0.45rem;
   padding: 0.7rem 1.4rem; background: var(--green); color: white; border: none;
   border-radius: 10px; font-size: 0.9rem; font-weight: 600; cursor: pointer; white-space: nowrap;
-  transition: background 0.15s;
+  transition: background 0.15s; flex-shrink: 0;
 }
 .srch-btn:hover:not(:disabled) { background: var(--green-dark); }
 .srch-btn:disabled { opacity: 0.5; cursor: not-allowed; }
@@ -81,9 +114,7 @@
   border: 1px solid #a7f3d0;
 }
 .srch-distance-row strong { font-weight: 800; font-size: 0.95rem; }
-.srch-distance-row svg { color: var(--green-dark); }
 
-/* Emergency-mode styled result cards */
 .srch-card-emergency {
   border-left: 4px solid #dc2626;
   background: linear-gradient(to right, #fff1f2 0%, var(--card) 8%);
@@ -93,11 +124,9 @@
   background: var(--gold); color: #1a1a1a;
   font-size: 0.65rem; font-weight: 800;
   padding: 0.1rem 0.45rem; border-radius: 50px;
-  margin-left: 0.35rem;
-  letter-spacing: 0.04em;
+  margin-left: 0.35rem; letter-spacing: 0.04em;
 }
 
-/* Alternatives panel */
 .srch-alt-row {
   display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;
   padding: 0.7rem 0.85rem; border-radius: 10px;
@@ -118,6 +147,7 @@
 .srch-stock-low { color: #d97706; }
 .srch-stock-out { color: #dc2626; }
 
+/* ── Action buttons ── */
 .srch-actions { display: flex; gap: 0.5rem; margin-bottom: 0.75rem; flex-wrap: wrap; }
 .srch-action-btn {
   display: flex; align-items: center; gap: 0.35rem;
@@ -127,6 +157,10 @@
 }
 .srch-action-btn:hover, .srch-action-btn.active { border-color: var(--green); color: var(--green); background: var(--green-light); }
 
+/* Show in Maps button */
+.srch-maps-btn { border-color: #3b82f6; color: #3b82f6; }
+.srch-maps-btn:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
+
 /* ── Expand panels ── */
 .srch-panel { background: var(--input-bg); border-radius: 10px; padding: 0.85rem 1rem; margin-bottom: 0.75rem; }
 .srch-panel-title { font-size: 0.8rem; font-weight: 700; color: var(--text-muted); margin-bottom: 0.6rem; text-transform: uppercase; letter-spacing: 0.05em; }
@@ -134,8 +168,6 @@
 .srch-compare-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.5rem 0; border-bottom: 1px solid var(--border); gap: 1rem; }
 .srch-compare-row:last-child { border-bottom: none; }
 .srch-compare-best { background: var(--green-light); border-radius: 6px; padding: 0.5rem 0.6rem; margin: 0 -0.6rem; }
-.srch-alt-row { display: flex; align-items: center; gap: 0.5rem; padding: 0.35rem 0; border-bottom: 1px solid var(--border); flex-wrap: wrap; }
-.srch-alt-row:last-child { border-bottom: none; }
 
 /* ── Reserve ── */
 .srch-reserve-btn {

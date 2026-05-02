@@ -34,18 +34,23 @@ export class SearchService {
     return this.http.get<any[]>(`${this.base}/filter`, { params });
   }
 
-  // Returns PriceComparisonDto[]: pharmacyName, pharmacyAddress, price, quantity, distance
+  // Returns PriceComparisonDto[]: pharmacy, price, quantity
   getPricesByMedicine(medicineId: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.base}/medicine/${medicineId}/prices`);
   }
 
-  // Returns MedicineAlternativeDto[]: brandMedicine, alternativeMedicine, equivalenceNote
+  // Returns PharmacyStock[] of generic alternatives
   getAlternatives(brandName: string): Observable<any[]> {
     return this.http.get<any[]>(`${this.base}/alternatives`, { params: new HttpParams().set('brandName', brandName) });
   }
 
-  // Returns MedicineCompareResponseDto: medicine, alternatives[], pharmacies[]
+  // Returns MedicineCompareResponseDto
   compareMedicine(medicineId: string): Observable<any> {
     return this.http.get<any>(`http://localhost:8082/api/auth/medicines/${medicineId}/compare`);
+  }
+
+  // Returns string[] — medicine name suggestions for autocomplete (max 8)
+  getSuggestions(keyword: string): Observable<string[]> {
+    return this.http.get<string[]>(`${this.base}/suggest`, { params: new HttpParams().set('keyword', keyword) });
   }
 }
