@@ -39,22 +39,84 @@
       </div>
       <p class="login-hint">Already have an account? <a (click)="goToLogin()">Login here</a></p>
     </div>
+
+    <!-- Hero visual — real looking medicine card -->
     <div class="hero-visual">
       <div class="mock-card">
-        <div class="mock-top">
-          <div class="mock-pill"></div>
-          <div class="mock-dist">1.2 km</div>
+
+        <!-- Card 1 (main, front) -->
+        <div class="real-card real-card-front">
+          <div class="real-card-top">
+            <div>
+              <div class="real-med-name">Paracetamol 500mg</div>
+              <div class="real-generic">Generic: Acetaminophen</div>
+            </div>
+            <div class="real-price">₹17</div>
+          </div>
+          <div class="real-pharmacy-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            <span class="real-ph-name">MedPlus SIPCOT</span>
+          </div>
+          <div class="real-dist-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span class="real-dist">0.5 km from you</span>
+            <span class="real-stock-badge">300 in stock</span>
+          </div>
+          <div class="real-actions">
+            <div class="real-action-chip">💲 Compare</div>
+            <div class="real-action-chip">🗺 Maps</div>
+            <div class="real-action-chip">💊 Generics</div>
+          </div>
+          <div class="real-reserve-btn">Reserve Now — 30 min hold</div>
         </div>
-        <div class="mock-name"></div>
-        <div class="mock-sub"></div>
-        <div class="mock-row">
-          <div class="mock-price"></div>
-          <div class="mock-stock"></div>
+
+        <!-- Card 2 (behind, peeking) -->
+        <div class="real-card real-card-back">
+          <div class="real-card-top">
+            <div>
+              <div class="real-med-name">Azithromycin 500mg</div>
+              <div class="real-generic">Generic: Azithromycin</div>
+            </div>
+            <div class="real-price">₹158</div>
+          </div>
+          <div class="real-pharmacy-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+            <span class="real-ph-name">Siruseri 24Hr Pharma</span>
+            <span class="badge-247">24/7</span>
+          </div>
+          <div class="real-dist-row">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" width="13" height="13"><path d="M21 10c0 7-9 13-9 13S3 17 3 10a9 9 0 1 1 18 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            <span class="real-dist">2.1 km from you</span>
+            <span class="real-stock-badge">65 in stock</span>
+          </div>
         </div>
-        <div class="mock-btn"></div>
+
       </div>
     </div>
   </header>
+
+  <!-- Stats strip -->
+  <div class="stats-strip">
+    <div class="stat-item">
+      <span class="stat-num">500+</span>
+      <span class="stat-label">Verified Pharmacies</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num">10k+</span>
+      <span class="stat-label">Medicines Tracked</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num">30 sec</span>
+      <span class="stat-label">Average Reserve Time</span>
+    </div>
+    <div class="stat-divider"></div>
+    <div class="stat-item">
+      <span class="stat-num">24/7</span>
+      <span class="stat-label">Emergency Access</span>
+    </div>
+  </div>
 
   <!-- How it works -->
   <section class="section how-section">
