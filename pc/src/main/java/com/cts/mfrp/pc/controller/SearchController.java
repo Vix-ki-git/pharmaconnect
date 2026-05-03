@@ -1,20 +1,25 @@
 package com.cts.mfrp.pc.controller;
 
+import com.cts.mfrp.pc.model.Medicine;
 import com.cts.mfrp.pc.model.PharmacyStock;
 import com.cts.mfrp.pc.dto.MedicineSearchResult;
+import com.cts.mfrp.pc.repository.MedicineRepository;
 import com.cts.mfrp.pc.service.SearchService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/search")
+@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 public class SearchController {
 
     private final SearchService searchService;
+    private final MedicineRepository medicineRepository;
 
     /**
      * Finds closest pharmacies for a medicine based on user's GPS
@@ -52,7 +57,7 @@ public class SearchController {
     }
 
     /**
-     * Exact search by Medicine ID sorted by lowest price (Your original logic)
+     * Exact search by Medicine ID sorted by lowest price
      * GET /api/search/medicine/12345-abcde/prices
      */
     @GetMapping("/medicine/{medicineId}/prices")
@@ -64,7 +69,7 @@ public class SearchController {
 
     /**
      * Finds cheaper generic equivalents for a specific brand name
-     * GET /api/search/alternatives?brandName=Tylenol
+     * GET /api/search/alternatives?brandName=Crocin
      */
     @GetMapping("/alternatives")
     public ResponseEntity<List<PharmacyStock>> getAlternatives(
@@ -80,7 +85,26 @@ public class SearchController {
             @RequestParam Float lng,
             @RequestParam(required = false) Double radius) {
 
-        List<MedicineSearchResult> results = searchService.filterMedicines(keyword, lat, lng, radius);
-        return ResponseEntity.ok(results);
+        return ResponseEntity.ok(searchService.filterMedicines(keyword, lat, lng, radius));
+    }
+
+    /**
+     * Autocomplete suggestions — returns up to 8 medicine names matching the keyword
+     * GET /api/search/suggest?keyword=para
+     */
+    @GetMapping("/suggest")
+    public ResponseEntity<List<String>> suggest(@RequestParam String keyword) {
+        if (keyword == null || keyword.trim().length() < 2) {
+            return ResponseEntity.ok(List.of());
+        }
+        List<Medicine> matches = medicineRepository
+                .findByNameContainingIgnoreCaseOrGenericNameContainingIgnoreCase(
+                        keyword.trim(), keyword.trim());
+        List<String> names = matches.stream()
+                .map(Medicine::getName)
+                .distinct()
+                .limit(8)
+                .collect(Collectors.toList());
+        return ResponseEntity.ok(names);
     }
 }

@@ -2,6 +2,8 @@ import { Component, OnDestroy, NgZone } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
+import { Subject } from 'rxjs';
+import { debounceTime, distinctUntilChanged, switchMap } from 'rxjs/operators';
 import { SearchService } from '../../../services/search.service';
 import { ReservationService } from '../../../services/reservation.service';
 import { AuthService } from '../../../services/auth.service';
@@ -18,6 +20,8 @@ interface ResultCard {
   quantity: number;
   price: number;
   distance?: number;
+  lat?: number;
+  lng?: number;
 }
 
 type SortOption = 'default' | 'price-asc' | 'price-desc' | 'distance' | 'stock-desc';
@@ -42,16 +46,20 @@ export class SearchPage implements OnDestroy {
   searched = false;
   sidebarOpen = false;
 
+  // Autocomplete
+  suggestions: string[] = [];
+  showSuggestions = false;
+  private keywordSubject = new Subject<string>();
+  private suggestSub: any;
+
   reservingId: string | null = null;
   reserveQty = 1;
   reserveLoading = false;
 
-  // Price comparison panel
   priceCompareId: string | null = null;
   priceCompareData: any[] = [];
   priceCompareLoading = false;
 
-  // Generic alternatives panel
   alternativesId: string | null = null;
   alternativesData: any[] = [];
   alternativesLoading = false;
@@ -71,10 +79,49 @@ export class SearchPage implements OnDestroy {
     private ngZone: NgZone
   ) {
     this.user = this.authService.getCurrentUser();
+
+    // Debounce typing → fetch suggestions after 250ms pause
+    this.suggestSub = this.keywordSubject.pipe(
+      debounceTime(250),
+      distinctUntilChanged(),
+      switchMap(kw => {
+        if (kw.trim().length < 2) return [];
+        return this.searchService.getSuggestions(kw.trim());
+      })
+    ).subscribe({
+      next: (list: string[]) => {
+        this.suggestions = list;
+        this.showSuggestions = list.length > 0;
+      },
+      error: () => { this.suggestions = []; this.showSuggestions = false; }
+    });
   }
 
   ngOnDestroy() {
     clearTimeout(this.toastTimer);
+    this.suggestSub?.unsubscribe();
+  }
+
+  // Called on every keyup in the input
+  onKeywordChange() {
+    this.keywordSubject.next(this.keyword);
+  }
+
+  // User clicked a suggestion
+  selectSuggestion(name: string) {
+    this.keyword = name;
+    this.showSuggestions = false;
+    this.suggestions = [];
+    this.search();
+  }
+
+  // Hide suggestions when input loses focus (small delay so click registers)
+  onBlur() {
+    setTimeout(() => { this.showSuggestions = false; }, 150);
+  }
+
+  onFocus() {
+    if (this.suggestions.length > 0) this.showSuggestions = true;
   }
 
   private applySort() {
@@ -96,17 +143,18 @@ export class SearchPage implements OnDestroy {
     this.reservingId = null;
     this.priceCompareId = null;
     this.alternativesId = null;
+    this.showSuggestions = false;
     this.clearToast();
     this.sortBy = m !== 'keyword' ? 'distance' : 'default';
   }
 
-  onSortChange() {
-    this.applySort();
-  }
+  onSortChange() { this.applySort(); }
 
   search() {
     const kw = this.keyword.trim();
     if (!kw) return;
+    this.showSuggestions = false;
+    this.suggestions = [];
     this.rawResults = [];
     this.results = [];
     this.searched = false;
@@ -118,6 +166,26 @@ export class SearchPage implements OnDestroy {
     this.mode === 'keyword' ? this.doKeywordSearch(kw) : this.doGpsSearch(kw);
   }
 
+  // ── Google Maps route opener ──────────────────────────
+
+  openInMaps(card: ResultCard) {
+    if (card.lat && card.lng) {
+      if (this.cachedCoords) {
+        const url = `https://www.google.com/maps/dir/${this.cachedCoords.lat},${this.cachedCoords.lng}/${card.lat},${card.lng}`;
+        window.open(url, '_blank');
+      } else {
+        const url = `https://www.google.com/maps/search/?api=1&query=${card.lat},${card.lng}`;
+        window.open(url, '_blank');
+      }
+    } else {
+      const query = encodeURIComponent(card.pharmacyName + ' ' + card.pharmacyAddress);
+      const url = `https://www.google.com/maps/search/?api=1&query=${query}`;
+      window.open(url, '_blank');
+    }
+  }
+
+  // ── Search internals ──────────────────────────────────
+
   private doKeywordSearch(kw: string) {
     this.loading = true;
     this.searchService.searchKeyword(kw).subscribe({
@@ -128,8 +196,7 @@ export class SearchPage implements OnDestroy {
               const pLat = item.pharmacy?.lat;
               const pLng = item.pharmacy?.lng;
               const distance = (coords && pLat != null && pLng != null)
-                ? this.haversine(coords.lat, coords.lng, pLat, pLng)
-                : undefined;
+                ? this.haversine(coords.lat, coords.lng, pLat, pLng) : undefined;
               return {
                 stockId: item.id,
                 pharmacyId: item.pharmacy?.id ?? '',
@@ -140,6 +207,8 @@ export class SearchPage implements OnDestroy {
                 pharmacyAddress: item.pharmacy?.address ?? '',
                 quantity: item.quantity,
                 price: item.price,
+                lat: pLat ?? undefined,
+                lng: pLng ?? undefined,
                 distance
               };
             });
@@ -175,10 +244,8 @@ export class SearchPage implements OnDestroy {
   private haversine(lat1: number, lng1: number, lat2: number, lng2: number): number {
     const R = 6371;
     const toRad = (d: number) => (d * Math.PI) / 180;
-    const dLat = toRad(lat2 - lat1);
-    const dLng = toRad(lng2 - lng1);
-    const a = Math.sin(dLat / 2) ** 2
-      + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
+    const dLat = toRad(lat2 - lat1), dLng = toRad(lng2 - lng1);
+    const a = Math.sin(dLat / 2) ** 2 + Math.cos(toRad(lat1)) * Math.cos(toRad(lat2)) * Math.sin(dLng / 2) ** 2;
     return 2 * R * Math.asin(Math.sqrt(a));
   }
 
@@ -191,20 +258,16 @@ export class SearchPage implements OnDestroy {
     navigator.geolocation.getCurrentPosition(
       (pos) => {
         this.ngZone.run(() => {
-          const lat = pos.coords.latitude;
-          const lng = pos.coords.longitude;
+          const lat = pos.coords.latitude, lng = pos.coords.longitude;
           this.cachedCoords = { lat, lng };
-
           let obs;
           if (this.mode === 'emergency') {
             obs = this.searchService.searchEmergency(kw, lat, lng, this.user?.id);
           } else if (this.radius < 50) {
-            // Use radius filter for "nearest" mode when a custom radius is set
             obs = this.searchService.filterByRadius(kw, lat, lng, this.radius, this.user?.id);
           } else {
             obs = this.searchService.searchClosest(kw, lat, lng, this.user?.id);
           }
-
           obs.subscribe({
             next: (items) => {
               this.rawResults = items.map(item => ({
@@ -217,6 +280,8 @@ export class SearchPage implements OnDestroy {
                 pharmacyAddress: item.pharmacyAddress,
                 quantity: item.quantity,
                 price: item.price,
+                lat: item.lat ?? undefined,
+                lng: item.lng ?? undefined,
                 distance: item.distance
               }));
               this.applySort();
@@ -241,12 +306,10 @@ export class SearchPage implements OnDestroy {
     );
   }
 
-  // Price comparison — toggled per card
+  // ── Price comparison ──────────────────────────────────
+
   togglePriceCompare(card: ResultCard) {
-    if (this.priceCompareId === card.stockId) {
-      this.priceCompareId = null;
-      return;
-    }
+    if (this.priceCompareId === card.stockId) { this.priceCompareId = null; return; }
     this.priceCompareId = card.stockId;
     this.priceCompareData = [];
     this.priceCompareLoading = true;
@@ -256,12 +319,10 @@ export class SearchPage implements OnDestroy {
     });
   }
 
-  // Generic alternatives — toggled per card
+  // ── Generic alternatives ──────────────────────────────
+
   toggleAlternatives(card: ResultCard) {
-    if (this.alternativesId === card.stockId) {
-      this.alternativesId = null;
-      return;
-    }
+    if (this.alternativesId === card.stockId) { this.alternativesId = null; return; }
     this.alternativesId = card.stockId;
     this.alternativesData = [];
     this.alternativesLoading = true;
@@ -271,18 +332,15 @@ export class SearchPage implements OnDestroy {
     });
   }
 
+  // ── Reservation ───────────────────────────────────────
+
   startReserve(stockId: string) {
-    if (!this.user?.id) {
-      this.router.navigate(['/login']);
-      return;
-    }
+    if (!this.user?.id) { this.router.navigate(['/login']); return; }
     this.reservingId = this.reservingId === stockId ? null : stockId;
     this.reserveQty = 1;
   }
 
-  cancelReserve() {
-    this.reservingId = null;
-  }
+  cancelReserve() { this.reservingId = null; }
 
   confirmReserve(card: ResultCard) {
     if (this.reserveQty < 1 || this.reserveQty > card.quantity) {
@@ -295,10 +353,7 @@ export class SearchPage implements OnDestroy {
         this.reserveLoading = false;
         this.reservingId = null;
         const expiry = this.parseDateTime(res.expiresAt);
-        this.showToast(
-          `Reserved ${this.reserveQty}x ${card.medicineName} at ${card.pharmacyName}. Hold expires at ${expiry}.`,
-          'success'
-        );
+        this.showToast(`Reserved ${this.reserveQty}x ${card.medicineName} at ${card.pharmacyName}. Hold expires at ${expiry}.`, 'success');
         const found = this.rawResults.find(r => r.stockId === card.stockId);
         if (found) { found.quantity -= this.reserveQty; this.applySort(); }
       },
@@ -316,8 +371,8 @@ export class SearchPage implements OnDestroy {
   parseDateTime(dt: any): string {
     if (!dt) return 'unknown';
     if (Array.isArray(dt)) {
-      const d = new Date(dt[0], dt[1] - 1, dt[2], dt[3] ?? 0, dt[4] ?? 0);
-      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      return new Date(dt[0], dt[1] - 1, dt[2], dt[3] ?? 0, dt[4] ?? 0)
+        .toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
     }
     return new Date(dt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
   }
@@ -328,13 +383,7 @@ export class SearchPage implements OnDestroy {
     this.toastTimer = setTimeout(() => (this.toast = null), 5000);
   }
 
-  private clearToast() {
-    clearTimeout(this.toastTimer);
-    this.toast = null;
-  }
+  private clearToast() { clearTimeout(this.toastTimer); this.toast = null; }
 
-  logout() {
-    this.authService.logout();
-    this.router.navigate(['/']);
-  }
+  logout() { this.authService.logout(); this.router.navigate(['/']); }
 }

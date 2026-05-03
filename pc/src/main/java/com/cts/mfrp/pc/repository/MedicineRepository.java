@@ -4,6 +4,7 @@ import com.cts.mfrp.pc.model.Medicine;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
 import java.util.Optional;
 
 @Repository
@@ -12,5 +13,5 @@ public interface MedicineRepository extends JpaRepository<Medicine, String> {
 
     // Add this for BulkUploadService Class
     Optional<Medicine> findByNameIgnoreCase(String name);
-
+    List<Medicine> findByNameContainingIgnoreCaseOrGenericNameContainingIgnoreCase(String name, String genericName);
 }
