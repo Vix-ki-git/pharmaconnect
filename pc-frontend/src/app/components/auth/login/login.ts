@@ -1,4 +1,4 @@
-import { Component, AfterViewInit, NgZone } from '@angular/core';
+import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -12,7 +12,7 @@ type LoginMode = 'user' | 'pharmacy' | 'admin';
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
-export class Login implements AfterViewInit {
+export class Login {
   email = '';
   password = '';
   rememberMe = false;
@@ -22,37 +22,8 @@ export class Login implements AfterViewInit {
 
   constructor(
     private authService: AuthService,
-    private router: Router,
-    private ngZone: NgZone
+    private router: Router
   ) {}
-
-  ngAfterViewInit() {
-    const tryInit = () => {
-      const g = (window as any).google;
-      if (!g) { setTimeout(tryInit, 200); return; }
-      g.accounts.id.initialize({
-        client_id: '637661381312-0r1rl4q9c9c2ku8abjrj08bld26p6mi7.apps.googleusercontent.com',
-        callback: (res: any) => this.ngZone.run(() => this.handleGoogleCallback(res))
-      });
-      g.accounts.id.renderButton(
-        document.getElementById('google-signin-btn'),
-        { theme: 'outline', size: 'large', text: 'continue_with', shape: 'rectangular', width: 340 }
-      );
-    };
-    setTimeout(tryInit, 100);
-  }
-
-  handleGoogleCallback(res: any) {
-    this.loading = true;
-    this.errorMessage = '';
-    this.authService.googleLogin(res.credential).subscribe({
-      next: (user) => this.redirectByRole(user.role),
-      error: () => {
-        this.loading = false;
-        this.errorMessage = 'Google sign-in failed. Please try again.';
-      }
-    });
-  }
 
   get loginTitle(): string {
     return this.loginMode === 'pharmacy' ? 'Pharmacy Login'
