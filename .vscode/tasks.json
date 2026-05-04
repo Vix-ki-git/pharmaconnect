@@ -18,10 +18,7 @@
       "problemMatcher": {
         "owner": "spring-boot",
         "pattern": {
-          "regexp": "^.*$",
-          "file": 1,
-          "location": 2,
-          "message": 3
+          "regexp": "^$"
         },
         "background": {
           "activeOnStart": true,
@@ -43,7 +40,7 @@
         "reveal": "always",
         "group": "pharmaconnect"
       },
-      "dependsOn": ["PharmaConnect: Backend"],
+      "dependsOn": "PharmaConnect: Backend",
       "problemMatcher": []
     },
     {
@@ -60,18 +57,26 @@
         "reveal": "always",
         "group": "pharmaconnect"
       },
-      "dependsOn": ["PharmaConnect: Seed DB"],
-      "problemMatcher": []
+      "dependsOn": "PharmaConnect: Backend",
+      "problemMatcher": {
+        "owner": "angular",
+        "pattern": {
+          "regexp": "^$"
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*(Application bundle generation|Compiling|Building).*$",
+          "endsPattern": "^.*(compiled successfully|Application bundle generation complete|Local:.*4200).*$"
+        }
+      }
     },
     {
       "label": "PharmaConnect: Start All",
-      "detail": "Starts backend, seeds DB, starts frontend (auto-runs on Codespace open)",
+      "detail": "Starts backend + seed + frontend (auto-runs on Codespace open)",
       "dependsOn": [
-        "PharmaConnect: Backend",
         "PharmaConnect: Seed DB",
         "PharmaConnect: Frontend"
       ],
-      "dependsOrder": "sequence",
       "problemMatcher": [],
       "runOptions": {
         "runOn": "folderOpen"
