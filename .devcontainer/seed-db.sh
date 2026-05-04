@@ -12,7 +12,10 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 REPO_ROOT="$(pwd)"
 
-DB_HOST="${DB_HOST:-localhost}"
+# Use 127.0.0.1 not "localhost" — the mysql CLI treats "localhost" as a Unix
+# socket connection, but we don't have a socket (MySQL runs in a sidecar
+# container). 127.0.0.1 forces a TCP connection which actually works.
+DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PASSWORD="${DB_PASSWORD:-pharmaconnect_dev}"
 
 # Verify the mysql client is available — give a clear error instead of failing
@@ -36,6 +39,12 @@ for i in $(seq 1 90); do
   if $MYSQL -e "SELECT 1 FROM medicine LIMIT 1;" >/dev/null 2>&1; then
     break
   fi
+  # Print the actual error on the first iteration and every 30s after, so
+  # failures are visible instead of silently retrying.
+  if [ "$i" -eq 1 ] || [ $((i % 15)) -eq 0 ]; then
+    echo "    Attempt $i — mysql says:"
+    $MYSQL -e "SELECT 1 FROM medicine LIMIT 1;" 2>&1 | sed 's/^/      /'
+  fi
   if [ "$i" -eq 90 ]; then
     cat <<EOF
 
@@ -44,7 +53,7 @@ Likely cause: the Spring Boot backend hasn't finished booting yet, or it
 crashed during startup. Check the "PharmaConnect: Backend" task panel.
 
 You can also verify MySQL connectivity manually:
-  mysql -h $DB_HOST -uroot -p$DB_PASSWORD pharmaconnect -e 'SHOW TABLES'
+  mysql -h 127.0.0.1 -uroot -p$DB_PASSWORD pharmaconnect -e 'SHOW TABLES'
 EOF
     exit 1
   fi

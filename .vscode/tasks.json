@@ -47,7 +47,7 @@
       "label": "PharmaConnect: Frontend",
       "detail": "Angular dev server on port 4200",
       "type": "shell",
-      "command": "npm start -- --host 0.0.0.0 --disable-host-check",
+      "command": "npm start -- --host 0.0.0.0 --allowed-hosts all",
       "options": {
         "cwd": "${workspaceFolder}/pc-frontend"
       },
