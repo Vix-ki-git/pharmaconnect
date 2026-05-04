@@ -1,15 +1,12 @@
 #!/usr/bin/env bash
 # Loads sample data into the pharmaconnect MySQL database.
 #
-# IMPORTANT: Run this AFTER starting the Spring Boot backend at least once,
-# so Hibernate has created the tables. Order:
-#   1. cd pc && ./mvnw spring-boot:run     (wait for startup, then stop or new terminal)
-#   2. bash .devcontainer/seed-db.sh       (you are here)
-#   3. cd pc-frontend && npm start
+# Idempotent: if the medicine table already has rows, this script exits cleanly
+# without re-running the seed scripts (which would otherwise fail with primary
+# key violations because the seed files use fixed UUIDs).
 #
-# This script is idempotent-ish: re-running it will likely fail with primary-key
-# violations because the seed files use fixed UUIDs. If you want a clean reseed,
-# uncomment the TRUNCATE block at the top of database/dummy_data.sql first.
+# Requires the Spring Boot backend to have been started at least once so
+# Hibernate has created the tables.
 set -euo pipefail
 
 cd "$(dirname "$0")/.."
@@ -20,19 +17,32 @@ DB_PASSWORD="${DB_PASSWORD:-pharmaconnect_dev}"
 
 MYSQL="mysql -h $DB_HOST -uroot -p$DB_PASSWORD pharmaconnect"
 
-echo "==> Verifying backend has been started (tables must exist)..."
-if ! $MYSQL -e "SELECT 1 FROM medicine LIMIT 1;" >/dev/null 2>&1; then
-  cat <<EOF
+# Wait up to 60s for tables to exist (backend may still be booting if called
+# from an auto-run task right after backend startup).
+echo "==> Waiting for backend tables to exist (up to 60s)..."
+for i in $(seq 1 30); do
+  if $MYSQL -e "SELECT 1 FROM medicine LIMIT 1;" >/dev/null 2>&1; then
+    break
+  fi
+  if [ "$i" -eq 30 ]; then
+    cat <<EOF
 
-ERROR: tables don't exist in the 'pharmaconnect' database yet.
-Start the backend at least once so Hibernate creates the schema:
-
+ERROR: tables don't exist after waiting 60s.
+Make sure the Spring Boot backend has started:
   cd pc && ./mvnw spring-boot:run
-
-Wait until you see "Started Application" in the logs, then re-run this script
-(you can leave the backend running — open a second terminal).
 EOF
-  exit 1
+    exit 1
+  fi
+  sleep 2
+done
+
+# Idempotency check: if there's already data, skip.
+COUNT=$($MYSQL -sN -e "SELECT COUNT(*) FROM medicine;" 2>/dev/null || echo 0)
+if [ "$COUNT" -gt 0 ]; then
+  echo "==> medicine table already has $COUNT rows — skipping seed."
+  echo "    To force reseed: uncomment the TRUNCATE block at the top of"
+  echo "    database/dummy_data.sql, then re-run this script."
+  exit 0
 fi
 
 echo "==> Loading database/seed_data.sql (medicine catalog)..."

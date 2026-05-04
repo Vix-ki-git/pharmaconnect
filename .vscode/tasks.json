@@ -1,0 +1,81 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "PharmaConnect: Backend",
+      "detail": "Spring Boot backend on port 8082",
+      "type": "shell",
+      "command": "./mvnw spring-boot:run",
+      "options": {
+        "cwd": "${workspaceFolder}/pc"
+      },
+      "isBackground": true,
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "pharmaconnect"
+      },
+      "problemMatcher": {
+        "owner": "spring-boot",
+        "pattern": {
+          "regexp": "^.*$",
+          "file": 1,
+          "location": 2,
+          "message": 3
+        },
+        "background": {
+          "activeOnStart": true,
+          "beginsPattern": "^.*Starting .* using Java.*$",
+          "endsPattern": "^.*Started .* in .* seconds.*$"
+        }
+      }
+    },
+    {
+      "label": "PharmaConnect: Seed DB",
+      "detail": "Loads sample data (skips if already seeded)",
+      "type": "shell",
+      "command": "bash .devcontainer/seed-db.sh",
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "pharmaconnect"
+      },
+      "dependsOn": ["PharmaConnect: Backend"],
+      "problemMatcher": []
+    },
+    {
+      "label": "PharmaConnect: Frontend",
+      "detail": "Angular dev server on port 4200",
+      "type": "shell",
+      "command": "npm start -- --host 0.0.0.0 --disable-host-check",
+      "options": {
+        "cwd": "${workspaceFolder}/pc-frontend"
+      },
+      "isBackground": true,
+      "presentation": {
+        "panel": "dedicated",
+        "reveal": "always",
+        "group": "pharmaconnect"
+      },
+      "dependsOn": ["PharmaConnect: Seed DB"],
+      "problemMatcher": []
+    },
+    {
+      "label": "PharmaConnect: Start All",
+      "detail": "Starts backend, seeds DB, starts frontend (auto-runs on Codespace open)",
+      "dependsOn": [
+        "PharmaConnect: Backend",
+        "PharmaConnect: Seed DB",
+        "PharmaConnect: Frontend"
+      ],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "runOptions": {
+        "runOn": "folderOpen"
+      }
+    }
+  ]
+}

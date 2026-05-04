@@ -19,57 +19,42 @@ the cloud, with zero local installs, in about 3 minutes.
 3. Wait ~2–3 minutes. GitHub builds the container, installs Java 21 + Node 20 +
    MySQL 8, runs `npm ci`, and warms the Maven cache. You'll see a VS Code
    window in your browser with the project ready.
-4. When the build is done, the integrated terminal prints a 3-step boot guide.
-   Follow it (also reproduced below).
+4. **VS Code will prompt: "Allow automatic tasks to run?"** Click **Allow**
+   (or **Allow Always**). This lets the backend, DB seed, and frontend
+   auto-start every time you open this codespace.
+5. Three task panels open in the bottom Terminal area:
+   - **PharmaConnect: Backend** — Spring Boot booting (~60–90s on first run)
+   - **PharmaConnect: Seed DB** — runs once the backend is ready, idempotent
+   - **PharmaConnect: Frontend** — Angular dev server, starts after seed
+6. When the frontend finishes compiling, port 4200 auto-opens in a new browser
+   tab. You're done — no commands typed.
 
-### Boot the app (first session)
+> **Demo accounts**: passwords are all `password` (see `database/dummy_data.sql`
+> for the user list — admin user is typically `admin@pharmaconnect.com`).
 
-In the VS Code terminal:
+### Subsequent sessions
 
-```bash
-# 1. Start the backend — this creates the DB tables on first boot
-cd pc
-./mvnw spring-boot:run
-```
+The same auto-start runs every time you open the codespace. The DB seed step
+detects existing data and skips itself, so it's safe.
 
-Wait until the logs say `Started Application in X seconds`. Leave it running,
-then open a **second terminal** (Terminal → New Terminal):
+If you ever decline the "Allow automatic tasks" prompt or want to start things
+manually, you have two equivalent options:
 
-```bash
-# 2. Seed the DB with sample medicines, users, pharmacies
-bash .devcontainer/seed-db.sh
-```
+**Option A — VS Code task palette** (Ctrl+Shift+P → "Tasks: Run Task" →
+"PharmaConnect: Start All")
 
-Then open a **third terminal** for the frontend:
-
-```bash
-# 3. Start the frontend (--host 0.0.0.0 is required so Codespaces can forward it)
-cd pc-frontend
-npm start -- --host 0.0.0.0
-```
-
-Once the frontend says `Local: http://localhost:4200/`, VS Code's **Ports**
-panel (bottom of the screen, or `Ctrl+\`` then click "Ports") shows the public
-forwarded URL. Click the globe icon next to port 4200 — the app opens in a new
-browser tab. You're done.
-
-> **Demo accounts**: passwords are all `password` (see comments in
-> `database/dummy_data.sql` for the user list).
-
-### Boot the app (subsequent sessions)
-
-After the first launch, the DB and tables persist for the lifetime of that
-codespace. So you only need:
+**Option B — terminal commands**:
 
 ```bash
 # Terminal 1
 cd pc && ./mvnw spring-boot:run
 
-# Terminal 2
+# Terminal 2 (run once after backend is up; safe to re-run)
+bash .devcontainer/seed-db.sh
+
+# Terminal 3
 cd pc-frontend && npm start -- --host 0.0.0.0
 ```
-
-If you delete and recreate the codespace, you'll need the seed step again.
 
 ---
 
@@ -123,14 +108,21 @@ included in the comma-separated list.
 This was a known bug fixed via `@JsonIgnore` on `Pharmacy.owner`. If you see
 it now, you may have an old branch. Pull from main.
 
-### `seed-db.sh` says "tables don't exist yet"
-You haven't started the backend yet. Run `./mvnw spring-boot:run` from `pc/`,
-wait for `Started Application`, then re-run the seed script (you can leave the
-backend running in another terminal).
+### `seed-db.sh` says "tables don't exist after waiting 60s"
+The backend hasn't booted yet, or it crashed. Check the **PharmaConnect: Backend**
+task panel for errors. Most often it's a MySQL connection issue — check the
+**db** container is running with `docker compose -f .devcontainer/docker-compose.yml ps`.
 
-### Re-running `seed-db.sh` fails with primary-key violations
-The seed files use fixed UUIDs. To reseed cleanly, uncomment the `TRUNCATE`
-block at the top of `database/dummy_data.sql` before running the script.
+### `seed-db.sh` says "medicine table already has X rows — skipping seed"
+This is correct behavior — the seed already ran. To force a clean reseed:
+uncomment the `TRUNCATE` block at the top of `database/dummy_data.sql`, then
+run `bash .devcontainer/seed-db.sh` manually.
+
+### Auto-start tasks didn't fire
+You probably declined the "Allow automatic tasks" prompt. Run them manually
+via Ctrl+Shift+P → "Tasks: Run Task" → "PharmaConnect: Start All".
+Or reset the prompt: open Settings (Ctrl+,), search "task allow", and reset
+"Task: Allow Automatic Tasks" to "auto".
 
 ### MySQL container won't start
 In the Codespaces terminal: `docker compose -f .devcontainer/docker-compose.yml logs db`
