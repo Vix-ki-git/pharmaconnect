@@ -32,3 +32,6 @@ pc/upload-dir/
 uploads/
 
 user_stories.md
+
+# Local-only dev notes
+issues_to_be_resolved.md
