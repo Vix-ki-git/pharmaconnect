@@ -6,6 +6,14 @@ set -euo pipefail
 REPO_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 cd "$REPO_ROOT"
 
+echo "==> Installing MySQL client (needed by seed-db.sh)..."
+if ! command -v mysql >/dev/null 2>&1; then
+  sudo apt-get update -qq
+  sudo apt-get install -y -qq default-mysql-client
+else
+  echo "    Already installed"
+fi
+
 echo "==> Bootstrapping application.properties from example (if missing)..."
 PROP_FILE="pc/src/main/resources/application.properties"
 EXAMPLE_FILE="pc/src/main/resources/application.properties.example"

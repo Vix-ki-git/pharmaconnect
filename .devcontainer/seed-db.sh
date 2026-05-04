@@ -15,21 +15,36 @@ REPO_ROOT="$(pwd)"
 DB_HOST="${DB_HOST:-localhost}"
 DB_PASSWORD="${DB_PASSWORD:-pharmaconnect_dev}"
 
+# Verify the mysql client is available — give a clear error instead of failing
+# silently in the wait loop below.
+if ! command -v mysql >/dev/null 2>&1; then
+  cat <<EOF
+
+ERROR: 'mysql' command not found.
+Install the MySQL client and retry:
+  sudo apt-get update && sudo apt-get install -y default-mysql-client
+EOF
+  exit 1
+fi
+
 MYSQL="mysql -h $DB_HOST -uroot -p$DB_PASSWORD pharmaconnect"
 
-# Wait up to 60s for tables to exist (backend may still be booting if called
-# from an auto-run task right after backend startup).
-echo "==> Waiting for backend tables to exist (up to 60s)..."
-for i in $(seq 1 30); do
+# Wait up to 180s for tables to exist (backend startup on a fresh codespace
+# can take 60-120s due to Maven dependency download on first run).
+echo "==> Waiting for backend tables to exist (up to 180s)..."
+for i in $(seq 1 90); do
   if $MYSQL -e "SELECT 1 FROM medicine LIMIT 1;" >/dev/null 2>&1; then
     break
   fi
-  if [ "$i" -eq 30 ]; then
+  if [ "$i" -eq 90 ]; then
     cat <<EOF
 
-ERROR: tables don't exist after waiting 60s.
-Make sure the Spring Boot backend has started:
-  cd pc && ./mvnw spring-boot:run
+ERROR: tables don't exist after waiting 180s.
+Likely cause: the Spring Boot backend hasn't finished booting yet, or it
+crashed during startup. Check the "PharmaConnect: Backend" task panel.
+
+You can also verify MySQL connectivity manually:
+  mysql -h $DB_HOST -uroot -p$DB_PASSWORD pharmaconnect -e 'SHOW TABLES'
 EOF
     exit 1
   fi
