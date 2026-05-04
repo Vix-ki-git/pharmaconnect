@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class SellerService {
-  private base = 'http://localhost:8082/api/seller-portal';
+  private base = `${environment.apiBaseUrl}/api/seller-portal`;
 
   constructor(private http: HttpClient) {}
 
@@ -20,6 +21,6 @@ export class SellerService {
   }
 
   uploadLicense(pharmacyId: string, formData: FormData): Observable<any> {
-    return this.http.post<any>(`http://localhost:8082/api/pharmacies/${pharmacyId}/upload-license`, formData);
+    return this.http.post<any>(`${environment.apiBaseUrl}/api/pharmacies/${pharmacyId}/upload-license`, formData);
   }
 }

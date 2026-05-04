@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private base = 'http://localhost:8082/api/auth';
+  private base = `${environment.apiBaseUrl}/api/auth`;
 
   constructor(private http: HttpClient) {}
 
@@ -34,7 +35,7 @@ export class AuthService {
     isOperated247: boolean;
     sellerEmailAddress: string;
   }): Observable<any> {
-    return this.http.post<any>('http://localhost:8082/api/seller-onboarding/register-pharmacy', dto);
+    return this.http.post<any>(`${environment.apiBaseUrl}/api/seller-onboarding/register-pharmacy`, dto);
   }
 
   logout() {

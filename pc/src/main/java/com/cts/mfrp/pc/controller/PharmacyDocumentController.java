@@ -10,7 +10,6 @@ import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequestMapping("/api/pharmacies")
-@CrossOrigin(origins = "*")
 public class PharmacyDocumentController {
 
     @Autowired

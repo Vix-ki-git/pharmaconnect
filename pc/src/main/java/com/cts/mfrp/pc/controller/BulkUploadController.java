@@ -13,7 +13,6 @@ import org.springframework.web.multipart.MultipartFile;
  */
 @RestController
 @RequestMapping("/api/auth/seller")
-@CrossOrigin(origins = "*") // Adjust as per your security requirements
 public class BulkUploadController {
 
     @Autowired

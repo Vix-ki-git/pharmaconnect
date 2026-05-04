@@ -1,11 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  private sellerBase = 'http://localhost:8082/api/auth/admin/sellers';
-  private medBase = 'http://localhost:8082/api/admin/medicines';
+  private sellerBase = `${environment.apiBaseUrl}/api/auth/admin/sellers`;
+  private medBase = `${environment.apiBaseUrl}/api/admin/medicines`;
 
   constructor(private http: HttpClient) {}
 
@@ -54,10 +55,10 @@ export class AdminService {
 
   // DocumentReviewDto[]: id, pharmacyId, pharmacyName, documentType, fileUrl, status, uploadedAt
   getPendingDocuments(): Observable<any[]> {
-    return this.http.get<any[]>('http://localhost:8082/api/auth/admin/documents/pending');
+    return this.http.get<any[]>(`${environment.apiBaseUrl}/api/auth/admin/documents/pending`);
   }
 
   updateDocumentStatus(documentId: string, status: 'APPROVED' | 'REJECTED'): Observable<any> {
-    return this.http.patch<any>(`http://localhost:8082/api/auth/admin/documents/${documentId}/status?status=${status}`, {});
+    return this.http.patch<any>(`${environment.apiBaseUrl}/api/auth/admin/documents/${documentId}/status?status=${status}`, {});
   }
 }

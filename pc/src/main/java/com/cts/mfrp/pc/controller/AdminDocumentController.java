@@ -12,7 +12,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/auth/admin/documents")
-@CrossOrigin(origins = "http://localhost:4200")
 public class AdminDocumentController {
 
     // 2. Change the service type to AdminApprovalService

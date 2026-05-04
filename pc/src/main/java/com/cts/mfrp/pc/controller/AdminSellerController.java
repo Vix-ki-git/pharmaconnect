@@ -12,7 +12,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth/admin/sellers")
-@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 public class AdminSellerController {
 

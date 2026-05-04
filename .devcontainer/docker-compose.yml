@@ -1,0 +1,26 @@
+services:
+  app:
+    image: mcr.microsoft.com/devcontainers/java:21-bookworm
+    volumes:
+      - ../..:/workspaces:cached
+    command: sleep infinity
+    network_mode: service:db
+    environment:
+      DB_HOST: localhost
+      DB_PORT: "3306"
+      DB_NAME: pharmaconnect
+      DB_USER: root
+      DB_PASSWORD: ${DB_PASSWORD:-pharmaconnect_dev}
+      BREVO_API_KEY: ${BREVO_API_KEY:-DUMMY_VALUE}
+
+  db:
+    image: mysql:8
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:-pharmaconnect_dev}
+      MYSQL_DATABASE: pharmaconnect
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uroot", "-p${DB_PASSWORD:-pharmaconnect_dev}"]
+      interval: 5s
+      timeout: 5s
+      retries: 20

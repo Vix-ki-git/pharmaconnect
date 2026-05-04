@@ -1,10 +1,11 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../../environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class InventoryService {
-  private base = 'http://localhost:8082/api/inventory';
+  private base = `${environment.apiBaseUrl}/api/inventory`;
 
   constructor(private http: HttpClient) {}
 
@@ -52,7 +53,7 @@ export class InventoryService {
   bulkUpload(pharmacyId: string, file: File): Observable<string> {
     const form = new FormData();
     form.append('file', file);
-    return this.http.post(`http://localhost:8082/api/auth/seller/inventory/bulk-upload-csv/${pharmacyId}`, form, {
+    return this.http.post(`${environment.apiBaseUrl}/api/auth/seller/inventory/bulk-upload-csv/${pharmacyId}`, form, {
       responseType: 'text'
     });
   }

@@ -1,0 +1,42 @@
+{
+  "name": "PharmaConnect (Java 21 + Node 20 + MySQL 8)",
+  "dockerComposeFile": "docker-compose.yml",
+  "service": "app",
+  "workspaceFolder": "/workspaces/${localWorkspaceFolderBasename}",
+
+  "features": {
+    "ghcr.io/devcontainers/features/node:1": {
+      "version": "20"
+    }
+  },
+
+  "forwardPorts": [4200, 8082],
+  "portsAttributes": {
+    "4200": {
+      "label": "Angular Frontend",
+      "onAutoForward": "openBrowser"
+    },
+    "8082": {
+      "label": "Spring Boot Backend",
+      "onAutoForward": "silent"
+    }
+  },
+
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "vscjava.vscode-java-pack",
+        "Pivotal.vscode-spring-boot",
+        "Angular.ng-template",
+        "esbenp.prettier-vscode"
+      ],
+      "settings": {
+        "java.configuration.updateBuildConfiguration": "automatic"
+      }
+    }
+  },
+
+  "postCreateCommand": "bash .devcontainer/post-create.sh",
+
+  "remoteUser": "vscode"
+}

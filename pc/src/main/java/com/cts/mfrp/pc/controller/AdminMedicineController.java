@@ -13,7 +13,6 @@ import java.util.Map;
 
 @RestController
 @RequestMapping("/api/admin/medicines")
-@CrossOrigin(origins = "http://localhost:4200")
 @RequiredArgsConstructor
 public class AdminMedicineController {
 

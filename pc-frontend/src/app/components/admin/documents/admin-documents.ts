@@ -4,6 +4,7 @@ import { RouterLink, Router } from '@angular/router';
 import { AuthService } from '../../../services/auth.service';
 import { ThemeService } from '../../../services/theme.service';
 import { AdminService } from '../../../services/admin.service';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-admin-documents',
@@ -90,7 +91,7 @@ export class AdminDocuments implements OnInit {
 
   getDocUrl(path: string): string {
     if (!path) return '';
-    return `http://localhost:8082/${path.replace(/\\/g, '/')}`;
+    return `${environment.apiBaseUrl}/${path.replace(/\\/g, '/')}`;
   }
 
   isPdf(path: string): boolean {
