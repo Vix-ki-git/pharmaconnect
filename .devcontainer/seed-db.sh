@@ -12,7 +12,7 @@ set -euo pipefail
 cd "$(dirname "$0")/.."
 REPO_ROOT="$(pwd)"
 
-DB_HOST="${DB_HOST:-localhost}"
+DB_HOST="${DB_HOST:-127.0.0.1}"
 DB_PASSWORD="${DB_PASSWORD:-pharmaconnect_dev}"
 
 # Verify the mysql client is available — give a clear error instead of failing
