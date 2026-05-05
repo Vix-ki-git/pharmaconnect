@@ -16,6 +16,7 @@ REPO_ROOT="$(pwd)"
 # socket connection, but we don't have a socket (MySQL runs in a sidecar
 # container). 127.0.0.1 forces a TCP connection which actually works.
 DB_HOST="${DB_HOST:-127.0.0.1}"
+[ "$DB_HOST" = "localhost" ] && DB_HOST=127.0.0.1
 DB_PASSWORD="${DB_PASSWORD:-pharmaconnect_dev}"
 
 # Verify the mysql client is available — give a clear error instead of failing
@@ -40,10 +41,12 @@ for i in $(seq 1 90); do
     break
   fi
   # Print the actual error on the first iteration and every 30s after, so
-  # failures are visible instead of silently retrying.
+  # failures are visible instead of silently retrying. The `|| true` is
+  # required because `set -e` + `pipefail` would otherwise kill the script
+  # on the first failed mysql attempt.
   if [ "$i" -eq 1 ] || [ $((i % 15)) -eq 0 ]; then
     echo "    Attempt $i — mysql says:"
-    $MYSQL -e "SELECT 1 FROM medicine LIMIT 1;" 2>&1 | sed 's/^/      /'
+    { $MYSQL -e "SELECT 1 FROM medicine LIMIT 1;" 2>&1 || true; } | sed 's/^/      /'
   fi
   if [ "$i" -eq 90 ]; then
     cat <<EOF
