@@ -339,7 +339,7 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ============================================================
 -- VERIFICATION
 -- ============================================================
-SELECT 'users'                AS table_name, COUNT(*) AS rows FROM users
+SELECT 'users'                AS table_name, COUNT(*) AS `rows` FROM users
 UNION ALL SELECT 'pharmacy',             COUNT(*) FROM pharmacy
 UNION ALL SELECT 'medicine',             COUNT(*) FROM medicine
 UNION ALL SELECT 'pharmacy_stock',       COUNT(*) FROM pharmacy_stock
