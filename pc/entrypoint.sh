@@ -45,6 +45,10 @@ google.client.id=${GOOGLE_CLIENT_ID:-}
 google.client.secret=${GOOGLE_CLIENT_SECRET:-}
 brevo.api.key=${BREVO_API_KEY:-}
 
+# Groq (chatbot)
+groq.api.key=${GROQ_API_KEY:-}
+groq.model=${GROQ_MODEL:-llama-3.3-70b-versatile}
+
 # ===============================
 # FILE UPLOADS
 # ===============================
