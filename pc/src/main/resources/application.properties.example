@@ -42,6 +42,10 @@ google.client.id=${GOOGLE_CLIENT_ID:}
 google.client.secret=${GOOGLE_CLIENT_SECRET:}
 brevo.api.key=${BREVO_API_KEY:DUMMY_VALUE}
 
+# Groq — free tier. Get a key at https://console.groq.com/keys
+groq.api.key=${GROQ_API_KEY:}
+groq.model=${GROQ_MODEL:llama-3.3-70b-versatile}
+
 # ===============================
 # FILE UPLOADS
 # ===============================
