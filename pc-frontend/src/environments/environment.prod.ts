@@ -6,5 +6,5 @@
 // This file is substituted in for environment.ts at build time via the
 // `fileReplacements` block in angular.json's production configuration.
 export const environment = {
-  apiBaseUrl: 'https://YOUR-BACKEND-NAME.onrender.com',
+  apiBaseUrl: 'https://pharmaconnect-backend-sl7k.onrender.com',
 };
