@@ -72,27 +72,34 @@ public class BulkUploadService {
                     continue;
                 }
 
+                if (dto.getManufacturingDate() == null || dto.getManufacturingDate().isBlank()) {
+                    skipped.add("Row " + rowNum + ": For '" + name + "', manufacturing date is mandatory.");
+                    continue;
+                }
+                if (dto.getExpiryDate() == null || dto.getExpiryDate().isBlank()) {
+                    skipped.add("Row " + rowNum + ": For '" + name + "', expiry date is mandatory.");
+                    continue;
+                }
+
                 LocalDate mfgDate;
                 LocalDate expDate;
                 try {
-                    mfgDate = (dto.getManufacturingDate() == null || dto.getManufacturingDate().isBlank())
-                            ? null : LocalDate.parse(dto.getManufacturingDate());
-                    expDate = (dto.getExpiryDate() == null || dto.getExpiryDate().isBlank())
-                            ? null : LocalDate.parse(dto.getExpiryDate());
+                    mfgDate = LocalDate.parse(dto.getManufacturingDate());
+                    expDate = LocalDate.parse(dto.getExpiryDate());
                 } catch (DateTimeParseException e) {
                     skipped.add("Row " + rowNum + ": For '" + name + "', invalid date format (expected YYYY-MM-DD).");
                     continue;
                 }
 
-                if (mfgDate != null && mfgDate.isAfter(today)) {
+                if (mfgDate.isAfter(today)) {
                     skipped.add("Row " + rowNum + ": For '" + name + "', the manufacturing date should not be a future date.");
                     continue;
                 }
-                if (expDate != null && expDate.isBefore(today)) {
+                if (expDate.isBefore(today)) {
                     skipped.add("Row " + rowNum + ": For '" + name + "', the expiry date should not be a past date.");
                     continue;
                 }
-                if (mfgDate != null && expDate != null && expDate.isBefore(mfgDate)) {
+                if (expDate.isBefore(mfgDate)) {
                     skipped.add("Row " + rowNum + ": For '" + name + "', the expiry date must be on or after the manufacturing date.");
                     continue;
                 }

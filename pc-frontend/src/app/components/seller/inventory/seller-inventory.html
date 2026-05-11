@@ -103,12 +103,12 @@
           <input class="pc-input" type="number" [(ngModel)]="addPrice" min="0.01" step="0.01" placeholder="e.g. 25.50" />
         </div>
         <div class="pc-form-group">
-          <label class="pc-label">Manufacturing date</label>
-          <input class="pc-input" type="date" [(ngModel)]="addMfgDate" />
+          <label class="pc-label">Manufacturing date <span style="color:#c0392b">*</span></label>
+          <input class="pc-input" type="date" [(ngModel)]="addMfgDate" required />
         </div>
         <div class="pc-form-group">
-          <label class="pc-label">Expiry date</label>
-          <input class="pc-input" type="date" [(ngModel)]="addExpDate" />
+          <label class="pc-label">Expiry date <span style="color:#c0392b">*</span></label>
+          <input class="pc-input" type="date" [(ngModel)]="addExpDate" required />
         </div>
       </div>
       <button class="pc-btn pc-btn-primary" (click)="submitAdd()" [disabled]="addLoading">
