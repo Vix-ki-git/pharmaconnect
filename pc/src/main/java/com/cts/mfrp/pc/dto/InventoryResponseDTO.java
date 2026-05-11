@@ -9,6 +9,7 @@ import java.time.LocalDateTime;
 @Builder
 public class InventoryResponseDTO {
     private String stockId;
+    private String medicineId;
     private String medicineName;
     private String genericName;
     private String manufacturer;

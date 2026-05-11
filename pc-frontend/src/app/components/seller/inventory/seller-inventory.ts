@@ -48,6 +48,32 @@ export class SellerInventory implements OnInit {
   showBulkHelp = false;
 
   filterQuery = '';
+  sortBy: 'name' | 'recent' = 'name';
+
+  get sortedStock(): any[] {
+    const q = (this.filterQuery || '').trim().toLowerCase();
+    let arr = [...this.stock];
+    if (q) {
+      arr = arr.filter(s =>
+        (s.medicineName || '').toLowerCase().includes(q) ||
+        (s.genericName || '').toLowerCase().includes(q) ||
+        (s.manufacturer || '').toLowerCase().includes(q)
+      );
+    }
+    if (this.sortBy === 'recent') {
+      return arr.sort((a, b) => this.toMillis(b.lastUpdated) - this.toMillis(a.lastUpdated));
+    }
+    return arr.sort((a, b) => (a.medicineName || '').localeCompare(b.medicineName || ''));
+  }
+
+  private toMillis(d: any): number {
+    if (!d) return 0;
+    if (Array.isArray(d)) {
+      return new Date(d[0], d[1] - 1, d[2] ?? 1, d[3] ?? 0, d[4] ?? 0, d[5] ?? 0).getTime();
+    }
+    const t = new Date(d).getTime();
+    return isNaN(t) ? 0 : t;
+  }
 
   toast: { msg: string; type: 'success' | 'error' } | null = null;
   private toastTimer: any;
@@ -158,10 +184,51 @@ export class SellerInventory implements OnInit {
       this.addError = 'Select a medicine and enter valid quantity and price.';
       return;
     }
+    const today = new Date().toISOString().slice(0, 10);
+    if (this.addMfgDate && this.addMfgDate > today) {
+      this.addError = 'Invalid manufacturing date — cannot be a future date.';
+      return;
+    }
+    if (this.addExpDate && this.addExpDate < today) {
+      this.addError = 'Invalid expiry date — date is already in the past.';
+      return;
+    }
     if (this.addMfgDate && this.addExpDate && this.addExpDate < this.addMfgDate) {
       this.addError = 'Expiry date must be on or after the manufacturing date.';
       return;
     }
+
+    const newMfg = this.addMfgDate || null;
+    const newExp = this.addExpDate || null;
+    const exactMatch = this.stock.find(s =>
+      s.medicineId === this.addMedicineId &&
+      this.toIsoDateStr(s.manufacturingDate) === newMfg &&
+      this.toIsoDateStr(s.expiryDate) === newExp &&
+      Number(s.price) === Number(this.addPrice)
+    );
+
+    if (exactMatch) {
+      const ok = confirm(
+        `Item "${exactMatch.medicineName}" already exists with the same manufacturing date, expiry date and price (current quantity: ${exactMatch.quantity}).\n\nWould you like to modify it by adding ${this.addQty} to the existing quantity?`
+      );
+      if (!ok) { this.addError = ''; return; }
+      this.addLoading = true;
+      this.addError = '';
+      this.inventoryService.adjustQuantity(exactMatch.stockId, this.addQty).subscribe({
+        next: () => {
+          this.addLoading = false;
+          this.resetAddForm();
+          this.showToast('Existing inventory entry updated.', 'success');
+          this.loadStock();
+        },
+        error: (err) => {
+          this.addLoading = false;
+          this.addError = this.extractError(err, 'Failed to update existing item.');
+        }
+      });
+      return;
+    }
+
     this.addLoading = true;
     this.addError = '';
     this.inventoryService.addItem({
@@ -169,25 +236,54 @@ export class SellerInventory implements OnInit {
       medicine: { id: this.addMedicineId },
       quantity: this.addQty,
       price: this.addPrice,
-      manufacturingDate: this.addMfgDate || null,
-      expiryDate: this.addExpDate || null
+      manufacturingDate: newMfg,
+      expiryDate: newExp
     }).subscribe({
       next: () => {
         this.addLoading = false;
-        this.showAddForm = false;
-        this.addMedicineId = '';
-        this.addQty = 0;
-        this.addPrice = 0;
-        this.addMfgDate = '';
-        this.addExpDate = '';
+        this.resetAddForm();
         this.showToast('Item added to inventory.', 'success');
         this.loadStock();
       },
       error: (err) => {
         this.addLoading = false;
-        this.addError = typeof err.error === 'string' ? err.error : 'Failed to add item.';
+        this.addError = this.extractError(err, 'Failed to add item.');
       }
     });
+  }
+
+  private resetAddForm() {
+    this.showAddForm = false;
+    this.addMedicineId = '';
+    this.addQty = 0;
+    this.addPrice = 0;
+    this.addMfgDate = '';
+    this.addExpDate = '';
+  }
+
+  private extractError(err: any, fallback: string): string {
+    if (!err) return fallback;
+    const e = err.error;
+    if (typeof e === 'string' && e.trim()) return e;
+    if (e && typeof e === 'object') {
+      if (typeof e.message === 'string' && e.message.trim()) return e.message;
+      if (typeof e.error === 'string' && e.error.trim()) return e.error;
+    }
+    if (typeof err.message === 'string' && err.message.trim()) return err.message;
+    return fallback;
+  }
+
+  private toIsoDateStr(d: any): string | null {
+    if (!d) return null;
+    if (Array.isArray(d)) {
+      const y = d[0];
+      const m = String(d[1]).padStart(2, '0');
+      const day = String(d[2] ?? 1).padStart(2, '0');
+      return `${y}-${m}-${day}`;
+    }
+    if (typeof d === 'string') return d.slice(0, 10);
+    const dt = new Date(d);
+    return isNaN(dt.getTime()) ? null : dt.toISOString().slice(0, 10);
   }
 
   isExpired(item: any): boolean {

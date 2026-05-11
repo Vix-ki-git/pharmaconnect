@@ -42,10 +42,8 @@ public class BulkUploadController {
         }
 
         try {
-            // 3. Delegate processing to the service layer
-            bulkUploadService.processBulkUpload(file, pharmacyId);
-
-            return ResponseEntity.ok("Successfully processed the inventory file for Pharmacy: " + pharmacyId);
+            String summary = bulkUploadService.processBulkUpload(file, pharmacyId);
+            return ResponseEntity.ok(summary);
 
         } catch (RuntimeException e) {
             // Catches specific errors like "Medicine not found" or "Parsing errors"

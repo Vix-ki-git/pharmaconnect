@@ -161,15 +161,24 @@
             Upload CSV
           }
         </button>
-        @if (bulkMsg) { <span class="bulk-msg">{{ bulkMsg }}</span> }
+        @if (bulkMsg) { <span class="bulk-msg" style="white-space: pre-wrap">{{ bulkMsg }}</span> }
       </div>
     </div>
   }
 
-  <!-- Search -->
-  <div class="pc-search" style="margin-bottom:1.25rem">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
-    <input [(ngModel)]="filterQuery" placeholder="Search medicines..." />
+  <!-- Search + Sort -->
+  <div style="display:flex; gap:0.75rem; align-items:center; margin-bottom:1.25rem; flex-wrap:wrap">
+    <div class="pc-search" style="flex:1; min-width:240px; margin:0">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      <input [(ngModel)]="filterQuery" placeholder="Search medicines..." />
+    </div>
+    <label style="display:flex; gap:0.5rem; align-items:center; font-size:0.875rem; color:var(--pc-muted, #555)">
+      Sort by:
+      <select class="pc-select" [(ngModel)]="sortBy" style="padding:0.45rem 0.6rem">
+        <option value="name">A → Z (Alphabetical)</option>
+        <option value="recent">Recently updated</option>
+      </select>
+    </label>
   </div>
 
   <!-- Content -->
@@ -191,9 +200,17 @@
       </div>
     }
 
-    @if (!loading && stock.length > 0) {
+    @if (!loading && stock.length > 0 && sortedStock.length === 0) {
+      <div class="pc-state">
+        <div class="pc-state-icon">🔍</div>
+        <h3>No matches</h3>
+        <p>No medicines match "{{ filterQuery }}". Try a different search.</p>
+      </div>
+    }
+
+    @if (!loading && sortedStock.length > 0) {
       <div class="inv-grid">
-        @for (item of stock; track item.stockId) {
+        @for (item of sortedStock; track item.stockId) {
           <div class="inv-card"
                [class.card-low]="item.quantity > 0 && item.quantity <= 10 && !isExpired(item)"
                [class.card-out]="item.quantity === 0 && !isExpired(item)"
