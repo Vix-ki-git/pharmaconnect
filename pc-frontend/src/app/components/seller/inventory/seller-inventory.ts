@@ -184,16 +184,24 @@ export class SellerInventory implements OnInit {
       this.addError = 'Select a medicine and enter valid quantity and price.';
       return;
     }
+    if (!this.addMfgDate) {
+      this.addError = 'Manufacturing date is mandatory.';
+      return;
+    }
+    if (!this.addExpDate) {
+      this.addError = 'Expiry date is mandatory.';
+      return;
+    }
     const today = new Date().toISOString().slice(0, 10);
-    if (this.addMfgDate && this.addMfgDate > today) {
+    if (this.addMfgDate > today) {
       this.addError = 'Invalid manufacturing date — cannot be a future date.';
       return;
     }
-    if (this.addExpDate && this.addExpDate < today) {
+    if (this.addExpDate < today) {
       this.addError = 'Invalid expiry date — date is already in the past.';
       return;
     }
-    if (this.addMfgDate && this.addExpDate && this.addExpDate < this.addMfgDate) {
+    if (this.addExpDate < this.addMfgDate) {
       this.addError = 'Expiry date must be on or after the manufacturing date.';
       return;
     }
