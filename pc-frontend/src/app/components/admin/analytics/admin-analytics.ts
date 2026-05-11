@@ -6,7 +6,6 @@ import { AuthService } from '../../../services/auth.service';
 import { ThemeService } from '../../../services/theme.service';
 import { SellerService } from '../../../services/seller.service';
 import { AdminService } from '../../../services/admin.service';
-
 @Component({
   selector: 'app-admin-analytics',
   imports: [CommonModule, FormsModule, RouterLink],
@@ -23,7 +22,6 @@ export class AdminAnalytics implements OnInit {
   loadingPharmacies = true;
   searched = false;
   error = '';
-
   constructor(
     private authService: AuthService,
     public themeService: ThemeService,
@@ -33,7 +31,6 @@ export class AdminAnalytics implements OnInit {
   ) {
     this.user = this.authService.getCurrentUser();
   }
-
   ngOnInit() {
     if (this.authService.getRole() !== 'ADMIN') { this.router.navigate(['/login']); return; }
     this.adminService.getAllSellers().subscribe({
@@ -41,7 +38,6 @@ export class AdminAnalytics implements OnInit {
       error: () => { this.loadingPharmacies = false; }
     });
   }
-
   fetch() {
     const id = this.pharmacyId.trim();
     if (!id) return;
@@ -62,7 +58,6 @@ export class AdminAnalytics implements OnInit {
       }
     });
   }
-
   formatDate(dt: any): string {
     if (!dt) return '—';
     if (Array.isArray(dt)) {
@@ -70,7 +65,6 @@ export class AdminAnalytics implements OnInit {
     }
     return new Date(dt).toLocaleDateString([], { dateStyle: 'medium' });
   }
-
   logout() {
     this.authService.logout();
     this.router.navigate(['/']);
