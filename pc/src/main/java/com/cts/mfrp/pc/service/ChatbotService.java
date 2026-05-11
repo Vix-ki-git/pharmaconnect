@@ -1,10 +1,13 @@
 package com.cts.mfrp.pc.service;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
@@ -13,6 +16,8 @@ import java.util.Map;
 
 @Service
 public class ChatbotService {
+
+    private static final Logger log = LoggerFactory.getLogger(ChatbotService.class);
 
     private static final String GROQ_URL =
             "https://api.groq.com/openai/v1/chat/completions";
@@ -79,10 +84,17 @@ public class ChatbotService {
             @SuppressWarnings("unchecked")
             Map<String, Object> response = restTemplate.postForObject(GROQ_URL, entity, Map.class);
             return extractReply(response);
+        } catch (HttpStatusCodeException e) {
+            String status = e.getStatusCode().toString();
+            String responseBody = e.getResponseBodyAsString();
+            log.error("Groq call failed: status={} body={}", status, responseBody);
+            return "Assistant error (" + status + "): " + truncate(responseBody);
         } catch (RestClientException e) {
-            return "The assistant is temporarily unavailable. Please try again in a moment.";
+            log.error("Groq call network error", e);
+            return "The assistant is temporarily unavailable: " + e.getMessage();
         } catch (Exception e) {
-            return "Sorry, something went wrong. Please try again.";
+            log.error("Groq call unexpected error", e);
+            return "Sorry, something went wrong: " + e.getMessage();
         }
     }
 
@@ -105,5 +117,10 @@ public class ChatbotService {
         }
 
         return "Sorry, I couldn't generate a reply. Please try rephrasing.";
+    }
+
+    private String truncate(String s) {
+        if (s == null) return "(no body)";
+        return s.length() > 400 ? s.substring(0, 400) + "..." : s;
     }
 }
