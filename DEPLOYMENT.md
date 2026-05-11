@@ -81,7 +81,10 @@ restarted (or rebuilt) for new secret values to take effect.
 You don't need to configure these — they just work:
 
 - **Port forwarding**: ports 4200 (frontend) and 8082 (backend) are auto-forwarded.
-  4200 opens your browser when the dev server starts.
+  4200 opens your browser when the dev server starts. Both ports default to
+  **Private** visibility — the frontend works for *you* immediately, but to
+  share the URL with someone else (or to let your browser's cross-origin fetches
+  to 8082 succeed first time), see the troubleshooting section on port visibility.
 - **Backend URL detection**: the Angular app auto-detects whether it's running
   on `localhost` (laptop) or a Codespaces URL, and points API calls to the
   matching backend port. No `environment.prod.ts` builds, no env vars.
@@ -98,20 +101,73 @@ You don't need to configure these — they just work:
 Make sure the backend is running and the **Ports** panel shows port 8082 as
 forwarded. If port 8082 doesn't appear, restart `./mvnw spring-boot:run`.
 
-### Frontend page loads but every API call returns CORS error
-Your frontend URL probably doesn't match `https://*.app.github.dev`. Check the
-URL — Codespaces URLs always end with `.app.github.dev`. If you've set
-`CORS_ORIGINS` as a secret to override the default, make sure your origin is
-included in the comma-separated list.
+### Frontend loads but every API call returns nothing / "Unexpected token '<'" / 302
+The most common cause on a fresh codespace: **port 8082 is forwarded as Private**
+(the default). Cross-origin fetches from the 4200 frontend then hit GitHub's
+auth gate instead of Spring Boot, and the response is HTML (a sign-in or
+"Codespaces Access Port" warning page), which the frontend can't parse as JSON.
+
+Fix:
+1. Open the **Ports** tab → right-click row **8082** → **Port Visibility →
+   Public**. The icon next to 8082 changes from a lock to a globe.
+2. In a new tab, visit `https://<codespace-name>-8082.app.github.dev/` once.
+   You'll see a "You are about to access a development port" warning — click
+   **Continue**. This sets an acknowledgment cookie scoped to the 8082 host,
+   which the browser will then send on subsequent fetches from the frontend.
+3. Reload the frontend tab. Searches/logins/etc. now work.
+
+You can also flip visibility from a terminal:
+```bash
+gh codespace ports visibility 8082:public -c $CODESPACE_NAME
+```
+
+### Frontend page loads but every API call returns a true CORS error
+(Browser console shows an actual "blocked by CORS policy" message, not a parse
+error.) Your frontend URL probably doesn't match `https://*.app.github.dev`.
+Check the URL — Codespaces URLs always end with `.app.github.dev`. If you've
+set `CORS_ORIGINS` as a secret to override the default, make sure your origin
+is included in the comma-separated list.
+
+### Postman / curl from your laptop returns 302 or the warning HTML
+Postman has its own cookie jar and never clicked "Continue" on the interstitial,
+so GitHub's edge keeps serving it the warning page. Two workarounds:
+
+- **Easiest** — from inside the codespace terminal, hit the backend on
+  `localhost`, which bypasses the GitHub edge entirely:
+  ```bash
+  curl -i http://localhost:8082/api/search/medicines?q=para
+  ```
+- From your laptop's Postman: open the 8082 URL once in your browser, click
+  Continue, then copy the acknowledgment cookie from DevTools → Application →
+  Cookies and add it as a `Cookie:` header in Postman.
+
+### Hitting `/api/auth/register` (or `/login`, etc.) in a browser returns 405
+Expected — those are POST endpoints. A browser address bar issues a GET, which
+returns `405 Method Not Allowed`. Use Postman/curl with `-X POST -H
+"Content-Type: application/json" -d '{...}'`, or just exercise them through the
+frontend UI.
 
 ### Backend logs show "Could not initialize proxy ... no session"
 This was a known bug fixed via `@JsonIgnore` on `Pharmacy.owner`. If you see
 it now, you may have an old branch. Pull from main.
 
-### `seed-db.sh` says "tables don't exist after waiting 60s"
+### `seed-db.sh` says "tables don't exist after waiting 180s"
 The backend hasn't booted yet, or it crashed. Check the **PharmaConnect: Backend**
 task panel for errors. Most often it's a MySQL connection issue — check the
 **db** container is running with `docker compose -f .devcontainer/docker-compose.yml ps`.
+
+### `seed-db.sh` says `Can't connect to local server through socket '/run/mysqld/mysqld.sock'`
+The mysql CLI treats `-h localhost` as "use a Unix socket", which doesn't exist
+in this container setup (MySQL runs in a sidecar). The script forces TCP by
+coercing `DB_HOST=localhost` → `127.0.0.1` before invoking `mysql`. If you see
+this error, you're on an old version of `seed-db.sh` — pull from main.
+
+### `seed-db.sh` fails on the final verification SELECT with `ERROR 1064 ... near 'rows FROM users'`
+`ROWS` became a reserved word in MySQL 8.0.2, and the verification query at the
+bottom of `database/dummy_data.sql` used it as an unquoted column alias. Fixed
+by backtick-quoting (`` AS `rows` ``). If you hit this, pull from main. Note
+that the seed itself completed successfully before the verify step ran — your
+data is loaded; just rerun the task and the idempotency guard will skip.
 
 ### `seed-db.sh` says "medicine table already has X rows — skipping seed"
 This is correct behavior — the seed already ran. To force a clean reseed:
