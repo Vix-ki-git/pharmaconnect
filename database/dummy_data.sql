@@ -9,7 +9,7 @@
 -- Run order: db_setup.sql  →  start Spring Boot once  →  this file.
 --
 -- All passwords for dummy users are: "password"  (BCrypt cost 10)
--- The bcrypt hash below is the canonical hash for the string
+-- The bcrypt hash below is the canonical hasc-h for the string
 -- "password"; if you ever rotate it, regenerate via Spring's
 -- BCryptPasswordEncoder.
 --

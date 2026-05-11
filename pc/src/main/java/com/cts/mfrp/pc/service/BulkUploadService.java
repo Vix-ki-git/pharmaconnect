@@ -7,6 +7,9 @@ import com.cts.mfrp.pc.model.PharmacyStock;
 import com.cts.mfrp.pc.repository.MedicineRepository;
 import com.cts.mfrp.pc.repository.PharmacyStockRepository;
 import com.opencsv.bean.CsvToBeanBuilder;
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.PersistenceContext;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -15,8 +18,10 @@ import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 @Service
 public class BulkUploadService {
@@ -27,47 +32,122 @@ public class BulkUploadService {
     @Autowired
     private MedicineRepository medicineRepository;
 
-    public void processBulkUpload(MultipartFile file, String pharmacyId) throws Exception {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    @Transactional
+    public String processBulkUpload(MultipartFile file, String pharmacyId) throws Exception {
         try (Reader reader = new BufferedReader(new InputStreamReader(file.getInputStream()))) {
 
-            // 1. Map CSV columns to InventoryUploadDTO list
             List<InventoryUploadDTO> dtos = new CsvToBeanBuilder<InventoryUploadDTO>(reader)
                     .withType(InventoryUploadDTO.class)
                     .withIgnoreLeadingWhiteSpace(true)
                     .build()
                     .parse();
 
-            List<PharmacyStock> stocksToSave = new ArrayList<>();
+            // Preload existing stocks for this pharmacy so we can match without extra round-trips
+            List<PharmacyStock> existingStocks = stockRepository.findByPharmacyId(pharmacyId);
 
-            // 2. Loop through each DTO row and transform to Entity
+            LocalDate today = LocalDate.now();
+            int rowNum = 1;
+            int added = 0;
+            int merged = 0;
+            List<String> skipped = new ArrayList<>();
+
             for (InventoryUploadDTO dto : dtos) {
-                // Find medicine by Name. If duplicates exist in the catalog, take the first match;
-                // sellers identify medicines by display name in CSVs, not by UUID.
-                Medicine medicine = medicineRepository.findFirstByNameIgnoreCase(dto.getMedicineName())
-                        .orElseThrow(() -> new RuntimeException("Medicine not found in system: " + dto.getMedicineName()));
+                rowNum++;
 
-                PharmacyStock stock = new PharmacyStock();
+                String name = dto.getMedicineName() == null ? "" : dto.getMedicineName().trim();
 
-                // Link the existing Pharmacy ID
-                Pharmacy pharmacy = new Pharmacy();
-                pharmacy.setId(pharmacyId);
-                stock.setPharmacy(pharmacy);
+                if (name.isBlank()) {
+                    skipped.add("Row " + rowNum + ": missing medicine name.");
+                    continue;
+                }
+                if (dto.getQuantity() == null || dto.getQuantity() < 1) {
+                    skipped.add("Row " + rowNum + ": For '" + name + "', quantity must be at least 1.");
+                    continue;
+                }
+                if (dto.getPrice() == null || dto.getPrice() <= 0) {
+                    skipped.add("Row " + rowNum + ": For '" + name + "', price must be greater than 0.");
+                    continue;
+                }
 
-                // Set data from the CSV/DTO
-                stock.setMedicine(medicine);
-                stock.setQuantity(dto.getQuantity());
-                stock.setPrice(dto.getPrice());
+                LocalDate mfgDate;
+                LocalDate expDate;
+                try {
+                    mfgDate = (dto.getManufacturingDate() == null || dto.getManufacturingDate().isBlank())
+                            ? null : LocalDate.parse(dto.getManufacturingDate());
+                    expDate = (dto.getExpiryDate() == null || dto.getExpiryDate().isBlank())
+                            ? null : LocalDate.parse(dto.getExpiryDate());
+                } catch (DateTimeParseException e) {
+                    skipped.add("Row " + rowNum + ": For '" + name + "', invalid date format (expected YYYY-MM-DD).");
+                    continue;
+                }
 
-                // Parse Strings to LocalDate (format must be YYYY-MM-DD in CSV)
-                stock.setManufacturingDate(LocalDate.parse(dto.getManufacturingDate()));
-                stock.setExpiryDate(LocalDate.parse(dto.getExpiryDate()));
+                if (mfgDate != null && mfgDate.isAfter(today)) {
+                    skipped.add("Row " + rowNum + ": For '" + name + "', the manufacturing date should not be a future date.");
+                    continue;
+                }
+                if (expDate != null && expDate.isBefore(today)) {
+                    skipped.add("Row " + rowNum + ": For '" + name + "', the expiry date should not be a past date.");
+                    continue;
+                }
+                if (mfgDate != null && expDate != null && expDate.isBefore(mfgDate)) {
+                    skipped.add("Row " + rowNum + ": For '" + name + "', the expiry date must be on or after the manufacturing date.");
+                    continue;
+                }
 
-                // stock.setId() is NOT called, so the DB creates a new ID for every row
-                stocksToSave.add(stock);
+                Medicine medicine = medicineRepository.findFirstByNameIgnoreCase(name).orElse(null);
+                if (medicine == null) {
+                    skipped.add("Row " + rowNum + ": Medicine '" + name + "' was not found in the catalog.");
+                    continue;
+                }
+
+                final String medicineId = medicine.getId();
+                final LocalDate mfgFinal = mfgDate;
+                final LocalDate expFinal = expDate;
+                final Double price = dto.getPrice();
+
+                PharmacyStock match = existingStocks.stream()
+                        .filter(s -> medicineId.equals(s.getMedicine().getId()))
+                        .filter(s -> Objects.equals(s.getManufacturingDate(), mfgFinal))
+                        .filter(s -> Objects.equals(s.getExpiryDate(), expFinal))
+                        .filter(s -> Objects.equals(s.getPrice(), price))
+                        .findFirst()
+                        .orElse(null);
+
+                if (match != null) {
+                    match.setQuantity(match.getQuantity() + dto.getQuantity());
+                    stockRepository.save(match);
+                    merged++;
+                } else {
+                    PharmacyStock stock = new PharmacyStock();
+                    stock.setPharmacy(entityManager.getReference(Pharmacy.class, pharmacyId));
+                    stock.setMedicine(medicine);
+                    stock.setQuantity(dto.getQuantity());
+                    stock.setPrice(price);
+                    stock.setManufacturingDate(mfgFinal);
+                    stock.setExpiryDate(expFinal);
+                    PharmacyStock saved = stockRepository.save(stock);
+                    // include the newly-saved row in the in-memory list so subsequent duplicate
+                    // rows in the same CSV merge into it instead of creating yet another row
+                    existingStocks.add(saved);
+                    added++;
+                }
             }
 
-            // 3. Batch save for efficiency
-            stockRepository.saveAll(stocksToSave);
+            StringBuilder summary = new StringBuilder();
+            summary.append("Bulk upload complete: ").append(added).append(" added, ")
+                    .append(merged).append(" merged into existing");
+            if (!skipped.isEmpty()) {
+                summary.append(", ").append(skipped.size()).append(" skipped.\nSkipped rows:");
+                for (String s : skipped) {
+                    summary.append("\n  - ").append(s);
+                }
+            } else {
+                summary.append(".");
+            }
+            return summary.toString();
         }
     }
 }

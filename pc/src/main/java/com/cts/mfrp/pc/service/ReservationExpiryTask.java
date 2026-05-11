@@ -10,6 +10,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 
 @Component
@@ -31,12 +32,14 @@ public class ReservationExpiryTask {
                 .findByStatusAndExpiresAtBefore("PENDING", now);
 
         for (Reservation res : expiredReservations) {
-            // Use the Pharmacy and Medicine from the reservation to find the Stock record
-            stockRepository.findByPharmacyIdAndMedicineId(
+            // Restore the quantity to the earliest-expiry batch for this (pharmacy, medicine)
+            stockRepository.findAllByPharmacyIdAndMedicineId(
                             res.getPharmacy().getId(),
                             res.getMedicine().getId())
+                    .stream()
+                    .min(Comparator.comparing(PharmacyStock::getExpiryDate,
+                            Comparator.nullsLast(Comparator.naturalOrder())))
                     .ifPresent(stock -> {
-                        // Restore the quantity
                         stock.setQuantity(stock.getQuantity() + res.getQuantity());
                         stockRepository.save(stock);
                     });

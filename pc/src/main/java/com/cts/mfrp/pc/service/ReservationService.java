@@ -2,6 +2,7 @@ package com.cts.mfrp.pc.service;
 
 import com.cts.mfrp.pc.dto.ReservationRequestDto;
 import com.cts.mfrp.pc.dto.ReservationResponseDto;
+import com.cts.mfrp.pc.model.PharmacyStock;
 import com.cts.mfrp.pc.model.Reservation;
 import com.cts.mfrp.pc.repository.PharmacyStockRepository;
 import com.cts.mfrp.pc.repository.ReservationRepository;
@@ -14,7 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -31,14 +34,22 @@ public class ReservationService {
 
     @Transactional
     public ReservationResponseDto createReservation(ReservationRequestDto request) {
-        var stock = stockRepository
-                .findByPharmacyIdAndMedicineId(request.getPharmacyId(), request.getMedicineId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Medicine not stocked at this pharmacy"));
+        List<PharmacyStock> stocks = stockRepository
+                .findAllByPharmacyIdAndMedicineId(request.getPharmacyId(), request.getMedicineId());
 
-        if (stock.getQuantity() < request.getQuantity()) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Insufficient stock. Available: " + stock.getQuantity());
+        if (stocks.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Medicine not stocked at this pharmacy");
         }
+
+        var stock = stocks.stream()
+                .filter(s -> s.getQuantity() >= request.getQuantity())
+                .min(Comparator.comparing(PharmacyStock::getExpiryDate,
+                        Comparator.nullsLast(Comparator.naturalOrder())))
+                .orElseThrow(() -> {
+                    int totalAvailable = stocks.stream().mapToInt(PharmacyStock::getQuantity).sum();
+                    return new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Insufficient stock in any single batch. Total available: " + totalAvailable);
+                });
 
         var user = userRepository.findById(request.getUserId())
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "User not found"));
@@ -83,9 +94,12 @@ public class ReservationService {
                     "Only PENDING reservations can be cancelled. Current status: " + reservation.getStatus());
         }
 
-        stockRepository.findByPharmacyIdAndMedicineId(
-                reservation.getPharmacy().getId(),
-                reservation.getMedicine().getId())
+        stockRepository.findAllByPharmacyIdAndMedicineId(
+                        reservation.getPharmacy().getId(),
+                        reservation.getMedicine().getId())
+                .stream()
+                .min(Comparator.comparing(PharmacyStock::getExpiryDate,
+                        Comparator.nullsLast(Comparator.naturalOrder())))
                 .ifPresent(stock -> {
                     stock.setQuantity(stock.getQuantity() + reservation.getQuantity());
                     stockRepository.save(stock);

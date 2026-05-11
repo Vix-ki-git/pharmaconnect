@@ -1,14 +1,20 @@
 package com.cts.mfrp.pc.service;
 
 import com.cts.mfrp.pc.dto.InventoryResponseDTO;
+import com.cts.mfrp.pc.model.Medicine;
+import com.cts.mfrp.pc.model.Pharmacy;
 import com.cts.mfrp.pc.model.PharmacyStock;
 import com.cts.mfrp.pc.repository.PharmacyStockRepository;
+import jakarta.persistence.EntityManager;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.persistence.PersistenceContext;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 @Service
 public class InventoryService {
@@ -16,22 +22,31 @@ public class InventoryService {
     @Autowired
     private PharmacyStockRepository stockRepository;
 
+    @PersistenceContext
+    private EntityManager entityManager;
+
     @Transactional
     public InventoryResponseDTO addNewInventoryItem(PharmacyStock newStock) {
-        // 1. Logic: Check if this pharmacy already has this medicine in stock
-        // Use the repository method we discussed earlier
-        return stockRepository.findByPharmacyIdAndMedicineId(
-                        newStock.getPharmacy().getId(),
-                        newStock.getMedicine().getId())
-                .map(existingStock -> {
-                    // 2. If it exists, just update the quantity instead of creating a new row
-                    existingStock.setQuantity(existingStock.getQuantity() + newStock.getQuantity());
-                    return mapToDTO(stockRepository.save(existingStock));
-                })
-                .orElseGet(() -> {
-                    // 3. If it doesn't exist, save the new record
-                    return mapToDTO(stockRepository.save(newStock));
-                });
+        String pharmacyId = newStock.getPharmacy().getId();
+        String medicineId = newStock.getMedicine().getId();
+
+        Optional<PharmacyStock> exactMatch = stockRepository
+                .findAllByPharmacyIdAndMedicineId(pharmacyId, medicineId)
+                .stream()
+                .filter(s -> Objects.equals(s.getManufacturingDate(), newStock.getManufacturingDate()))
+                .filter(s -> Objects.equals(s.getExpiryDate(), newStock.getExpiryDate()))
+                .filter(s -> Objects.equals(s.getPrice(), newStock.getPrice()))
+                .findFirst();
+
+        if (exactMatch.isPresent()) {
+            PharmacyStock existing = exactMatch.get();
+            existing.setQuantity(existing.getQuantity() + newStock.getQuantity());
+            return mapToDTO(stockRepository.save(existing));
+        }
+
+        newStock.setPharmacy(entityManager.getReference(Pharmacy.class, pharmacyId));
+        newStock.setMedicine(entityManager.getReference(Medicine.class, medicineId));
+        return mapToDTO(stockRepository.save(newStock));
     }
     public List<InventoryResponseDTO> getStockByPharmacy(String pharmacyId) {
         List<PharmacyStock> stocks = stockRepository.findByPharmacyId(pharmacyId);
@@ -94,6 +109,7 @@ public class InventoryService {
     private InventoryResponseDTO mapToDTO(PharmacyStock stock) {
         return InventoryResponseDTO.builder()
                 .stockId(stock.getId())
+                .medicineId(stock.getMedicine().getId())
                 .medicineName(stock.getMedicine().getName())
                 .genericName(stock.getMedicine().getGenericName())
                 .manufacturer(stock.getMedicine().getManufacturer())

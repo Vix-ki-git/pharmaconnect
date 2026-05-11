@@ -8,7 +8,6 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
-import java.util.Optional;
 
 @Repository
 public interface PharmacyStockRepository extends JpaRepository<PharmacyStock, String> {
@@ -19,7 +18,7 @@ public interface PharmacyStockRepository extends JpaRepository<PharmacyStock, St
 
     List<PharmacyStock> findByPharmacyId(String pharmacyId);
 
-    Optional<PharmacyStock> findByPharmacyIdAndMedicineId(String pharmacyId, String medicineId);
+    List<PharmacyStock> findAllByPharmacyIdAndMedicineId(String pharmacyId, String medicineId);
 
     @Query("SELECT ps FROM PharmacyStock ps WHERE ps.medicine.id = :medicineId AND ps.quantity > 0")
     List<PharmacyStock> findAvailableStockByMedicine(@Param("medicineId") String medicineId);
