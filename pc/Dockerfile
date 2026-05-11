@@ -19,8 +19,14 @@ WORKDIR /app
 # Copy the fat jar produced by spring-boot-maven-plugin
 COPY --from=build /workspace/target/*.jar /app/app.jar
 
-# Render injects PORT at runtime; Spring Boot reads it via server.port=${PORT:10000}.
-# EXPOSE here is documentation only — Render uses $PORT for the actual mapping.
+# Entrypoint generates /app/config/application.properties at container start
+# from env vars (Render-injected). Spring Boot auto-loads files under ./config/
+# relative to WORKDIR, so no --spring.config.location flag is needed.
+COPY entrypoint.sh /app/entrypoint.sh
+RUN chmod +x /app/entrypoint.sh
+
+# Render injects PORT at runtime; entrypoint.sh defaults it to 10000.
+# EXPOSE is documentation only — Render uses $PORT for the actual mapping.
 EXPOSE 10000
 
-ENTRYPOINT ["java", "-jar", "/app/app.jar"]
+ENTRYPOINT ["/app/entrypoint.sh"]
