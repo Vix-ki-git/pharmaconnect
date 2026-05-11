@@ -5,7 +5,8 @@
 # OR leave it untouched and let env vars / Codespaces secrets fill in values
 # at runtime. Each ${VAR:default} reads env var VAR if set, else uses default.
 spring.application.name=pharmaconnect
-server.port=${SERVER_PORT:8082}
+# Render sets PORT automatically; local/codespaces fall through to 10000.
+server.port=${PORT:10000}
 
 # ===============================
 # DATABASE CONFIGURATION (MySQL)
@@ -13,9 +14,11 @@ server.port=${SERVER_PORT:8082}
 # Local: set DB_PASSWORD to your MySQL root password (or edit it inline).
 # Codespaces: DB_HOST is the docker-compose service name (e.g. "db");
 #             DB_PASSWORD comes from the DB_PASSWORD Codespaces secret.
-spring.datasource.url=jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:pharmaconnect}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
-spring.datasource.username=${DB_USER:root}
-spring.datasource.password=${DB_PASSWORD:}
+# Render / managed DB: set MYSQL_URL, MYSQL_USERNAME, MYSQL_PASSWORD.
+# Local/Codespaces: leave those unset and DB_HOST/DB_USER/DB_PASSWORD apply.
+spring.datasource.url=${MYSQL_URL:jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:pharmaconnect}?useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true}
+spring.datasource.username=${MYSQL_USERNAME:${DB_USER:root}}
+spring.datasource.password=${MYSQL_PASSWORD:${DB_PASSWORD:}}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 # ===============================
