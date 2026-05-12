@@ -18,6 +18,10 @@ cat > /app/config/application.properties <<EOF
 spring.application.name=pharmaconnect
 server.port=${PORT:-10000}
 
+# Render free tier + Aiven free tier cold-start race — defer bean creation
+# until first request so the port binds before Render's port-scan timeout.
+spring.main.lazy-initialization=true
+
 # ===============================
 # DATABASE CONFIGURATION (MySQL)
 # ===============================
@@ -45,9 +49,9 @@ google.client.id=${GOOGLE_CLIENT_ID:-}
 google.client.secret=${GOOGLE_CLIENT_SECRET:-}
 brevo.api.key=${BREVO_API_KEY:-}
 
-# Groq (chatbot)
-groq.api.key=${GROQ_API_KEY:-}
-groq.model=${GROQ_MODEL:-llama-3.3-70b-versatile}
+# Gemini (chatbot)
+gemini.api.key=${GEMINI_API_KEY:-}
+gemini.model=${GEMINI_MODEL:-gemini-2.0-flash}
 
 # ===============================
 # FILE UPLOADS

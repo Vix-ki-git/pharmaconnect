@@ -19,9 +19,6 @@ public class ChatbotService {
 
     private static final Logger log = LoggerFactory.getLogger(ChatbotService.class);
 
-    private static final String GROQ_URL =
-            "https://api.groq.com/openai/v1/chat/completions";
-
     private static final String SYSTEM_PROMPT = """
             You are PharmaConnect Assistant, a helpful guide inside an online pharmacy
             search app. Users are patients/buyers looking up over-the-counter and
@@ -52,48 +49,54 @@ public class ChatbotService {
 
     private final RestTemplate restTemplate = new RestTemplate();
 
-    @Value("${groq.api.key:}")
+    @Value("${gemini.api.key:}")
     private String apiKey;
 
-    @Value("${groq.model:llama-3.3-70b-versatile}")
+    @Value("${gemini.model:gemini-2.0-flash}")
     private String model;
 
     public String ask(String userMessage) {
         if (apiKey == null || apiKey.isBlank()) {
             return "The chatbot is not configured yet. An administrator needs to set the "
-                    + "GROQ_API_KEY environment variable. In the meantime, please use "
+                    + "GEMINI_API_KEY environment variable. In the meantime, please use "
                     + "the Search page to find medicines at nearby pharmacies.";
         }
 
+        String url = "https://generativelanguage.googleapis.com/v1beta/models/"
+                + model + ":generateContent?key=" + apiKey;
+
         Map<String, Object> body = Map.of(
-                "model", model,
-                "messages", List.of(
-                        Map.of("role", "system", "content", SYSTEM_PROMPT),
-                        Map.of("role", "user",   "content", userMessage)
+                "contents", List.of(Map.of(
+                        "role", "user",
+                        "parts", List.of(Map.of("text", userMessage))
+                )),
+                "systemInstruction", Map.of(
+                        "parts", List.of(Map.of("text", SYSTEM_PROMPT))
                 ),
-                "temperature", 0.4,
-                "max_tokens", 512
+                "generationConfig", Map.of(
+                        "temperature", 0.4,
+                        "maxOutputTokens", 512
+                )
         );
 
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.setBearerAuth(apiKey);
         HttpEntity<Map<String, Object>> entity = new HttpEntity<>(body, headers);
 
         try {
             @SuppressWarnings("unchecked")
-            Map<String, Object> response = restTemplate.postForObject(GROQ_URL, entity, Map.class);
+            Map<String, Object> response = restTemplate.postForObject(url, entity, Map.class);
             return extractReply(response);
         } catch (HttpStatusCodeException e) {
             String status = e.getStatusCode().toString();
             String responseBody = e.getResponseBodyAsString();
-            log.error("Groq call failed: status={} body={}", status, responseBody);
+            log.error("Gemini call failed: status={} body={}", status, responseBody);
             return "Assistant error (" + status + "): " + truncate(responseBody);
         } catch (RestClientException e) {
-            log.error("Groq call network error", e);
+            log.error("Gemini call network error", e);
             return "The assistant is temporarily unavailable: " + e.getMessage();
         } catch (Exception e) {
-            log.error("Groq call unexpected error", e);
+            log.error("Gemini call unexpected error", e);
             return "Sorry, something went wrong: " + e.getMessage();
         }
     }
@@ -102,18 +105,30 @@ public class ChatbotService {
     private String extractReply(Map<String, Object> response) {
         if (response == null) return "Sorry, I couldn't generate a reply. Please try rephrasing.";
 
-        Object choicesObj = response.get("choices");
-        if (choicesObj instanceof List<?> choices && !choices.isEmpty()) {
-            Object first = choices.get(0);
+        Object candidatesObj = response.get("candidates");
+        if (candidatesObj instanceof List<?> candidates && !candidates.isEmpty()) {
+            Object first = candidates.get(0);
             if (first instanceof Map<?, ?> firstMap) {
-                Object message = firstMap.get("message");
-                if (message instanceof Map<?, ?> messageMap) {
-                    Object content = messageMap.get("content");
-                    if (content instanceof String s && !s.isBlank()) {
-                        return s.trim();
+                Object content = firstMap.get("content");
+                if (content instanceof Map<?, ?> contentMap) {
+                    Object parts = contentMap.get("parts");
+                    if (parts instanceof List<?> partsList && !partsList.isEmpty()) {
+                        Object firstPart = partsList.get(0);
+                        if (firstPart instanceof Map<?, ?> partMap) {
+                            Object text = partMap.get("text");
+                            if (text instanceof String s && !s.isBlank()) {
+                                return s.trim();
+                            }
+                        }
                     }
                 }
             }
+        }
+
+        Object feedback = response.get("promptFeedback");
+        if (feedback instanceof Map<?, ?> feedbackMap && feedbackMap.get("blockReason") != null) {
+            return "I can't answer that question. Try asking about a specific medicine — "
+                    + "its use, dosage form, side effects, or generics.";
         }
 
         return "Sorry, I couldn't generate a reply. Please try rephrasing.";
