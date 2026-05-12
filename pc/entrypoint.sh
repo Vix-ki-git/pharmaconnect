@@ -51,7 +51,7 @@ brevo.api.key=${BREVO_API_KEY:-}
 
 # Gemini (chatbot)
 gemini.api.key=${GEMINI_API_KEY:-}
-gemini.model=${GEMINI_MODEL:-gemini-2.0-flash}
+gemini.model=${GEMINI_MODEL:-gemini-2.5-flash}
 
 # ===============================
 # FILE UPLOADS

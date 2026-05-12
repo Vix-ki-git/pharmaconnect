@@ -52,7 +52,7 @@ public class ChatbotService {
     @Value("${gemini.api.key:}")
     private String apiKey;
 
-    @Value("${gemini.model:gemini-2.0-flash}")
+    @Value("${gemini.model:gemini-2.5-flash}")
     private String model;
 
     public String ask(String userMessage) {
