@@ -1,7 +1,8 @@
-import { Component, ElementRef, ViewChild, AfterViewChecked } from '@angular/core';
+import { Component, ElementRef, ViewChild, ViewChildren, QueryList, AfterViewChecked } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
+import { marked } from 'marked';
 import { AuthService } from '../../../services/auth.service';
 import { ChatbotService } from '../../../services/chatbot.service';
 
@@ -9,6 +10,10 @@ interface ChatMessage {
   role: 'user' | 'assistant';
   text: string;
 }
+
+type ScrollMode = 'none' | 'bottom' | 'lastTop';
+
+marked.setOptions({ gfm: true, breaks: true, async: false });
 
 @Component({
   selector: 'app-chatbot',
@@ -18,6 +23,7 @@ interface ChatMessage {
 })
 export class Chatbot implements AfterViewChecked {
   @ViewChild('scrollAnchor') scrollAnchor?: ElementRef<HTMLDivElement>;
+  @ViewChildren('messageEl') messageEls?: QueryList<ElementRef<HTMLDivElement>>;
 
   sidebarOpen = false;
   user: any;
@@ -30,7 +36,7 @@ export class Chatbot implements AfterViewChecked {
     }
   ];
 
-  private shouldScroll = false;
+  private scrollMode: ScrollMode = 'none';
 
   constructor(
     private authService: AuthService,
@@ -40,10 +46,18 @@ export class Chatbot implements AfterViewChecked {
     this.user = this.authService.getCurrentUser();
   }
 
+  renderMarkdown(text: string): string {
+    return marked.parse(text) as string;
+  }
+
   ngAfterViewChecked() {
-    if (this.shouldScroll && this.scrollAnchor) {
+    if (this.scrollMode === 'bottom' && this.scrollAnchor) {
       this.scrollAnchor.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'end' });
-      this.shouldScroll = false;
+      this.scrollMode = 'none';
+    } else if (this.scrollMode === 'lastTop' && this.messageEls && this.messageEls.length > 0) {
+      const last = this.messageEls.last;
+      last.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      this.scrollMode = 'none';
     }
   }
 
@@ -54,13 +68,13 @@ export class Chatbot implements AfterViewChecked {
     this.messages.push({ role: 'user', text: msg });
     this.input = '';
     this.loading = true;
-    this.shouldScroll = true;
+    this.scrollMode = 'bottom';
 
     this.chatbotService.ask(msg).subscribe({
       next: (res) => {
         this.messages.push({ role: 'assistant', text: res.reply });
         this.loading = false;
-        this.shouldScroll = true;
+        this.scrollMode = 'lastTop';
       },
       error: () => {
         this.messages.push({
@@ -68,7 +82,7 @@ export class Chatbot implements AfterViewChecked {
           text: 'Sorry, I couldn’t reach the assistant. Please try again in a moment.'
         });
         this.loading = false;
-        this.shouldScroll = true;
+        this.scrollMode = 'lastTop';
       }
     });
   }

@@ -58,10 +58,12 @@
     <div class="pc-card chat-shell">
       <div class="chat-messages">
         @for (m of messages; track $index) {
-          <div class="chat-row" [class.chat-row-user]="m.role === 'user'">
-            <div class="chat-bubble" [class.chat-bubble-user]="m.role === 'user'">
-              {{ m.text }}
-            </div>
+          <div class="chat-row" #messageEl [class.chat-row-user]="m.role === 'user'">
+            @if (m.role === 'assistant') {
+              <div class="chat-bubble chat-md" [innerHTML]="renderMarkdown(m.text)"></div>
+            } @else {
+              <div class="chat-bubble chat-bubble-user">{{ m.text }}</div>
+            }
           </div>
         }
         @if (loading) {

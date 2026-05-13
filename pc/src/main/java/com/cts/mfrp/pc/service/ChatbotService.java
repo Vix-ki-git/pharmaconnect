@@ -41,7 +41,8 @@ public class ChatbotService {
                 people with kidney/liver disease — refer them to a doctor.
               * If asked something off-topic (politics, code help, etc.) politely steer
                 back to medicine questions.
-              * Keep replies under 180 words. Use short paragraphs or bullet points.
+              * Aim for 100-250 words. Use short paragraphs or bullet points.
+                Be thorough enough to actually answer the question — don't be terse.
               * Always end medication-related answers with one short line:
                 "This is general information, not medical advice — please consult a
                 pharmacist or doctor."
@@ -75,7 +76,8 @@ public class ChatbotService {
                 ),
                 "generationConfig", Map.of(
                         "temperature", 0.4,
-                        "maxOutputTokens", 512
+                        "maxOutputTokens", 1024,
+                        "thinkingConfig", Map.of("thinkingBudget", 0)
                 )
         );
 
@@ -113,13 +115,17 @@ public class ChatbotService {
                 if (content instanceof Map<?, ?> contentMap) {
                     Object parts = contentMap.get("parts");
                     if (parts instanceof List<?> partsList && !partsList.isEmpty()) {
-                        Object firstPart = partsList.get(0);
-                        if (firstPart instanceof Map<?, ?> partMap) {
-                            Object text = partMap.get("text");
-                            if (text instanceof String s && !s.isBlank()) {
-                                return s.trim();
+                        StringBuilder sb = new StringBuilder();
+                        for (Object p : partsList) {
+                            if (p instanceof Map<?, ?> partMap) {
+                                Object text = partMap.get("text");
+                                if (text instanceof String s && !s.isBlank()) {
+                                    if (sb.length() > 0) sb.append("\n\n");
+                                    sb.append(s.trim());
+                                }
                             }
                         }
+                        if (sb.length() > 0) return sb.toString();
                     }
                 }
             }
