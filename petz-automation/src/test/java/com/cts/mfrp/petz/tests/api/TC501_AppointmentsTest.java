@@ -8,6 +8,8 @@ import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Map;
+
 public class TC501_AppointmentsTest extends BaseApiTest {
 
     @Test(description = "TC501.1 — USER GET /appointments/my returns list")
@@ -51,5 +53,41 @@ public class TC501_AppointmentsTest extends BaseApiTest {
 
         Response r = RestAssured.given(ApiSpecs.asUser()).when().get("/appointments/hospital");
         Assert.assertEquals(r.statusCode(), 403, "Body: " + r.asString());
+    }
+
+    @Test(description = "TC501.5 — book an appointment and then cancel it")
+    public void bookAndCancelAppointment_lifecycle() {
+        ExtentReportManager.createTest("TC501.5 Appointment book + cancel",
+                "USER books a slot on a far-future date, then DELETEs to clean up");
+
+        // Pick the user's first pet (seed: Bruno = id 1, but fetch at runtime to stay robust)
+        Response pets = RestAssured.given(ApiSpecs.asUser()).when().get("/pets/my");
+        Integer petId = pets.jsonPath().getInt("data[0].id");
+        Assert.assertNotNull(petId, "Seed user must own at least one pet for this test");
+
+        Map<String, Object> body = Map.of(
+                "hospitalId", 1,
+                "doctorId",   1,
+                "petId",      petId,
+                "apptDate",   "2027-12-31",   // far future to avoid slot collision on reruns
+                "apptTime",   "10:00",
+                "reason",     "QA suite — please cancel");
+
+        Response book = RestAssured.given(ApiSpecs.asUser()).body(body).when().post("/appointments");
+        Assert.assertEquals(book.statusCode(), 200, "Body: " + book.asString());
+        Integer apptId = book.jsonPath().getInt("data.id");
+        Assert.assertNotNull(apptId);
+
+        try {
+            // Appears in /appointments/my
+            Response mine = RestAssured.given(ApiSpecs.asUser()).when().get("/appointments/my");
+            Assert.assertTrue(mine.jsonPath().getList("data.id").contains(apptId),
+                    "Newly booked appointment should appear in /appointments/my");
+        } finally {
+            Response cancel = RestAssured.given(ApiSpecs.asUser())
+                    .pathParam("id", apptId).when().delete("/appointments/{id}");
+            Assert.assertEquals(cancel.statusCode(), 200,
+                    "DELETE cleanup failed. Body: " + cancel.asString());
+        }
     }
 }

@@ -49,4 +49,34 @@ public class TC401_HospitalsPublicTest extends BaseApiTest {
         Response r = RestAssured.given(ApiSpecs.baseRequestSpec()).when().get(HOSPITALS_PUBLIC);
         Assert.assertEquals(r.statusCode(), 403, "Body: " + r.asString());
     }
+
+    @Test(description = "TC401.4 — GET /hospitals/public/{id}/doctors returns the hospital's doctors")
+    public void getHospitalDoctors_returnsList() {
+        ExtentReportManager.createTest("TC401.4 GET /hospitals/public/{id}/doctors",
+                "List doctors employed at the seeded hospital");
+
+        Response r = RestAssured.given(ApiSpecs.asUser())
+                .pathParam("id", SEEDED_HOSPITAL_ID)
+                .when().get("/hospitals/public/{id}/doctors");
+
+        Assert.assertEquals(r.statusCode(), 200, "Body: " + r.asString());
+        Assert.assertTrue(r.jsonPath().getBoolean("success"));
+        Assert.assertNotNull(r.jsonPath().getList("data"));
+    }
+
+    @Test(description = "TC401.5 — GET .../doctors/{doctorId}/slots returns available slots for the date")
+    public void getDoctorSlots_returnsSlots() {
+        ExtentReportManager.createTest("TC401.5 GET hospital doctor slots",
+                "Fetch slot grid for a specific doctor on a future date");
+
+        Response r = RestAssured.given(ApiSpecs.asUser())
+                .pathParam("hospitalId", SEEDED_HOSPITAL_ID)
+                .pathParam("doctorId",   1)
+                .queryParam("date", "2026-07-01")
+                .when().get("/hospitals/public/{hospitalId}/doctors/{doctorId}/slots");
+
+        Assert.assertEquals(r.statusCode(), 200, "Body: " + r.asString());
+        Assert.assertFalse(r.jsonPath().getList("data").isEmpty(),
+                "Expected at least one slot for the future date");
+    }
 }

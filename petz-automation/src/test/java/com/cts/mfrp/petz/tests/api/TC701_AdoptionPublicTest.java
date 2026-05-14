@@ -8,6 +8,8 @@ import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Map;
+
 import static com.cts.mfrp.petz.api.endpoints.ApiEndpoints.ADOPTION_ANIMALS;
 import static com.cts.mfrp.petz.api.endpoints.ApiEndpoints.ADOPTION_ANIMALS_BY_ID;
 
@@ -48,5 +50,24 @@ public class TC701_AdoptionPublicTest extends BaseApiTest {
         Response r = RestAssured.given(ApiSpecs.asUser()).when().get("/adoption/my-applications");
         Assert.assertEquals(r.statusCode(), 200, "Body: " + r.asString());
         Assert.assertTrue(r.jsonPath().getBoolean("success"));
+    }
+
+    @Test(description = "TC701.4 — POST /adoption/apply rejects a duplicate application with 400")
+    public void applyDuplicate_returns400() {
+        ExtentReportManager.createTest("TC701.4 POST /adoption/apply duplicate",
+                "Seed USER already has an application for animal id=1; re-applying returns 400");
+
+        Map<String, Object> body = Map.of(
+                "animalId",     SEEDED_ANIMAL_ID,
+                "reason",       "qa duplicate check",
+                "experience",   "some",
+                "housingType",  "APARTMENT",
+                "hasOtherPets", false);
+
+        Response r = RestAssured.given(ApiSpecs.asUser()).body(body).when().post("/adoption/apply");
+
+        Assert.assertEquals(r.statusCode(), 400, "Body: " + r.asString());
+        Assert.assertEquals(r.jsonPath().getString("message"),
+                "You already have an active application for this animal.");
     }
 }

@@ -16,12 +16,13 @@ import static com.cts.mfrp.petz.api.endpoints.ApiEndpoints.PETS_MY;
 
 public class TC301_PetsTest extends BaseApiTest {
 
-    @Test(description = "TC301.1 — POST /pets creates a pet; GET /pets/my includes it; DELETE removes it")
-    public void petsCreateListDelete_lifecycle() {
-        ExtentReportManager.createTest("TC301.1 Pets create/list/delete",
+    @Test(description = "TC301.1 — pet CRUD lifecycle: POST → GET → PUT → DELETE")
+    public void petsCRUD_lifecycle() {
+        ExtentReportManager.createTest("TC301.1 Pets create/list/update/delete",
                 "Full happy-path CRUD lifecycle for the authenticated USER");
 
-        Map<String, Object> body = Map.of(
+        // 1. Create
+        Map<String, Object> createBody = Map.of(
                 "name",     "QA Pet " + System.currentTimeMillis(),
                 "species",  "Dog",
                 "breed",    "Test",
@@ -30,12 +31,13 @@ public class TC301_PetsTest extends BaseApiTest {
                 "weightKg", 10.0);
 
         // NOTE: deployed backend rejects trailing-slash /pets/ — POST goes to /pets (no slash).
-        Response create = RestAssured.given(ApiSpecs.asUser()).body(body).when().post("/pets");
+        Response create = RestAssured.given(ApiSpecs.asUser()).body(createBody).when().post("/pets");
         Assert.assertEquals(create.statusCode(), 200, "Body: " + create.asString());
         Integer petId = create.jsonPath().getInt("data.id");
         Assert.assertNotNull(petId);
 
         try {
+            // 2. Read — pet appears in /pets/my and via /pets/{id}
             Response mine = RestAssured.given(ApiSpecs.asUser()).when().get(PETS_MY);
             Assert.assertEquals(mine.statusCode(), 200);
             Assert.assertTrue(mine.jsonPath().getList("data.id").contains(petId),
@@ -44,7 +46,22 @@ public class TC301_PetsTest extends BaseApiTest {
             Response one = RestAssured.given(ApiSpecs.asUser()).pathParam("id", petId).when().get(PETS_BY_ID);
             Assert.assertEquals(one.statusCode(), 200);
             Assert.assertEquals(one.jsonPath().getInt("data.id"), petId.intValue());
+
+            // 3. Update — change name and weight, confirm GET reflects it
+            Map<String, Object> updateBody = Map.of(
+                    "name",     "QA Pet Renamed",
+                    "species",  "Dog",
+                    "breed",    "Test",
+                    "ageYears", 3,
+                    "gender",   "MALE",
+                    "weightKg", 12.5);
+            Response update = RestAssured.given(ApiSpecs.asUser())
+                    .pathParam("id", petId).body(updateBody).when().put(PETS_BY_ID);
+            Assert.assertEquals(update.statusCode(), 200, "Body: " + update.asString());
+            Assert.assertEquals(update.jsonPath().getString("data.name"), "QA Pet Renamed");
+            Assert.assertEquals(update.jsonPath().getFloat("data.weightKg"), 12.5f, 0.001f);
         } finally {
+            // 4. Delete (cleanup so the test is idempotent on re-runs)
             RestAssured.given(ApiSpecs.asUser()).pathParam("id", petId).when().delete(PETS_BY_ID);
         }
     }

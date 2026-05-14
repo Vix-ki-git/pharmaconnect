@@ -47,4 +47,36 @@ public class TC901_NotificationsTest extends BaseApiTest {
         Response r = RestAssured.given(ApiSpecs.baseRequestSpec()).when().get("/notifications");
         Assert.assertEquals(r.statusCode(), 403, "Body: " + r.asString());
     }
+
+    @Test(description = "TC901.5 — PATCH /notifications/{id}/read marks a notification as read")
+    public void markOneAsRead_returns200() {
+        ExtentReportManager.createTest("TC901.5 PATCH /notifications/{id}/read",
+                "Fetch the first notification id, mark it read (idempotent)");
+
+        Response list = RestAssured.given(ApiSpecs.asUser()).when().get("/notifications");
+        Assert.assertEquals(list.statusCode(), 200);
+        Integer notificationId = list.jsonPath().getInt("data[0].id");
+        Assert.assertNotNull(notificationId,
+                "Seed user is expected to have at least one notification");
+
+        Response patch = RestAssured.given(ApiSpecs.asUser())
+                .pathParam("id", notificationId)
+                .when().patch("/notifications/{id}/read");
+
+        Assert.assertEquals(patch.statusCode(), 200, "Body: " + patch.asString());
+    }
+
+    @Test(description = "TC901.6 — PATCH /notifications/read-all marks all as read (idempotent)")
+    public void markAllAsRead_returns200() {
+        ExtentReportManager.createTest("TC901.6 PATCH /notifications/read-all",
+                "Bulk-mark every unread notification as read");
+
+        Response r = RestAssured.given(ApiSpecs.asUser()).when().patch("/notifications/read-all");
+        Assert.assertEquals(r.statusCode(), 200, "Body: " + r.asString());
+
+        // After a read-all, unread count must be zero
+        Response count = RestAssured.given(ApiSpecs.asUser()).when().get("/notifications/unread/count");
+        Assert.assertEquals(count.jsonPath().getInt("data"), 0,
+                "Unread count should be 0 right after read-all");
+    }
 }

@@ -38,5 +38,23 @@ public class TC601_RescueTest extends BaseApiTest {
         Assert.assertEquals(r.statusCode(), 403, "Body: " + r.asString());
     }
 
+    @Test(description = "TC601.4 — GET /rescue/{id} returns a single rescue report")
+    public void rescueById_returnsOne() {
+        ExtentReportManager.createTest("TC601.4 GET /rescue/{id}",
+                "Fetch the first rescue id from /rescue/my, then GET it back");
+
+        // Pull an id from the user's own list — seed user already has at least one rescue.
+        Response mine = RestAssured.given(ApiSpecs.asUser()).when().get("/rescue/my");
+        Assert.assertEquals(mine.statusCode(), 200);
+        Integer rescueId = mine.jsonPath().getInt("data[0].id");
+        Assert.assertNotNull(rescueId, "Seed user is expected to have at least one rescue report");
+
+        Response one = RestAssured.given(ApiSpecs.asUser())
+                .pathParam("id", rescueId).when().get("/rescue/{id}");
+
+        Assert.assertEquals(one.statusCode(), 200, "Body: " + one.asString());
+        Assert.assertEquals(one.jsonPath().getInt("data.id"), rescueId.intValue());
+    }
+
     // POST /rescue is multipart/form-data — deferred from this pass to keep the suite simple.
 }

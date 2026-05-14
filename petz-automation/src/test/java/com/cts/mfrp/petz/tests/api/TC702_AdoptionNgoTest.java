@@ -8,6 +8,8 @@ import io.restassured.response.Response;
 import org.testng.Assert;
 import org.testng.annotations.Test;
 
+import java.util.Map;
+
 public class TC702_AdoptionNgoTest extends BaseApiTest {
 
     @Test(description = "TC702.1 — NGO GET /adoption/ngo/animals returns animals owned by NGO")
@@ -36,5 +38,44 @@ public class TC702_AdoptionNgoTest extends BaseApiTest {
 
         Response r = RestAssured.given(ApiSpecs.asUser()).when().get("/adoption/ngo/animals");
         Assert.assertEquals(r.statusCode(), 403, "Body: " + r.asString());
+    }
+
+    @Test(description = "TC702.4 — NGO animal lifecycle: POST → PUT → DELETE")
+    public void ngoAnimalCRUD_lifecycle() {
+        ExtentReportManager.createTest("TC702.4 NGO animal create/update/delete",
+                "NGO lists a new animal, updates it, then removes the listing");
+
+        // 1. Create — backend defaults the optional fields, so a minimal body works
+        Map<String, Object> createBody = Map.of(
+                "name",    "QA Animal " + System.currentTimeMillis(),
+                "species", "Dog",
+                "city",    "Chennai");
+        Response create = RestAssured.given(ApiSpecs.asNgo())
+                .body(createBody).when().post("/adoption/ngo/animals");
+        Assert.assertEquals(create.statusCode(), 200, "Body: " + create.asString());
+        Integer animalId = create.jsonPath().getInt("data.id");
+        Assert.assertNotNull(animalId);
+
+        try {
+            // 2. Update
+            Map<String, Object> updateBody = Map.of(
+                    "name",         "QA Animal Renamed",
+                    "species",      "Dog",
+                    "breed",        "Indie Mix",
+                    "city",         "Chennai",
+                    "isVaccinated", true,
+                    "status",       "AVAILABLE");
+            Response update = RestAssured.given(ApiSpecs.asNgo())
+                    .pathParam("id", animalId).body(updateBody)
+                    .when().put("/adoption/ngo/animals/{id}");
+            Assert.assertEquals(update.statusCode(), 200, "Body: " + update.asString());
+            Assert.assertEquals(update.jsonPath().getString("data.name"), "QA Animal Renamed");
+            Assert.assertTrue(update.jsonPath().getBoolean("data.isVaccinated"));
+        } finally {
+            // 3. Delete (cleanup)
+            RestAssured.given(ApiSpecs.asNgo())
+                    .pathParam("id", animalId)
+                    .when().delete("/adoption/ngo/animals/{id}");
+        }
     }
 }
