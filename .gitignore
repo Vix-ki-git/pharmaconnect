@@ -31,6 +31,7 @@ pc/upload-dir/
 # Ignore the general uploads folder at the root
 uploads/
 docs/
+test-output/screenshots
 user_stories.md
 github_codespaces.md
 # Local-only dev notes
