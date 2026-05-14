@@ -30,10 +30,13 @@ out/
 pc/upload-dir/
 # Ignore the general uploads folder at the root
 uploads/
-
+docs/
+test-output/screenshots
+test-output/reports
 user_stories.md
 github_codespaces.md
 # Local-only dev notes
 issues_to_be_resolved.md
 STUDY_GUIDE.md
 api_documentation.md
+petz-automation/.claude
