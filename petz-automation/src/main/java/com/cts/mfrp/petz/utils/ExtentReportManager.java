@@ -21,7 +21,7 @@ public class ExtentReportManager {
         ExtentSparkReporter spark = new ExtentSparkReporter(REPORT_PATH);
         spark.config().setTheme(Theme.DARK);
         spark.config().setDocumentTitle("PETZ Automation Report");
-        spark.config().setReportName("TC001 - TC005 Landing Page Tests");
+        spark.config().setReportName("PETZ Automation Report - TC001 to TC016");
 
         extent = new ExtentReports();
         extent.attachReporter(spark);

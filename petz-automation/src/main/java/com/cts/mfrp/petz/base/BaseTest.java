@@ -27,14 +27,23 @@ public class BaseTest {
 
     @AfterMethod
     public void tearDown(ITestResult result) {
+        // If @BeforeMethod failed, createTest() was never called — create a fallback entry
+        if (ExtentReportManager.getTest() == null) {
+            ExtentReportManager.createTest(
+                    result.getName(),
+                    "Auto-created — test setup failed before report was initialized");
+        }
+
         if (result.getStatus() == ITestResult.FAILURE) {
-            String screenshotPath = ScreenshotUtil
-                    .takeScreenshot(driver, result.getName());
-            try {
-                ExtentReportManager.getTest()
-                        .addScreenCaptureFromPath(screenshotPath);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (driver != null) {
+                String screenshotPath = ScreenshotUtil
+                        .takeScreenshot(driver, result.getName());
+                try {
+                    ExtentReportManager.getTest()
+                            .addScreenCaptureFromPath(screenshotPath);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
             ExtentReportManager.getTest().fail(result.getThrowable());
         } else if (result.getStatus() == ITestResult.SUCCESS) {
