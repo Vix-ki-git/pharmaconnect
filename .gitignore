@@ -32,6 +32,7 @@ pc/upload-dir/
 uploads/
 docs/
 test-output/screenshots
+test-output/reports
 user_stories.md
 github_codespaces.md
 # Local-only dev notes
