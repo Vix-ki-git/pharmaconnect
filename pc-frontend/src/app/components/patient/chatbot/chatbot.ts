@@ -2,7 +2,8 @@ import { Component, ElementRef, ViewChild, ViewChildren, QueryList, AfterViewChe
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink, Router } from '@angular/router';
-import { marked } from 'marked';
+import {
+  marked } from 'marked';
 import { AuthService } from '../../../services/auth.service';
 import { ChatbotService } from '../../../services/chatbot.service';
 
