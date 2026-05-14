@@ -12,4 +12,25 @@
         </classes>
     </test>
 
+    <test name="TC006 to TC012 - Authentication Login Tests">
+        <classes>
+            <class name="com.cts.mfrp.petz.tests.TC006_LoginRenderTest"/>
+            <class name="com.cts.mfrp.petz.tests.TC007_LoginButtonDisabledEmptyTest"/>
+            <class name="com.cts.mfrp.petz.tests.TC008_LoginInvalidEmailTest"/>
+            <class name="com.cts.mfrp.petz.tests.TC009_LoginPasswordEyeToggleTest"/>
+            <class name="com.cts.mfrp.petz.tests.TC010_LoginWrongCredentialsTest"/>
+            <class name="com.cts.mfrp.petz.tests.TC011_LoginSuccessRoutesTest"/>
+            <class name="com.cts.mfrp.petz.tests.TC012_LoginCreateOneLinkTest"/>
+        </classes>
+    </test>
+
+    <test name="TC013 to TC016 - Authentication Register Tests">
+        <classes>
+            <class name="com.cts.mfrp.petz.tests.TC013_RegisterRenderTest"/>
+            <class name="com.cts.mfrp.petz.tests.TC014_RegisterAccountTypeOptionsTest"/>
+            <class name="com.cts.mfrp.petz.tests.TC015_RegisterButtonDisabledRulesTest"/>
+            <class name="com.cts.mfrp.petz.tests.TC016_RegisterPetOwnerSuccessTest"/>
+        </classes>
+    </test>
+
 </suite>

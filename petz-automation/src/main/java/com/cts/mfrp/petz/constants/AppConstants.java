@@ -16,5 +16,18 @@ public class AppConstants {
     public static final String REPORT_PATH     = "test-output/reports/ExtentReport.html";
     public static final String SCREENSHOT_PATH = "test-output/screenshots/";
 
+    // TC011 – update these to real registered accounts before running
+    public static final String PET_OWNER_EMAIL    = "petowner@test.com";
+    public static final String PET_OWNER_PASSWORD = "Test@1234";
+    public static final String NGO_EMAIL          = "ngo@test.com";
+    public static final String NGO_PASSWORD       = "Test@1234";
+    public static final String HOSPITAL_EMAIL     = "hospital@test.com";
+    public static final String HOSPITAL_PASSWORD  = "Test@1234";
+
+    // TC016 – static registration data (email is generated at runtime)
+    public static final String REG_FULL_NAME = "Test PetOwner";
+    public static final String REG_PHONE     = "+919876543210";
+    public static final String REG_PASSWORD  = "Strong@123";
+
     private AppConstants() {}
 }
