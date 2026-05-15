@@ -13,6 +13,7 @@ public class AppConstants {
     public static final String ADOPTION_MY_URL     = BASE_URL + "/adoption/my";
     public static final String APPOINTMENTS_URL    = BASE_URL + "/appointments";
     public static final String APPOINTMENTS_BOOK_URL = BASE_URL + "/appointments/book";
+    public static final String NOTIFICATIONS_URL     = BASE_URL + "/notifications";
 
     public static final String PAGE_TITLE   = "Petz \u2013 Animal Welfare Platform";
 

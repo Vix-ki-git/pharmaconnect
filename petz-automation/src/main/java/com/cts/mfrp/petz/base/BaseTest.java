@@ -14,38 +14,40 @@ public class BaseTest {
 
     protected WebDriver driver;
 
-    @BeforeSuite
+    @BeforeSuite(alwaysRun = true)
     public void initReport() {
         ExtentReportManager.initReport();
     }
 
-    @BeforeMethod
+    @BeforeMethod(alwaysRun = true)
     public void setUp() {
         DriverFactory.initDriver();
         driver = DriverFactory.getDriver();
     }
 
-    @AfterMethod
+    @AfterMethod(alwaysRun = true)
     public void tearDown(ITestResult result) {
+        var extentTest = ExtentReportManager.getTest();
         if (result.getStatus() == ITestResult.FAILURE) {
             String screenshotPath = ScreenshotUtil
                     .takeScreenshot(driver, result.getName());
-            try {
-                ExtentReportManager.getTest()
-                        .addScreenCaptureFromPath(screenshotPath);
-            } catch (Exception e) {
-                e.printStackTrace();
+            if (extentTest != null) {
+                try {
+                    extentTest.addScreenCaptureFromPath(screenshotPath);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+                extentTest.fail(result.getThrowable());
             }
-            ExtentReportManager.getTest().fail(result.getThrowable());
         } else if (result.getStatus() == ITestResult.SUCCESS) {
-            ExtentReportManager.getTest().pass("Test passed successfully");
+            if (extentTest != null) extentTest.pass("Test passed successfully");
         } else {
-            ExtentReportManager.getTest().skip("Test skipped");
+            if (extentTest != null) extentTest.skip("Test skipped");
         }
         DriverFactory.quitDriver();
     }
 
-    @AfterSuite
+    @AfterSuite(alwaysRun = true)
     public void flushReport() {
         ExtentReportManager.flushReport();
     }

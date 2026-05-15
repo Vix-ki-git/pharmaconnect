@@ -8,29 +8,40 @@
 <!--        </classes>-->
 <!--    </test>-->
 
+    <test name="Notifications Scenario (TC057 to TC058)">
+        <groups>
+            <run>
+                <include name="notifications"/>
+            </run>
+        </groups>
+        <classes>
+            <class name="com.cts.mfrp.petz.tests.NotificationsTest"/>
+        </classes>
+    </test>
+
 <!--    &lt;!&ndash;-->
 <!--    API tests are temporarily skipped because the backend host-->
 <!--    (petz-production.up.railway.app) is not reachable. Re-enable-->
 <!--    this block once the backend is up.-->
 
-    <test name="TC101+ - API Tests (REST Assured)">
-        <classes>
-            <class name="com.cts.mfrp.petz.tests.api.TC101_AuthLoginTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC102_AuthRegisterTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC201_UserProfileTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC301_PetsTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC401_HospitalsPublicTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC402_HospitalsRoleTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC501_AppointmentsTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC601_RescueTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC701_AdoptionPublicTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC702_AdoptionNgoTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC801_NgoTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC901_NotificationsTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC1001_AdminTest"/>
-            <class name="com.cts.mfrp.petz.tests.api.TC1101_AuthBoundariesTest"/>
-        </classes>
-    </test>
+<!--    <test name="TC101+ - API Tests (REST Assured)">-->
+<!--        <classes>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC101_AuthLoginTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC102_AuthRegisterTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC201_UserProfileTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC301_PetsTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC401_HospitalsPublicTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC402_HospitalsRoleTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC501_AppointmentsTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC601_RescueTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC701_AdoptionPublicTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC702_AdoptionNgoTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC801_NgoTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC901_NotificationsTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC1001_AdminTest"/>-->
+<!--            <class name="com.cts.mfrp.petz.tests.api.TC1101_AuthBoundariesTest"/>-->
+<!--        </classes>-->
+<!--    </test>-->
 
 
 
