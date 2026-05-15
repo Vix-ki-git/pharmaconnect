@@ -35,6 +35,10 @@ export class Register {
       this.errorMessage = 'Please fill in all required fields.';
       return;
     }
+    if (!/^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(this.email.trim())) {
+      this.errorMessage = 'Please enter a valid email address (e.g. john@example.com).';
+      return;
+    }
     if (!/^[0-9]{10}$/.test(this.phone)) {
       this.errorMessage = 'Phone must be exactly 10 digits (e.g. 9876543210).';
       return;

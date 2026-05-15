@@ -9,8 +9,9 @@ public class RegistrationRequest {
     @NotBlank(message = "Full name is required")
     private String name;
 
-    @Email(message = "Please provide a valid email address")
     @NotBlank(message = "Email is required")
+    @Email(regexp = "^[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+           message = "Please provide a valid email address (e.g. john@example.com)")
     private String email;
 
     @Size(min = 8, message = "Password must be at least 8 characters long")
