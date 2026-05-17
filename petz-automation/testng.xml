@@ -8,6 +8,30 @@
         </classes>
     </test>
 
+    <test name="Pet Detail and Apply Scenario (TC032 to TC035)">
+        <classes>
+            <class name="com.cts.mfrp.petz.tests.PetDetailAndApplyTest"/>
+        </classes>
+    </test>
+
+    <test name="My Applications Scenario (TC036 to TC037)">
+        <classes>
+            <class name="com.cts.mfrp.petz.tests.MyApplicationsTest"/>
+        </classes>
+    </test>
+
+    <test name="Book Appointment Scenario (TC038 to TC043)">
+        <classes>
+            <class name="com.cts.mfrp.petz.tests.BookAppointmentTest"/>
+        </classes>
+    </test>
+
+    <test name="My Appointments Scenario (TC045 to TC046)">
+        <classes>
+            <class name="com.cts.mfrp.petz.tests.MyAppointmentsTest"/>
+        </classes>
+    </test>
+
     <!--
     API tests are temporarily skipped because the backend host
     (petz-production.up.railway.app) is not reachable. Re-enable
