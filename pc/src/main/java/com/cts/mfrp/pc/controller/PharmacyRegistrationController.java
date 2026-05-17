@@ -3,6 +3,7 @@ package com.cts.mfrp.pc.controller;
 import com.cts.mfrp.pc.dto.SellerPharmacyRegistrationRequestDto;
 import com.cts.mfrp.pc.model.Pharmacy;
 import com.cts.mfrp.pc.service.PharmacyRegistrationService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,7 +18,7 @@ public class PharmacyRegistrationController {
     }
 
     @PostMapping("/register-pharmacy")
-    public ResponseEntity<?> registerPharmacyAndUpgradeUserRole(@RequestBody SellerPharmacyRegistrationRequestDto registrationRequestDto) {
+    public ResponseEntity<?> registerPharmacyAndUpgradeUserRole(@Valid @RequestBody SellerPharmacyRegistrationRequestDto registrationRequestDto) {
         try {
             Pharmacy successfullyRegisteredPharmacy = pharmacyRegistrationService.registerNewPharmacyForSeller(registrationRequestDto);
             return ResponseEntity.ok(successfullyRegisteredPharmacy);
