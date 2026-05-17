@@ -32,6 +32,12 @@
         </classes>
     </test>
 
+    <test name="Notifications Scenario (TC057 to TC058)">
+        <classes>
+            <class name="com.cts.mfrp.petz.tests.NotificationsTest"/>
+        </classes>
+    </test>
+
     <!--
     API tests are temporarily skipped because the backend host
     (petz-production.up.railway.app) is not reachable. Re-enable

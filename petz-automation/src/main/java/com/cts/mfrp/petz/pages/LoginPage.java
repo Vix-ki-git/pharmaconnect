@@ -60,7 +60,24 @@ public class LoginPage {
         fillEmail(email);
         fillPassword(password);
         clickSignIn();
-        wait.until(ExpectedConditions.urlMatches(".+/(dashboard|ngo|hospital).*"));
+        // Retry once if the first click doesn't trigger the redirect — the deployed
+        // backend on Railway is occasionally slow, and an initial click can race the
+        // form's async validation. A second click after a short pause is reliable.
+        if (!waitForPostLoginRedirect(EXPLICIT_WAIT)) {
+            try { clickSignIn(); } catch (Exception ignored) {}
+            new WebDriverWait(driver, Duration.ofSeconds(PAGE_LOAD_WAIT))
+                    .until(ExpectedConditions.urlMatches(".+/(dashboard|ngo|hospital).*"));
+        }
+    }
+
+    private boolean waitForPostLoginRedirect(int seconds) {
+        try {
+            new WebDriverWait(driver, Duration.ofSeconds(seconds))
+                    .until(ExpectedConditions.urlMatches(".+/(dashboard|ngo|hospital).*"));
+            return true;
+        } catch (Exception e) {
+            return false;
+        }
     }
 
     // ── TC007 / TC008: progressive enable ──
