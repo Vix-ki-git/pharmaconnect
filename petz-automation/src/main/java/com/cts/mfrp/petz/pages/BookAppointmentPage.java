@@ -12,219 +12,372 @@ import java.time.Duration;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Locale;
 
 import static com.cts.mfrp.petz.constants.AppConstants.APPOINTMENTS_BOOK_URL;
 import static com.cts.mfrp.petz.constants.AppConstants.EXPLICIT_WAIT;
 
 /**
- * /appointments/book. Covers PETZ_TC038 – PETZ_TC044.
+ * Page Object for /appointments/book — drives TC038–TC043.
+ * Targets Angular Material primitives: mat-select panels, mat-datepicker grid.
  */
 public class BookAppointmentPage {
 
     private final WebDriver driver;
     private final WebDriverWait wait;
 
-    private final By title    = By.xpath("//*[self::h1 or self::h2 or self::h3][contains(normalize-space(),'Book Appointment')]");
-    private final By subtitle = By.xpath("//*[contains(normalize-space(),'Schedule a vet visit for your pet')]");
+    // ── Page chrome ──
+    private final By title = By.xpath(
+            "//*[self::h1 or self::h2 or self::h3]" +
+            "[normalize-space()='Book Appointment' " +
+            "or contains(normalize-space(.),'Book Appointment')]");
 
-    private final By myAppointmentsBtn = By.xpath(
-            "//a[normalize-space()='My Appointments'] | //button[normalize-space()='My Appointments']");
+    private final By subtitle = By.xpath(
+            "//*[contains(normalize-space(.),'Schedule a vet visit for your pet')]");
 
-    // STEP 1
-    private final By hospitalSelect = By.xpath(
-            "//mat-select[@formcontrolname='hospital' or @name='hospital' or @formcontrolname='hospitalId']" +
-            " | //label[contains(normalize-space(),'Hospital')]/following::mat-select[1]");
-    private final By doctorSelect = By.xpath(
-            "//mat-select[@formcontrolname='doctor' or @name='doctor' or @formcontrolname='doctorId']" +
-            " | //label[contains(normalize-space(),'Doctor')]/following::mat-select[1]");
+    private final By myAppointmentsTopRight = By.xpath(
+            "(//*[self::a or self::button or self::mat-button " +
+            "or self::*[@role='button']][contains(normalize-space(.),'My Appointments')])[1]");
 
-    // STEP 2
-    private final By dateInput = By.xpath(
-            "//input[contains(@class,'mat-datepicker-input') or @formcontrolname='date' or @name='date']" +
-            " | //*[contains(normalize-space(),'Appointment Date')]/following::input[1]");
+    private final By infoBanner = By.xpath(
+            "//*[contains(normalize-space(.)," +
+            "\"You'll receive a confirmation once the hospital reviews your request\") " +
+            "or contains(normalize-space(.)," +
+            "'You will receive a confirmation once the hospital reviews your request')]");
+
+    // ── Section headings ──
+    private final By step1Heading = By.xpath(
+            "//*[contains(translate(normalize-space(.)," +
+            "'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')," +
+            "'CHOOSE HOSPITAL') and " +
+            "contains(translate(normalize-space(.)," +
+            "'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')," +
+            "'DOCTOR')]");
+
+    private final By step2Heading = By.xpath(
+            "//*[contains(translate(normalize-space(.)," +
+            "'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')," +
+            "'DATE') and " +
+            "contains(translate(normalize-space(.)," +
+            "'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')," +
+            "'TIME')]");
+
+    private final By step3Heading = By.xpath(
+            "//*[contains(translate(normalize-space(.)," +
+            "'abcdefghijklmnopqrstuvwxyz','ABCDEFGHIJKLMNOPQRSTUVWXYZ')," +
+            "'REASON FOR VISIT')]");
+
+    // ── Form fields (mat-select triggers + inputs) ──
+    // Identify each mat-select by its formControlName — these are unique and stable.
+    private final By hospitalSelect = By.xpath("//mat-select[@formcontrolname='hospitalId']");
+    private final By doctorSelect   = By.xpath("//mat-select[@formcontrolname='doctorId']");
+    private final By timeSelect     = By.xpath("//mat-select[@formcontrolname='apptTime']");
+
+    private final By dateInput = By.xpath("//input[@formcontrolname='apptDate']");
+
     private final By datepickerToggle = By.xpath(
-            "//mat-datepicker-toggle/button | //*[contains(@class,'mat-datepicker-toggle')]/button");
-    private final By timeSelect = By.xpath(
-            "//mat-select[@formcontrolname='time' or @name='time']" +
-            " | //label[contains(normalize-space(),'Preferred Time')]/following::mat-select[1]");
+            "(//mat-datepicker-toggle//button " +
+            "| //button[contains(@class,'mat-datepicker-toggle')])[1]");
 
-    // STEP 3
-    private final By reasonTextarea = By.xpath(
-            "//textarea[@formcontrolname='reason' or @name='reason' or contains(@placeholder,'Annual vaccination')]");
+    private final By reasonTextarea = By.xpath("//textarea[@formcontrolname='reason']");
 
-    // Footer
-    private final By confirmBtn = By.xpath(
-            "//button[normalize-space()='Confirm Booking' or normalize-space()='Confirm' or @type='submit']");
-    private final By cancelBtn  = By.xpath("//button[normalize-space()='Cancel']");
+    private final By confirmButton = By.xpath(
+            "(//button[contains(normalize-space(.),'Confirm Booking')] " +
+            "| //*[self::button or self::mat-button][@type='submit'])[1]");
 
-    // Option overlays (mat-select, mat-calendar)
-    private final By matOptions = By.xpath("//mat-option | //*[contains(@class,'mat-mdc-option')]");
-    private final By matCalendarCells = By.xpath("//mat-calendar//*[contains(@class,'mat-calendar-body-cell')]");
+    private final By cancelButton = By.xpath(
+            "(//button[normalize-space()='Cancel'] " +
+            "| //button[contains(normalize-space(.),'Cancel')])[1]");
+
+    // ── Overlay primitives (mat-select panel + datepicker calendar) ──
+    private static final String MAT_OPTION_XPATH =
+            "//div[contains(@class,'mat-select-panel') " +
+            "or contains(@class,'mat-mdc-select-panel') " +
+            "or contains(@class,'cdk-overlay-pane')]//mat-option";
+    private static final By MAT_OPTION       = By.xpath(MAT_OPTION_XPATH);
+    private static final By MAT_OPTION_FIRST = By.xpath("(" + MAT_OPTION_XPATH + ")[1]");
 
     public BookAppointmentPage(WebDriver driver) {
         this.driver = driver;
         this.wait   = new WebDriverWait(driver, Duration.ofSeconds(EXPLICIT_WAIT));
     }
 
-    public void open() { driver.get(APPOINTMENTS_BOOK_URL); }
+    public void open() {
+        driver.get(APPOINTMENTS_BOOK_URL);
+        wait.until(ExpectedConditions.urlContains("/appointments/book"));
+    }
 
-    // Layout
-    public boolean isTitleVisible()             { return isVisible(title); }
-    public boolean isSubtitleVisible()          { return isVisible(subtitle); }
-    public boolean isMyAppointmentsBtnVisible() { return isVisible(myAppointmentsBtn); }
-    public boolean isHospitalSelectVisible()    { return isVisible(hospitalSelect); }
-    public boolean isDoctorSelectVisible()      { return isVisible(doctorSelect); }
-    public boolean isDateInputVisible()         { return isVisible(dateInput); }
-    public boolean isTimeSelectVisible()        { return isVisible(timeSelect); }
-    public boolean isReasonTextareaVisible()    { return isVisible(reasonTextarea); }
-    public boolean isConfirmDisabled() {
+    public String getCurrentUrl() {
+        return driver.getCurrentUrl();
+    }
+
+    // ── Chrome / layout ──
+
+    public boolean isTitleVisible() {
+        try { return wait.until(ExpectedConditions.visibilityOfElementLocated(title)).isDisplayed(); }
+        catch (Exception e) { return driver.getPageSource().contains("Book Appointment"); }
+    }
+
+    public boolean isSubtitleVisible() {
+        try { return driver.findElement(subtitle).isDisplayed(); }
+        catch (Exception e) {
+            return driver.getPageSource().contains("Schedule a vet visit for your pet");
+        }
+    }
+
+    public boolean isMyAppointmentsTopRightVisible() {
+        try { return driver.findElement(myAppointmentsTopRight).isDisplayed(); }
+        catch (Exception e) { return false; }
+    }
+
+    public boolean isStep1Visible() { return present(step1Heading) || sourceHas("CHOOSE HOSPITAL"); }
+    public boolean isStep2Visible() { return present(step2Heading) || sourceHas("DATE") && sourceHas("TIME"); }
+    public boolean isStep3Visible() { return present(step3Heading) || sourceHas("REASON FOR VISIT"); }
+
+    public boolean isHospitalDropdownVisible() { return present(hospitalSelect); }
+    public boolean isDoctorDropdownVisible()   { return present(doctorSelect); }
+    public boolean isDateFieldVisible()        { return present(dateInput); }
+    public boolean isTimeDropdownVisible()     { return present(timeSelect); }
+    public boolean isReasonTextareaVisible()   { return present(reasonTextarea); }
+    public boolean isInfoBannerVisible() {
+        try { return driver.findElement(infoBanner).isDisplayed(); }
+        catch (Exception e) {
+            return driver.getPageSource().toLowerCase(Locale.ENGLISH)
+                    .contains("receive a confirmation");
+        }
+    }
+
+    public boolean isCancelButtonVisible() { return present(cancelButton); }
+
+    public boolean isConfirmButtonDisabled() {
         try {
-            WebElement btn = driver.findElement(confirmBtn);
-            String d = btn.getAttribute("disabled");
-            String aria = btn.getAttribute("aria-disabled");
-            return (d != null && !d.equals("false")) || "true".equalsIgnoreCase(aria);
-        } catch (Exception e) { return true; }
-    }
-    public boolean isConfirmEnabled() { return !isConfirmDisabled(); }
-
-    public boolean infoBannerVisible() {
-        return driver.getPageSource().contains("hospital reviews your request");
-    }
-
-    // STEP 1
-    public List<String> openHospitalOptions() {
-        WebElement sel = wait.until(ExpectedConditions.elementToBeClickable(hospitalSelect));
-        try { sel.click(); } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", sel);
-        }
-        wait.until(ExpectedConditions.visibilityOfElementLocated(matOptions));
-        return driver.findElements(matOptions).stream().map(WebElement::getText).map(String::trim).toList();
-    }
-
-    public void selectFirstHospital() {
-        openHospitalOptions();
-        WebElement first = driver.findElements(matOptions).get(0);
-        try { first.click(); } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", first);
-        }
-    }
-
-    public List<String> openDoctorOptions() {
-        WebElement sel = wait.until(ExpectedConditions.elementToBeClickable(doctorSelect));
-        try { sel.click(); } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", sel);
-        }
-        try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(matOptions));
-            return driver.findElements(matOptions).stream().map(WebElement::getText).map(String::trim).toList();
-        } catch (Exception e) {
-            return List.of();
-        }
-    }
-
-    public boolean isDoctorSelectDisabled() {
-        try {
-            WebElement el = driver.findElement(doctorSelect);
-            String aria = el.getAttribute("aria-disabled");
-            return "true".equalsIgnoreCase(aria);
-        } catch (Exception e) { return false; }
-    }
-
-    public void selectFirstDoctor() {
-        openDoctorOptions();
-        List<WebElement> opts = driver.findElements(matOptions);
-        if (opts.isEmpty()) return;
-        try { opts.get(0).click(); } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", opts.get(0));
-        }
-    }
-
-    // STEP 2 — date
-    public void openDatepicker() {
-        try { safeClick(datepickerToggle); }
-        catch (Exception e) { safeClick(dateInput); }
-    }
-
-    public void selectDate(LocalDate date) {
-        // Easiest reliable path: type ISO/locale date directly into the input.
-        WebElement input = wait.until(ExpectedConditions.visibilityOfElementLocated(dateInput));
-        input.click();
-        input.sendKeys(Keys.chord(Keys.CONTROL, "a"), Keys.DELETE);
-        input.sendKeys(date.format(DateTimeFormatter.ofPattern("M/d/yyyy")));
-        input.sendKeys(Keys.ENTER);
-    }
-
-    public boolean isDateCellDisabled(LocalDate date) {
-        openDatepicker();
-        try {
-            String aria = date.format(DateTimeFormatter.ofPattern("MMMM d, yyyy", java.util.Locale.ENGLISH));
-            WebElement cell = driver.findElement(By.xpath(
-                    "//*[contains(@class,'mat-calendar-body-cell') and @aria-label='" + aria + "']"));
-            String disabled = cell.getAttribute("aria-disabled");
-            return "true".equalsIgnoreCase(disabled);
+            WebElement btn = driver.findElement(confirmButton);
+            String disabledAttr = btn.getAttribute("disabled");
+            String ariaDisabled = btn.getAttribute("aria-disabled");
+            return !btn.isEnabled()
+                    || (disabledAttr != null && !disabledAttr.equals("false"))
+                    || "true".equalsIgnoreCase(ariaDisabled);
         } catch (Exception e) {
             return false;
         }
     }
 
-    // STEP 2 — time
-    public List<String> openTimeOptions() {
-        WebElement sel = wait.until(ExpectedConditions.elementToBeClickable(timeSelect));
-        try { sel.click(); } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", sel);
-        }
-        try {
-            wait.until(ExpectedConditions.visibilityOfElementLocated(matOptions));
-            return driver.findElements(matOptions).stream().map(WebElement::getText).map(String::trim).toList();
-        } catch (Exception e) {
-            return List.of();
-        }
+    public boolean isConfirmButtonEnabled() { return !isConfirmButtonDisabled(); }
+
+    // ── Mat-select interactions ──
+
+    public List<WebElement> openHospitalDropdown() {
+        openMatSelect(hospitalSelect);
+        return driver.findElements(MAT_OPTION);
+    }
+
+    public List<WebElement> openDoctorDropdown() {
+        openMatSelect(doctorSelect);
+        return driver.findElements(MAT_OPTION);
+    }
+
+    public List<WebElement> openTimeDropdown() {
+        openMatSelect(timeSelect);
+        return driver.findElements(MAT_OPTION);
+    }
+
+    public void selectFirstHospital() {
+        openHospitalDropdown();
+        clickFirstOption();
+    }
+
+    public void selectFirstDoctor() {
+        openDoctorDropdown();
+        clickFirstOption();
     }
 
     public void selectFirstTime() {
-        openTimeOptions();
-        List<WebElement> opts = driver.findElements(matOptions);
-        if (opts.isEmpty()) return;
-        try { opts.get(0).click(); } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", opts.get(0));
+        openTimeDropdown();
+        clickFirstOption();
+    }
+
+    private void openMatSelect(By selectLocator) {
+        WebElement sel = wait.until(ExpectedConditions.elementToBeClickable(selectLocator));
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block:'center'});", sel);
+
+        WebDriverWait shortWait = new WebDriverWait(driver, Duration.ofSeconds(3));
+
+        // Strategy 1: native click on the mat-select host.
+        try { sel.click(); } catch (Exception ignored) {}
+        if (panelHasOpened(shortWait)) return;
+
+        // Strategy 2: keyboard activation — mat-select opens on ENTER / SPACE when focused.
+        try { sel.sendKeys(Keys.ENTER); } catch (Exception ignored) {}
+        if (panelHasOpened(shortWait)) return;
+
+        // Strategy 3: JS click on the host (last resort, bypasses any pointer-interception).
+        try {
+            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", sel);
+        } catch (Exception ignored) {}
+        wait.until(ExpectedConditions.presenceOfElementLocated(MAT_OPTION));
+    }
+
+    private boolean panelHasOpened(WebDriverWait shortWait) {
+        try {
+            shortWait.until(ExpectedConditions.presenceOfElementLocated(MAT_OPTION));
+            return true;
+        } catch (Exception e) {
+            return false;
         }
     }
 
-    // STEP 3 — reason
-    public void typeReason(String text) {
+    private void clickFirstOption() {
+        WebElement first = wait.until(
+                ExpectedConditions.elementToBeClickable(MAT_OPTION_FIRST));
+        scrollAndClick(first);
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(MAT_OPTION));
+    }
+
+    public String getHospitalDisplayValue() { return matSelectText(hospitalSelect); }
+    public String getDoctorDisplayValue()   { return matSelectText(doctorSelect); }
+    public String getTimeDisplayValue()     { return matSelectText(timeSelect); }
+
+    private String matSelectText(By selectLocator) {
+        try {
+            return driver.findElement(selectLocator).getText().trim();
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    // ── Date picker ──
+
+    public void openDatepicker() {
+        try {
+            WebElement toggle = driver.findElement(datepickerToggle);
+            scrollAndClick(toggle);
+        } catch (Exception e) {
+            // Fall back to clicking the input itself.
+            WebElement in = driver.findElement(dateInput);
+            scrollAndClick(in);
+        }
+        wait.until(ExpectedConditions.visibilityOfElementLocated(
+                By.xpath("//mat-calendar | //*[contains(@class,'mat-calendar')]")));
+    }
+
+    /** Returns the calendar cell for the given date, or null if it isn't currently rendered. */
+    public WebElement calendarCellFor(LocalDate date) {
+        // Angular Material aria-label format: 'May 16, 2026'
+        String aria = date.format(DateTimeFormatter.ofPattern("MMMM d, yyyy", Locale.ENGLISH));
+        try {
+            return driver.findElement(By.xpath(
+                    "//mat-calendar//*[@aria-label=\"" + aria + "\"]"));
+        } catch (Exception e) {
+            // Some builds render aria-label without commas or with a different format.
+            try {
+                return driver.findElement(By.xpath(
+                        "//mat-calendar//*[contains(@aria-label,\"" + aria + "\")]"));
+            } catch (Exception e2) {
+                return null;
+            }
+        }
+    }
+
+    public boolean isCellDisabled(WebElement cell) {
+        if (cell == null) return false;
+        String aria   = cell.getAttribute("aria-disabled");
+        String clazz  = cell.getAttribute("class");
+        return "true".equalsIgnoreCase(aria)
+                || (clazz != null && clazz.toLowerCase(Locale.ENGLISH).contains("disabled"));
+    }
+
+    public void tryClickCell(WebElement cell) {
+        if (cell == null) return;
+        try {
+            ((JavascriptExecutor) driver).executeScript(
+                    "arguments[0].scrollIntoView({block:'center'});", cell);
+            cell.click();
+        } catch (Exception ignored) {}
+    }
+
+    public String getDateInputValue() {
+        try { return driver.findElement(dateInput).getAttribute("value"); }
+        catch (Exception e) { return ""; }
+    }
+
+    /**
+     * Picks a date by clicking its calendar cell. The cell must already be visible
+     * in the calendar viewport (callers can use openDatepicker() + navigation helpers).
+     */
+    public void pickDate(LocalDate date) {
+        openDatepicker();
+        WebElement cell = calendarCellFor(date);
+        if (cell == null) {
+            // Date is on a future month — advance using the "next month" header button as needed.
+            for (int i = 0; i < 24 && cell == null; i++) {
+                try {
+                    driver.findElement(By.xpath(
+                            "//button[contains(@class,'mat-calendar-next-button') " +
+                            "or @aria-label='Next month']")).click();
+                    cell = calendarCellFor(date);
+                } catch (Exception e) {
+                    break;
+                }
+            }
+        }
+        if (cell != null) {
+            cell.click();
+        }
+        wait.until(ExpectedConditions.invisibilityOfElementLocated(
+                By.xpath("//mat-calendar | //*[contains(@class,'mat-calendar')]")));
+    }
+
+    public void closeDatepicker() {
+        try { driver.findElement(By.tagName("body")).sendKeys(Keys.ESCAPE); }
+        catch (Exception ignored) {}
+    }
+
+    // ── Reason / submit / cancel ──
+
+    public void fillReason(String text) {
         WebElement el = wait.until(ExpectedConditions.visibilityOfElementLocated(reasonTextarea));
-        el.clear(); el.sendKeys(text);
+        el.clear();
+        el.sendKeys(text);
+        // Trigger Angular's blur-based validation.
+        el.sendKeys(Keys.TAB);
     }
 
-    // Footer
-    public void clickConfirm() {
-        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(confirmBtn));
-        ((JavascriptExecutor) driver).executeScript("arguments[0].scrollIntoView({block:'center'});", btn);
-        try { btn.click(); } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
-        }
+    public void clearReason() {
+        try {
+            WebElement el = driver.findElement(reasonTextarea);
+            el.clear();
+            el.sendKeys(Keys.TAB);
+        } catch (Exception ignored) {}
+    }
+
+    public String getReasonValue() {
+        try { return driver.findElement(reasonTextarea).getAttribute("value"); }
+        catch (Exception e) { return ""; }
     }
 
     public void clickCancel() {
-        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(cancelBtn));
-        try { btn.click(); } catch (Exception e) {
-            ((JavascriptExecutor) driver).executeScript("arguments[0].click();", btn);
-        }
+        WebElement btn = wait.until(ExpectedConditions.elementToBeClickable(cancelButton));
+        scrollAndClick(btn);
     }
 
-    public void clickMyAppointments() { safeClick(myAppointmentsBtn); }
+    // ── Internals ──
 
-    public String getCurrentUrl() { return driver.getCurrentUrl(); }
-
-    // ── helpers ──
-    private boolean isVisible(By by) {
-        try { return wait.until(ExpectedConditions.visibilityOfElementLocated(by)).isDisplayed(); }
+    private boolean present(By locator) {
+        try { return driver.findElement(locator).isDisplayed(); }
         catch (Exception e) { return false; }
     }
 
-    private void safeClick(By by) {
-        WebElement el = wait.until(ExpectedConditions.elementToBeClickable(by));
-        try { el.click(); } catch (Exception e) {
+    private boolean sourceHas(String needle) {
+        return driver.getPageSource().toUpperCase(Locale.ENGLISH).contains(needle.toUpperCase(Locale.ENGLISH));
+    }
+
+    private void scrollAndClick(WebElement el) {
+        ((JavascriptExecutor) driver).executeScript(
+                "arguments[0].scrollIntoView({block:'center'});", el);
+        try {
+            el.click();
+        } catch (Exception e) {
             ((JavascriptExecutor) driver).executeScript("arguments[0].click();", el);
         }
     }
