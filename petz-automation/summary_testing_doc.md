@@ -51,7 +51,7 @@ A UI test-automation suite for the **PETZ** web app (an Angular animal-welfare p
                   │  tests/      4 journeys     │   │  features/   4 .feature    │
                   │  base/       BaseTest       │   │  cucumber/   runner        │
                   │  listeners/  TestListener   │   │              hooks         │
-                  │  bootstrap/  TestDataBootstrap   │              steps        │
+                  │                             │   │              steps         │
                   │                             │   │                            │
                   │  testng.xml  →  mvn test    │   │  testng-cucumber.xml       │
                   │                             │   │       →  mvn verify -Pcucumber
@@ -94,7 +94,6 @@ petz-automation/
 ├── src/test/java/com/cts/mfrp/petz/
 │   ├── base/BaseTest.java                ← TestNG lifecycle: @BeforeClass driver+login, @AfterClass quit
 │   ├── listeners/TestListener.java       ← TestNG→Extent bridge + per-test screenshot
-│   ├── bootstrap/TestDataBootstrap.java  ← regenerates register-data.xlsx (run once)
 │   ├── tests/                            ← TestNG suite (4 classes, 15 TCs)
 │   │   ├── PublicJourneyTest.java        (TC01–TC02)
 │   │   ├── PetOwnerJourneyTest.java      (TC03–TC09)
@@ -177,7 +176,6 @@ The default config file (baseUrl, browser, headless, timeouts, seed creds). Over
 
 - **`BaseTest`** — Superclass of the 4 journey classes. `@BeforeClass`: `DriverFactory.initDriver()` then, if `role() != null`, auto-login via `LoginPage.loginAs(role)`. `@AfterClass`: quit. **One browser + one login shared across all TCs in a class** — that's how each role logs in exactly once.
 - **`TestListener`** (`ITestListener`, registered in `testng.xml`) — Bridges TestNG → ExtentReports. On suite start inits the report; per test creates an `ExtentTest`, tags it with the **journey class as a category**, logs the data row; on pass/fail captures a screenshot, **embeds it as base64**, and writes a standalone `.png`; on finish flushes the report.
-- **`TestDataBootstrap`** — `main()` that regenerates `register-data.xlsx`. Run once (or after editing). Anchored via the `petz.basedir` system property set by the exec plugin.
 - **The 4 journey classes** — `PublicJourneyTest` (anonymous), `PetOwnerJourneyTest`, `NGOJourneyTest`, `HospitalJourneyTest`. Each `@Test` is `TCxx_…` ordered by `priority`; data-driven ones use a `@DataProvider` that reads the matching xml/xlsx fixture.
 
 ### 5.7 Cucumber suite › `src/test`
@@ -191,7 +189,7 @@ The default config file (baseUrl, browser, headless, timeouts, seed creds). Over
 
 ### 5.8 Root config files
 
-- **`pom.xml`** — Dependencies; surefire runs `${suiteXmlFile}` (default `testng.xml`); exec plugin for the bootstrap; **`cucumber` profile** that flips `${suiteXmlFile}` → `testng-cucumber.xml` and adds the dashboard plugin (bound to `verify`).
+- **`pom.xml`** — Dependencies; surefire runs `${suiteXmlFile}` (default `testng.xml`); **`cucumber` profile** that flips `${suiteXmlFile}` → `testng-cucumber.xml` and adds the dashboard plugin (bound to `verify`).
 - **`testng.xml`** — The TestNG suite: 4 classes in fixed order, `preserve-order="true"`, `TestListener` registered.
 - **`testng-cucumber.xml`** — The Cucumber suite: just `RunCucumberTest` (no listener — Cucumber plugins produce the report).
 
@@ -268,8 +266,7 @@ mvn test '"-Dheadless=true"'
 
 ### First-time setup
 ```powershell
-mvn clean test-compile                                                            # 1. compile
-mvn exec:java '"-Dexec.mainClass=com.cts.mfrp.petz.bootstrap.TestDataBootstrap"'  # 2. generate register-data.xlsx (one-shot)
+mvn clean test-compile   # compile (test data is committed under src/test/resources/testdata/)
 ```
 
 ### TestNG suite (default)
@@ -346,7 +343,7 @@ If approved:
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| `Excel file not found: testdata/register-data.xlsx` | xlsx never generated | Run the `TestDataBootstrap` command (§9) |
+| `Excel file not found: testdata/register-data.xlsx` | file missing/deleted | Restore from git: `git checkout -- src/test/resources/testdata/register-data.xlsx` |
 | Screenshots blank/broken in a report | path-based embed regression | Ensure base64 embedding (§11) |
 | Cucumber report has no dashboard | ran `mvn test -Pcucumber` | Use `mvn verify -Pcucumber` |
 | Login times out at 15 s | someone shortened the login wait | Keep `loginWait=30` / `submitAndWait`'s 30 s |
