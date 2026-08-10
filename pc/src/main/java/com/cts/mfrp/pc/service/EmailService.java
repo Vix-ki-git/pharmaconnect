@@ -22,7 +22,7 @@ public class EmailService {
         ApiKeyAuth apiKeyAuth = (ApiKeyAuth) defaultClient.getAuthentication("api-key");
 
         if (apiKey == null || apiKey.isEmpty()) {
-            System.err.println("❌ ERROR: Brevo API Key is missing in properties!");
+            System.err.println("ERROR: Brevo API Key is missing in properties!");
             return;
         }
         apiKeyAuth.setApiKey(apiKey);
